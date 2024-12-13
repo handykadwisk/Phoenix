@@ -16,9 +16,15 @@ import axios from "axios";
 import dateFormat from "dateformat";
 import Input from "@/Components/Input";
 import Swal from "sweetalert2";
+import { ArrowDownTrayIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { BeatLoader } from "react-spinners";
 
 export default function Index({ auth }: PageProps) {
     const { timeOffTipes }: any = usePage().props;
+
+    const [isLoading, setIsLoading] = useState<any>({
+        get_all: false,
+    });
     
     const employee:any = auth.user.employee;
 
@@ -156,21 +162,26 @@ export default function Index({ auth }: PageProps) {
             if (type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_MONTH != null) {
                 items["detail"] = [];
             }
+            console.log('type: ',type)
 
             if (
                 type.TIME_OFF_TYPE_ID == 2
             ) {
                 items["detail"] = [];
                 setRowDate(type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY);
+            } else {
+                setFieldTotalTimeOff(0);
             }
             
             setSelectedType(getSelectedType(value) ? getSelectedType(value): {});
         }
-        setFieldTotalTimeOff(0);
+        
         
         items[name] = value;
         setDataRequestTimeOff(items);
     };
+
+    console.log('fieldTotalTimeOff: ', fieldTotalTimeOff)
     
     
     const addRowDailyOff = (e: FormEvent) => {
@@ -287,12 +298,15 @@ export default function Index({ auth }: PageProps) {
     // Edit time Off
 
     const [editRequestTimeOff, setEditRequestTimeOff] = useState<any>({});
-   const handleEditModal = async (data: any) => {
-       await axios
-           .get(`/getRequestTimeOffById/${data.REQUEST_TIME_OFF_MASTER_ID}`)
-           .then((res) => setEditRequestTimeOff(res.data))
-           .catch((err) => console.log(err));
+    const getDataTimeOff = (id: any) => {
+        axios
+            .get(`/getRequestTimeOffById/${id}`)
+            .then((res) => setEditRequestTimeOff(res.data))
+            .catch((err) => console.log(err));
+    }
+   const handleEditModal = (data: any) => {
        
+       getDataTimeOff(data.REQUEST_TIME_OFF_MASTER_ID);
        setSelectedTypeForEdit(
            getSelectedType(data.TIME_OFF_TYPE_ID) ? getSelectedType(data.TIME_OFF_TYPE_ID) : {}
        );
@@ -359,13 +373,15 @@ console.log('tems: ', items)
              if (type.TIME_OFF_TYPE_ID == 2) {
                  items["request_time_off"] = [];
                  setRowDateForEdit(type.TIME_OFF_TYPE_NOT_REDUCE_LEAVE_BY_DAY);
+             } else {
+                 setFieldTotalTimeOff(0);
              }
 
             setSelectedTypeForEdit(
                 getSelectedType(value) ? getSelectedType(value) : {}
             );
         }
-        setFieldTotalTimeOff(0);
+        
         
         items[name] = value;
         setEditRequestTimeOff(items);
@@ -386,6 +402,8 @@ console.log('tems: ', items)
     // End Edit Time Off
 
 
+    console.log("editRequestTimeOff: ", editRequestTimeOff);
+    
     // set for 3 month
     const setForThreeMonth = (value: any) => {
         const start = new Date(value.toLocaleDateString("en-CA"));
@@ -432,6 +450,10 @@ console.log('tems: ', items)
             confirmButtonText: "Yes, Sure!",
         }).then(async (result) => {
             if (result.isConfirmed) {
+                setIsLoading({
+                    ...isLoading,
+                    get_all: true,
+                });
                 setModal({
                     modalRequestTimeOff: false,
                     modalEditRequestTimeOff: false,
@@ -450,7 +472,15 @@ console.log('tems: ', items)
                                 "Canceled!",
                                 "Request Time Off has been canceled.",
                                 "success"
-                            );
+                            ).then((result) => {
+                                if (result.isConfirmed) {
+                                    setIsLoading({
+                                        ...isLoading,
+                                        get_all: false,
+                                    });
+                                }
+                            });
+                            
                         } else {
                             Swal.fire(
                                 "Failed!",
@@ -467,6 +497,7 @@ console.log('tems: ', items)
                     } else {
                         throw new Error("Unexpected response status");
                     }
+                    
                 } catch (error) {
                     console.error(error);
                     Swal.fire(
@@ -477,6 +508,64 @@ console.log('tems: ', items)
                 }
             }
         });
+    };
+
+    const handleFileDownload = async (id: number) => {
+        await axios({
+            url: `/downloadTimeOffDocument/${id}`,
+            method: "GET",
+            responseType: "blob",
+        })
+            .then((response) => {
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", response.headers.filename);
+                document.body.appendChild(link);
+                link.click();
+            })
+            .catch((err) => {
+                if (err.response.status === 404) {
+                    alert("File not Found");
+                }
+            });
+    };
+
+    const alertDelete = async (idDocument: string, timeOffMasterId: string) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteDocument(idDocument, timeOffMasterId);
+            }
+        });
+    };
+
+    const deleteDocument = async (idDocument: string, timeOffMasterId: string) => {
+        await axios
+            .post(`/deleteTimeOffDocument`, { idDocument, timeOffMasterId })
+            .then((res) => {
+                Swal.fire({
+                    title: "Success",
+                    text: "Images Delete",
+                    icon: "success",
+                }).then((result: any) => {
+                    if (result.value) {
+                        getDataTimeOff(timeOffMasterId);
+                    }
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     return (
@@ -886,9 +975,8 @@ console.log('tems: ', items)
                                             )}
                                             {selectedType.TIME_OFF_TYPE_ID ==
                                                 "1" ||
-                                            (
-                                                selectedType.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE ==
-                                                    "1") ? (
+                                            selectedType.TIME_OFF_TYPE_IS_NOT_REDUCE_LEAVE ==
+                                                "1" ? (
                                                 ""
                                             ) : (
                                                 <tr>
@@ -1122,7 +1210,7 @@ console.log('tems: ', items)
                         modalEditRequestTimeOff: false,
                     })
                 }
-                headers={null}
+                headers={{ "Content-type": "multipart/form-data" }}
                 submitButtonName={
                     editRequestTimeOff.STATUS == 0 ? "Edit" : null
                 }
@@ -1605,7 +1693,84 @@ console.log('tems: ', items)
                                             : ""}
                                     </select>
                                 </div>
-                            ):""}
+                            ) : (
+                                ""
+                            )}
+
+                            <div className="mt-3">
+                                <InputLabel value="Attachment File" />
+                                {editRequestTimeOff?.FILE_ID ? (
+                                    ""
+                                ) : (
+                                    <Input
+                                        type="file"
+                                        onChange={(e: any) => {
+                                            editTimeOff(
+                                                "FILE_ID_new",
+                                                e.target.files[0]
+                                            );
+                                        }}
+                                        multiple
+                                        className="mt-1 bg-white ring-white shadow-xl"
+                                    />
+                                )}
+
+                                {editRequestTimeOff?.FILE_ID ? (
+                                    <div className="grid-cols-2 grid gap-4 ml-1 mt-2 mb-4">
+                                        <div
+                                            className="text-sm text-gray-900 cursor-pointer hover:text-red-600 w-fit"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                window.open(
+                                                    window.location.origin +
+                                                        "/storage/" +
+                                                        editRequestTimeOff
+                                                            .document
+                                                            ?.DOCUMENT_DIRNAME +
+                                                        editRequestTimeOff
+                                                            .document
+                                                            ?.DOCUMENT_FILENAME,
+                                                    "_blank"
+                                                );
+                                            }}
+                                        >
+                                            <span>
+                                                {
+                                                    editRequestTimeOff.document
+                                                        .DOCUMENT_ORIGINAL_NAME
+                                                }
+                                            </span>
+                                        </div>
+                                        <div className="flex">
+                                            <span>
+                                                <ArrowDownTrayIcon
+                                                    className="w-6 text-blue-600 hover:cursor-pointer"
+                                                    title="Download Images"
+                                                    onClick={(e) =>
+                                                        handleFileDownload(
+                                                            editRequestTimeOff.FILE_ID
+                                                        )
+                                                    }
+                                                />
+                                            </span>
+                                            {editRequestTimeOff.STATUS == 0 && (
+                                                <span>
+                                                    <XMarkIcon
+                                                        className="w-7 text-red-600 hover:cursor-pointer"
+                                                        title="Delete Images"
+                                                        onClick={(e) =>
+                                                            alertDelete(
+                                                                editRequestTimeOff.FILE_ID,
+                                                                editRequestTimeOff.REQUEST_TIME_OFF_MASTER_ID
+                                                            )
+                                                        }
+                                                    />
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : ""}
+                            </div>
 
                             <div className="relative mt-4">
                                 <label
@@ -1764,63 +1929,77 @@ console.log('tems: ', items)
                 </div>
 
                 <div className="relative col-span-3 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
-                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
-                        <AGGrid
-                            addButtonLabel={undefined}
-                            addButtonModalState={undefined}
-                            withParam={""}
-                            searchParam={searchDate.time_off_search}
-                            // loading={isLoading.get_policy}
-                            url={"getRequestTimeOffAgGrid"}
-                            doubleClickEvent={handleEditModal}
-                            triggeringRefreshData={successSearch}
-                            colDefs={[
-                                {
-                                    headerName: "Request Date",
-                                    flex: 3,
-                                    valueGetter: function (params: any) {
-                                        if (params.data) {
-                                            return dateFormat(
-                                                params.data.REQUEST_DATE,
-                                                "dd mmm yyyy"
-                                            );
-                                        }
-                                    },
-                                },
-                                {
-                                    headerName: "Description",
-                                    flex: 4,
-                                    valueGetter: function (params: any) {
-                                        if (params.data) {
-                                            if (params.data.DESCRIPTION ) {
-                                                return params.data.DESCRIPTION;
-                                            } else {
-                                                return "-";
+                    {isLoading.get_all ? (
+                        <div className="flex justify-center items-center sweet-loading h-[199px]">
+                            <BeatLoader
+                                // cssOverride={override}
+                                size={10}
+                                color={"#ff4242"}
+                                loading={true}
+                                speedMultiplier={1.5}
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                            />
+                        </div>
+                    ) : (
+                        <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                            <AGGrid
+                                addButtonLabel={undefined}
+                                addButtonModalState={undefined}
+                                withParam={""}
+                                searchParam={searchDate.time_off_search}
+                                // loading={isLoading.get_policy}
+                                url={"getRequestTimeOffAgGrid"}
+                                doubleClickEvent={handleEditModal}
+                                triggeringRefreshData={successSearch}
+                                colDefs={[
+                                    {
+                                        headerName: "Request Date",
+                                        flex: 3,
+                                        valueGetter: function (params: any) {
+                                            if (params.data) {
+                                                return dateFormat(
+                                                    params.data.REQUEST_DATE,
+                                                    "dd mmm yyyy"
+                                                );
                                             }
-                                        }
+                                        },
                                     },
-                                },
-                                {
-                                    headerName: "Status",
-                                    // field: "POLICY_STATUS_ID",
-                                    flex: 3,
-                                    valueGetter: function (params: any) {
-                                        if (params.data) {
-                                            if (params.data.STATUS == 0) {
-                                                return "Waiting Approval";
-                                            } else if (
-                                                params.data.STATUS == 1
-                                            ) {
-                                                return "Rejected";
-                                            } else {
-                                                return "Approved";
+                                    {
+                                        headerName: "Description",
+                                        flex: 4,
+                                        valueGetter: function (params: any) {
+                                            if (params.data) {
+                                                if (params.data.DESCRIPTION) {
+                                                    return params.data.DESCRIPTION;
+                                                } else {
+                                                    return "-";
+                                                }
                                             }
-                                        }
+                                        },
                                     },
-                                },
-                            ]}
-                        />
-                    </div>
+                                    {
+                                        headerName: "Status",
+                                        // field: "POLICY_STATUS_ID",
+                                        flex: 3,
+                                        valueGetter: function (params: any) {
+                                            if (params.data) {
+                                                if (params.data.STATUS == 0) {
+                                                    return "Waiting Approval";
+                                                } else if (
+                                                    params.data.STATUS == 1
+                                                ) {
+                                                    return "Rejected";
+                                                } else {
+                                                    return "Approved";
+                                                }
+                                            }
+                                        },
+                                    },
+                                ]}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>

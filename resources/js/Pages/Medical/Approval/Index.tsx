@@ -341,7 +341,7 @@ export default function Index({ auth }: PageProps) {
     const alertDelete = async (idDocument: string, medicalId: string) => {
         Swal.fire({
             title: "Are you sure?",
-            text: "You won't delete document!",
+            text: "You won't be able to revert this!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",

@@ -26,7 +26,8 @@ export default function Index({ auth }: PageProps) {
 
     const [searchDefault, setSearchDefault] = useState<any>({
         COMPANY_ID: employee.COMPANY_ID,
-        DIVISION_ID: employee.division.COMPANY_DIVISION_ID            
+        DIVISION_ID: employee.division.COMPANY_DIVISION_ID,
+        EMPLOYEE_ID: employee.EMPLOYEE_ID
     });
     
     useEffect(() => {
@@ -283,8 +284,8 @@ export default function Index({ auth }: PageProps) {
 
     
     return (
-        <AuthenticatedLayout user={auth.user} header={"Review Time Off"}>
-            <Head title="Review Time Off" />
+        <AuthenticatedLayout user={auth.user} header={"Request Time Off For Approve"}>
+            <Head title="Request Time Off For Approve" />
             {isSuccess && (
                 <ToastMessage
                     message={isSuccess}
