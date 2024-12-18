@@ -96,7 +96,7 @@ class ReceiptController extends Controller
 
     public function getBankAccount()
     { 
-        $data = RBankTransaction::where('BANK_TRANSACTION_FOR_INVOICE', 1)->get();
+        $data = RBankTransaction::all();
 
         return response()->json($data);
     }

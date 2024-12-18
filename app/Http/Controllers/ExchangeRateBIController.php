@@ -25,9 +25,6 @@ class ExchangeRateBIController extends Controller
         $sortModel = $request->input('sort');
         $newSearch = json_decode($request->newFilter, true);
 
-        // dd($newSearch[0]);
-        
-        
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
             foreach ($sortModel as $sortItem) {
@@ -40,7 +37,6 @@ class ExchangeRateBIController extends Controller
             if ($newSearch[0]["flag"] !== "") {
                 $query->where('EXCHANGE_RATE_BI_ID', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
             }else{
-                // dd("masuk sini");
                 foreach ($newSearch[0] as $keyId => $searchValue) {
                     if ($keyId === 'EXCHANGE_RATE_BI_DATE') {
                         $query->where('EXCHANGE_RATE_BI_DATE', 'LIKE', '%' . $searchValue . '%');
@@ -52,7 +48,7 @@ class ExchangeRateBIController extends Controller
         $query->orderBy('EXCHANGE_RATE_BI_DATE', 'desc');
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
-
+        
         return $data;
     }
     

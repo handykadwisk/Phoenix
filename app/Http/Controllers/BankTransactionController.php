@@ -24,6 +24,7 @@ class BankTransactionController extends Controller
         $query = RBankTransaction::query();
         $sortModel = $request->input('sort');
         $newSearch = json_decode($request->newFilter, true);
+        $filterModel = json_decode($request->input('filter'), true);
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -34,10 +35,34 @@ class BankTransactionController extends Controller
             }
         }
 
-        if ($request->newFilter !== "") {
+        if (!empty($request->newFilter)) {
             foreach ($newSearch as $searchValue) {
-                if ($searchValue['BANK_TRANSACTION_NAME']) {
-                    $query->where('BANK_TRANSACTION_NAME', 'LIKE', '%' . $searchValue['BANK_TRANSACTION_NAME'] . '%');
+                if (!empty($searchValue['BANK_TRANSACTION_NAME'])) {
+                    $query->whereHas('bank', function ($bank) use ($searchValue) {
+                            $bank->where('BANK_NAME', 'LIKE', '%' . $searchValue['BANK_TRANSACTION_NAME'] . '%')
+                            ->orWhere('BANK_ABBREVIATION', 'LIKE', '%' . $searchValue['BANK_TRANSACTION_NAME'] . '%');
+                        })
+                        ->orWhereHas('currency', function ($currency) use ($searchValue) {
+                            $currency->where('CURRENCY_SYMBOL', $searchValue['BANK_TRANSACTION_NAME']);
+                        })
+                        ->orWhere('BANK_TRANSACTION_ACCOUNT_NUMBER', 'LIKE', '%' . $searchValue['BANK_TRANSACTION_NAME'] . '%');
+                }
+            }
+        }        
+
+        if ($filterModel) {
+            foreach ($filterModel as $filterModelKey) {
+                foreach ($filterModelKey as $filterValue) {
+                    if ($filterValue === "No") {
+                        $query->where('BANK_TRANSACTION_FOR_INVOICE', 0)
+                              ->orWhere('BANK_TRANSACTION_FOR_INVOICE', null);
+                    } else if ($filterValue === "Yes") {
+                        $query->where('BANK_TRANSACTION_FOR_INVOICE', 1);
+                    } else if ($filterValue === "Not Active") {
+                        $query->where('BANK_TRANSACTION_STATUS', 1);
+                    } else if ($filterValue === "Active") {
+                        $query->where('BANK_TRANSACTION_STATUS', 0);
+                    }
                 }
             }
         }
@@ -108,7 +133,7 @@ class BankTransactionController extends Controller
         }
         
         DB::transaction(function () use ($request) {
-            $bank_id = isset($request->BANK_ID) ? $request->BANK_ID['code'] : $request->BANK_ID;
+            $bank_id = isset($request->BANK_ID) ? $request->BANK_ID['value'] : $request->BANK_ID;
             $bank_transaction_coa_code = isset($request->BANK_TRANSACTION_COA_CODE) ? $request->BANK_TRANSACTION_COA_CODE['code'] : $request->BANK_TRANSACTION_COA_CODE;
             
             // Create Bank Transaction
@@ -190,6 +215,33 @@ class BankTransactionController extends Controller
 
         return new JsonResponse([
             'msg' => 'New bank transaction has been edited.'
+        ], 201, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function disable_bank(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            $selectedData = $request->rowSelectedData;
+    
+            if ($selectedData) {
+                foreach ($selectedData as $value) {
+                    $bankTransactionId = $value['BANK_TRANSACTION_ID'];
+    
+                    RBankTransaction::where('BANK_TRANSACTION_ID', $bankTransactionId)->update([
+                        'BANK_TRANSACTION_STATUS' => 1,
+                        'BANK_TRANSACTION_DISABLE_DATE' => now()
+                    ]);
+    
+                    // Created Log Bank Transaction
+                    user_log_create("Disabled (Bank Transaction).", "Bank Transaction", $bankTransactionId);
+                }
+            }
+        });
+
+        return new JsonResponse([
+            'msg' => 'Bank transaction has been disabled.'
         ], 201, [
             'X-Inertia' => true
         ]);

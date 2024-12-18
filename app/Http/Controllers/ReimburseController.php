@@ -37,6 +37,7 @@ class ReimburseController extends Controller
         $query = Reimburse::query();
         $sortModel = $request->input('sort');
         $newSearch = json_decode($request->newFilter, true);
+        $filterModel = json_decode($request->input('filter'), true);
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -112,6 +113,21 @@ class ReimburseController extends Controller
                         ->orWhere('REIMBURSE_THIRD_APPROVAL_STATUS', 4);
                 } else if ($approval_status === "complited") {
                     $query->where('REIMBURSE_SECOND_APPROVAL_STATUS', 6);
+                }
+            }
+        }
+
+        if ($filterModel) {
+            foreach ($filterModel as $filterModelKey) {
+                foreach ($filterModelKey as $filterValue) {
+                    if ($filterValue === 'Execute') {
+                        $query->where('REIMBURSE_SECOND_APPROVAL_STATUS', 6);
+                    } elseif ($filterValue === 'Pending') {
+                        $query->where(function ($subQuery) {
+                            $subQuery->whereNull('REIMBURSE_SECOND_APPROVAL_STATUS')
+                                    ->orWhere('REIMBURSE_SECOND_APPROVAL_STATUS', '!=', 6);
+                        });
+                    }
                 }
             }
         }

@@ -20,7 +20,10 @@ export default function AGGrid({
     triggeringRefreshData,
     doubleClickEvent = () => {},
     addButtonModalState = () => {},
-    cellHeight,
+    rowHeight,
+    rowSelection,
+    onSelectionChanged,
+    suppressRowClickSelection,
 }: PropsWithChildren<{
     colDefs: any;
     url: string;
@@ -31,7 +34,10 @@ export default function AGGrid({
     triggeringRefreshData: string;
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
-    cellHeight: number | undefined;
+    rowHeight?: number | undefined;
+    rowSelection?: any;
+    onSelectionChanged?: CallableFunction | any;
+    suppressRowClickSelection?: boolean;
 }>) {
     const gridRef = useRef<AgGridReact>(null);
     const getServerSideDatasource = (): IServerSideDatasource => {
@@ -58,6 +64,8 @@ export default function AGGrid({
                         filterParams[colId] = filterModel[colId].filter;
                     } else if (filterModel[colId].filterType === "date") {
                         filterParams[colId] = filterModel[colId].dateFrom;
+                    } else if (filterModel[colId].filterType === "set") {
+                        filterParams[colId] = filterModel[colId].values;
                     }
                 }
 
@@ -69,7 +77,8 @@ export default function AGGrid({
                     urlNew = `${url}?`;
                 }
 
-                // console.log("Search param", searchParam);
+                console.log("Filter model from AG Grid:", filterModel);
+                console.log("Filter params sent to API:", filterParams);
 
                 axios
                     .get(
@@ -90,9 +99,17 @@ export default function AGGrid({
         };
     };
 
+    const handleRowSelectedChange = (params: any) => {
+        // console.log("Selected Row", params.api.getSelectedRows());
+        // params.api.deselectAll();
+        const dataSelected = params.api.getSelectedRows();
+        onSelectionChanged(dataSelected);
+    };
+
     const onGridReady = (params: GridReadyEvent<any, any>) => {
         var dataSource = getServerSideDatasource();
         params.api!.setGridOption("serverSideDatasource", dataSource);
+        // params.api.deselectAll();
         // params.api!.sizeColumnsToFit()
     };
 
@@ -103,6 +120,7 @@ export default function AGGrid({
     useEffect(() => {
         if (triggeringRefreshData !== "") {
             gridRef.current!.api!.refreshServerSide({ purge: true });
+            gridRef.current!.api!.deselectAll();
         }
     }, [triggeringRefreshData, gridRef]);
 
@@ -139,7 +157,10 @@ export default function AGGrid({
                     onGridReady={onGridReady}
                     rowModelType="serverSide"
                     onRowDoubleClicked={doubleClicked}
-                    rowHeight={cellHeight}
+                    rowHeight={rowHeight}
+                    rowSelection={rowSelection}
+                    onSelectionChanged={handleRowSelectedChange}
+                    suppressRowClickSelection={suppressRowClickSelection}
                 />
             </div>
         </div>

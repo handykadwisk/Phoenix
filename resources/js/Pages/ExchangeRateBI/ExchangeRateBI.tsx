@@ -831,7 +831,6 @@ export default function ExchangeRateController({ auth }: PageProps) {
                             url={"getExchangeRateBI"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
-                            cellHeight={undefined}
                             colDefs={[
                                 {
                                     headerName: "No.",
@@ -840,8 +839,13 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 },
                                 {
                                     headerName: "Date",
-                                    field: "EXCHANGE_RATE_BI_DATE",
                                     flex: 7,
+                                    cellRenderer: (params: any) => {
+                                        return dateFormat(
+                                            params.data.EXCHANGE_RATE_BI_DATE,
+                                            "dd-mm-yyyy"
+                                        );
+                                    },
                                 },
                             ]}
                         />

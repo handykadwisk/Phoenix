@@ -15,6 +15,9 @@ import ToggleWithIcon from "@/Components/ToggleWithIcon";
 import axios from "axios";
 import AGGrid from "@/Components/AgGrid";
 import ModalToAction from "@/Components/Modal/ModalToAction";
+import Swal from "sweetalert2";
+import BadgeFlat from "@/Components/BadgeFlat";
+import dateFormat from "dateformat";
 
 export default function BankTransaction({ auth }: PageProps) {
     useEffect(() => {
@@ -108,6 +111,7 @@ export default function BankTransaction({ auth }: PageProps) {
         });
 
         setIsSuccess(message.msg);
+
         setTimeout(() => {
             setIsSuccess("");
         }, 5000);
@@ -180,7 +184,6 @@ export default function BankTransaction({ auth }: PageProps) {
     });
 
     const getBankSelect = (value: any) => {
-        // console.log("Value : ", value);
         if (value) {
             const selected = selectBank.filter(
                 (option: any) => option.value === value
@@ -262,7 +265,7 @@ export default function BankTransaction({ auth }: PageProps) {
         ],
     });
 
-    console.log("Search", searchBankTransaction);
+    // console.log("Search", searchBankTransaction);
     // Search End
 
     // OnChange Input Search Start
@@ -295,7 +298,62 @@ export default function BankTransaction({ auth }: PageProps) {
     };
     // Clear Search End
 
-    // console.log(data);
+    const [rowSelectedData, setRowSelectedData] = useState<any>([]);
+
+    const onSelectionChanged = (dataSelected: any) => {
+        console.log("ada", dataSelected);
+
+        setRowSelectedData(dataSelected);
+    };
+
+    console.log("Row Selected Data", rowSelectedData);
+
+    const handleDisableBank = async (dataSelected: any) => {
+        console.log("Data Selected", dataSelected);
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You want to disable the bank",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await axios
+                    .patch("/bankTransactionDisableBank", { rowSelectedData })
+                    .then(function (response) {
+                        // console.log(response);
+                        setIsSuccess("Bank transaction has been disabled.");
+                        setTimeout(() => {
+                            setIsSuccess("");
+                        }, 5000);
+
+                        setRefreshSuccess("success");
+                        setTimeout(() => {
+                            setRefreshSuccess("");
+                        }, 1000);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+        });
+    };
+
+    const handleRowStatus = (
+        bankTransactionStatus: number,
+        textAlign: string = ""
+    ) => {
+        if (bankTransactionStatus === 1) {
+            return {
+                backgroundColor: "#FFBFAA",
+                textAlign: textAlign,
+            };
+        }
+    };
+
+    console.log("Data", data);
     // console.log("Bank Transaction", bankTransaction.data);
 
     return (
@@ -327,7 +385,7 @@ export default function BankTransaction({ auth }: PageProps) {
                 body={
                     <>
                         <div className="md:grid md:grid-cols-2 md:gap-4 mt-4">
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_NAME"
                                     className="mb-2"
@@ -349,7 +407,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     }
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_COA_CODE"
                                     className="mb-2"
@@ -378,7 +436,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     primaryColor={"bg-red-500"}
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_COA_CODE"
                                     className="mb-2"
@@ -410,7 +468,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     primaryColor={"bg-red-500"}
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_CURRENCY_ID"
                                     className="mb-2"
@@ -443,7 +501,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     primaryColor={"bg-red-500"}
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_ACCOUNT_NUMBER"
                                     className="mb-2"
@@ -465,7 +523,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     }
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_ACCOUNT_NAME"
                                     className="mb-2"
@@ -488,6 +546,25 @@ export default function BankTransaction({ auth }: PageProps) {
                                 />
                             </div>
                         </div>
+                        <div className="w-full my-4 md:mb-0">
+                            <InputLabel
+                                htmlFor="BANK_TRANSACTION_ADDRESS"
+                                className="w-full lg:w-1/4 mb-2"
+                            >
+                                Bank Address
+                            </InputLabel>
+                            <TextArea
+                                rows="5"
+                                autoComplete="off"
+                                value={data.BANK_TRANSACTION_ADDRESS}
+                                onChange={(val: any) =>
+                                    handleChangeAdd(
+                                        val.target.value,
+                                        "BANK_TRANSACTION_ADDRESS"
+                                    )
+                                }
+                            />
+                        </div>
                         <fieldset className="mt-5 px-3 py-5 rounded-lg border-2">
                             <legend className="ml-3 px-3 font-medium">
                                 Information For Debit Note
@@ -509,25 +586,6 @@ export default function BankTransaction({ auth }: PageProps) {
                                         handleChangeAdd(
                                             val.target.value,
                                             "BANK_TRANSACTION_NAME_INVOICE"
-                                        )
-                                    }
-                                />
-                            </div>
-                            <div className="block lg:flex w-full mb-7">
-                                <InputLabel
-                                    htmlFor="BANK_TRANSACTION_ADDRESS"
-                                    className="w-full lg:w-1/4 mb-2"
-                                >
-                                    Bank Address
-                                </InputLabel>
-                                <TextArea
-                                    rows="5"
-                                    autoComplete="off"
-                                    value={data.BANK_TRANSACTION_ADDRESS}
-                                    onChange={(val: any) =>
-                                        handleChangeAdd(
-                                            val.target.value,
-                                            "BANK_TRANSACTION_ADDRESS"
                                         )
                                     }
                                 />
@@ -600,7 +658,7 @@ export default function BankTransaction({ auth }: PageProps) {
                 body={
                     <>
                         <div className="md:grid md:grid-cols-2 md:gap-4 mt-4">
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_NAME"
                                     className="mb-2"
@@ -622,7 +680,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     }
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_COA_CODE"
                                     className="mb-2"
@@ -654,7 +712,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     primaryColor={"bg-red-500"}
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_COA_CODE"
                                     className="mb-2"
@@ -691,7 +749,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     primaryColor={"bg-red-500"}
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_CURRENCY_ID"
                                     className="mb-2"
@@ -729,7 +787,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     primaryColor={"bg-red-500"}
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_ACCOUNT_NUMBER"
                                     className="mb-2"
@@ -754,7 +812,7 @@ export default function BankTransaction({ auth }: PageProps) {
                                     }
                                 />
                             </div>
-                            <div className="w-full mb-5 md:mb-2">
+                            <div className="w-full mb-3 md:mb-0">
                                 <InputLabel
                                     htmlFor="BANK_TRANSACTION_ACCOUNT_NAME"
                                     className="mb-2"
@@ -780,6 +838,25 @@ export default function BankTransaction({ auth }: PageProps) {
                                 />
                             </div>
                         </div>
+                        <div className="w-full my-4 md:mb-0">
+                            <InputLabel
+                                htmlFor="BANK_TRANSACTION_ADDRESS"
+                                className="w-full lg:w-1/4 mb-2"
+                            >
+                                Bank Address
+                            </InputLabel>
+                            <TextArea
+                                rows="5"
+                                autoComplete="off"
+                                value={dataById?.BANK_TRANSACTION_ADDRESS || ""}
+                                onChange={(val: any) =>
+                                    handleChangeEdit(
+                                        val.target.value,
+                                        "BANK_TRANSACTION_ADDRESS"
+                                    )
+                                }
+                            />
+                        </div>
                         <fieldset className="mt-5 px-3 py-5 rounded-lg border-2">
                             <legend className="ml-3 px-3 font-medium">
                                 Information For Debit Note
@@ -804,27 +881,6 @@ export default function BankTransaction({ auth }: PageProps) {
                                         handleChangeEdit(
                                             val.target.value,
                                             "BANK_TRANSACTION_NAME_INVOICE"
-                                        )
-                                    }
-                                />
-                            </div>
-                            <div className="block lg:flex w-full mb-7">
-                                <InputLabel
-                                    htmlFor="BANK_TRANSACTION_ADDRESS"
-                                    className="w-full lg:w-1/4 mb-2"
-                                >
-                                    Bank Address
-                                </InputLabel>
-                                <TextArea
-                                    rows="5"
-                                    autoComplete="off"
-                                    value={
-                                        dataById?.BANK_TRANSACTION_ADDRESS || ""
-                                    }
-                                    onChange={(val: any) =>
-                                        handleChangeEdit(
-                                            val.target.value,
-                                            "BANK_TRANSACTION_ADDRESS"
                                         )
                                     }
                                 />
@@ -896,7 +952,7 @@ export default function BankTransaction({ auth }: PageProps) {
                             id="BANK_TRANSACTION_NAME"
                             name="BANK_TRANSACTION_NAME"
                             type="text"
-                            placeholder="Bank Name"
+                            placeholder="Bank Name / Currency / Account Number"
                             autoComplete="off"
                             value={
                                 searchBankTransaction.bank_transaction_search[0]
@@ -976,6 +1032,15 @@ export default function BankTransaction({ auth }: PageProps) {
                 }
                 dataList={
                     <>
+                        {rowSelectedData.length > 0 && (
+                            <button
+                                onClick={handleDisableBank}
+                                className="px-5 py-1 mb-5 bg-red-600 hover:bg-red-500 text-white text-sm font-medium rounded-md"
+                            >
+                                Disable Bank
+                            </button>
+                        )}
+
                         <AGGrid
                             addButtonLabel={undefined}
                             addButtonModalState={undefined}
@@ -986,46 +1051,100 @@ export default function BankTransaction({ auth }: PageProps) {
                             url={"getBankTransaction"}
                             doubleClickEvent={handleEditModal}
                             triggeringRefreshData={refreshSuccess}
-                            cellHeight={80}
+                            rowHeight={80}
+                            rowSelection={"multiple"}
+                            onSelectionChanged={onSelectionChanged}
+                            suppressRowClickSelection={true}
                             colDefs={[
+                                {
+                                    checkboxSelection: (params: any) => {
+                                        return params.data
+                                            ?.BANK_TRANSACTION_STATUS === 1
+                                            ? false
+                                            : true;
+                                    },
+                                    width: 50,
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
+                                        );
+                                    },
+                                },
                                 {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
-                                    width: 100,
-                                    cellStyle: {
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        textAlign: "center",
+                                    width: 80,
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
+                                        );
                                     },
                                 },
                                 {
                                     headerName: "Title",
                                     field: "BANK_TRANSACTION_NAME",
                                     flex: 2,
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
+                                        );
+                                    },
                                 },
                                 {
                                     headerName: "Bank",
                                     flex: 2,
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
+                                        );
+                                    },
                                     cellRenderer: (params: any) => {
                                         const bank_name =
                                             params.data.bank?.BANK_NAME;
+
+                                        return bank_name ? bank_name : "-";
+                                    },
+                                },
+                                {
+                                    headerName: "Currency",
+                                    flex: 1,
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
+                                        );
+                                    },
+                                    cellRenderer: (params: any) => {
                                         const currency =
                                             params.data.currency
                                                 ?.CURRENCY_SYMBOL;
 
-                                        return (
-                                            currency +
-                                            `${
-                                                bank_name !== undefined
-                                                    ? " - " + bank_name
-                                                    : ""
-                                            }`
+                                        return currency;
+                                    },
+                                },
+                                {
+                                    headerName: "COA",
+                                    flex: 1,
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
                                         );
+                                    },
+                                    cellRenderer: (params: any) => {
+                                        const coa =
+                                            params.data
+                                                .BANK_TRANSACTION_COA_CODE;
+
+                                        return coa ? coa : "-";
                                     },
                                 },
                                 {
                                     headerName: "Account",
                                     flex: 2,
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
+                                        );
+                                    },
                                     cellRenderer: (params: any) => {
                                         return (
                                             <div className="flex flex-col">
@@ -1042,6 +1161,90 @@ export default function BankTransaction({ auth }: PageProps) {
                                                     }
                                                 </div>
                                             </div>
+                                        );
+                                    },
+                                },
+                                {
+                                    headerName: "Show at Document",
+                                    flex: 1,
+                                    filter: "agSetColumnFilter",
+                                    filterParams: {
+                                        values: ["Yes", "No"],
+                                    },
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
+                                        );
+                                    },
+                                    cellRenderer: (params: any) => {
+                                        const status =
+                                            params.data
+                                                .BANK_TRANSACTION_FOR_INVOICE;
+
+                                        return status === 1 ? (
+                                            <BadgeFlat
+                                                className={
+                                                    "bg-green-500 text-white"
+                                                }
+                                                title={"Yes"}
+                                                body={"Yes"}
+                                            />
+                                        ) : (
+                                            <BadgeFlat
+                                                className={
+                                                    "bg-red-500 text-white"
+                                                }
+                                                title={"No"}
+                                                body={"No"}
+                                            />
+                                        );
+                                    },
+                                },
+                                {
+                                    headerName: "Status",
+                                    flex: 1,
+                                    filter: "agSetColumnFilter",
+                                    filterParams: {
+                                        values: ["Active", "Not Active"],
+                                    },
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.BANK_TRANSACTION_STATUS
+                                        );
+                                    },
+                                    cellRenderer: (params: any) => {
+                                        const status =
+                                            params.data.BANK_TRANSACTION_STATUS;
+
+                                        return status === 1 ? (
+                                            <BadgeFlat
+                                                className={
+                                                    "bg-red-500 text-white"
+                                                }
+                                                title={"Not Active"}
+                                                body={
+                                                    <div className="flex flex-col">
+                                                        <div className="">
+                                                            Not Active
+                                                        </div>
+                                                        <div className="">
+                                                            {dateFormat(
+                                                                params.data
+                                                                    .BANK_TRANSACTION_DISABLE_DATE,
+                                                                "dd-mm-yyyy"
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                }
+                                            />
+                                        ) : (
+                                            <BadgeFlat
+                                                className={
+                                                    "bg-green-500 text-white"
+                                                }
+                                                title={"Active"}
+                                                body={"Active"}
+                                            />
                                         );
                                     },
                                 },

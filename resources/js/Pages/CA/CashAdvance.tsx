@@ -2310,7 +2310,7 @@ export default function CashAdvance({ auth }: PageProps) {
         const days = calculateBusinessDays(requestedDate, new Date());
         if (days > 3) {
             return {
-                backgroundColor: "red",
+                backgroundColor: "#FFBFAA",
                 textAlign: "center",
             };
         } else if (days > 1) {
@@ -10720,7 +10720,9 @@ export default function CashAdvance({ auth }: PageProps) {
                             url={"getCA"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
-                            cellHeight={130}
+                            rowHeight={130}
+                            rowSelection={""}
+                            onSelectionChanged={""}
                             colDefs={[
                                 {
                                     headerName: "No.",
@@ -10729,7 +10731,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     cellStyle: (params: any) => {
                                         return calculateDate(
                                             params.data
-                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                                ?.cash_advance_detail?.[0]
+                                                .CASH_ADVANCE_DETAIL_END_DATE
                                         );
                                     },
                                 },
@@ -10740,7 +10743,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     cellStyle: (params: any) => {
                                         return calculateDate(
                                             params.data
-                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                                ?.cash_advance_detail?.[0]
+                                                .CASH_ADVANCE_DETAIL_END_DATE
                                         );
                                     },
                                 },
@@ -10750,7 +10754,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     cellStyle: (params: any) => {
                                         return calculateDate(
                                             params.data
-                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                                ?.cash_advance_detail?.[0]
+                                                .CASH_ADVANCE_DETAIL_END_DATE
                                         );
                                     },
                                     cellRenderer: (params: any) => {
@@ -10770,7 +10775,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     cellStyle: (params: any) => {
                                         return calculateDate(
                                             params.data
-                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                                ?.cash_advance_detail?.[0]
+                                                .CASH_ADVANCE_DETAIL_END_DATE
                                         );
                                     },
                                     valueFormatter: (params: any) => {
@@ -10787,7 +10793,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     cellStyle: (params: any) => {
                                         return calculateDate(
                                             params.data
-                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                                ?.cash_advance_detail?.[0]
+                                                .CASH_ADVANCE_DETAIL_END_DATE
                                         );
                                     },
                                     valueFormatter: (params: any) => {
@@ -10806,7 +10813,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             cellStyle: (params: any) => {
                                                 return calculateDate(
                                                     params.data
-                                                        ?.CASH_ADVANCE_REQUESTED_DATE
+                                                        ?.cash_advance_detail[0]
+                                                        ?.CASH_ADVANCE_DETAIL_END_DATE
                                                 );
                                             },
                                             cellRenderer: (params: any) => {
@@ -10969,7 +10977,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             cellStyle: (params: any) => {
                                                 return calculateDate(
                                                     params.data
-                                                        ?.CASH_ADVANCE_REQUESTED_DATE
+                                                        ?.cash_advance_detail[0]
+                                                        ?.CASH_ADVANCE_DETAIL_END_DATE
                                                 );
                                             },
                                             cellRenderer: (params: any) => {
@@ -10999,10 +11008,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     5
                                                         ? "Execute"
                                                         : "Pending";
-                                                console.log(
-                                                    "Value Getter Status:",
-                                                    status
-                                                );
                                                 return status;
                                             },
                                         },
@@ -11019,7 +11024,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                             cellStyle: (params: any) => {
                                                 return calculateDate(
                                                     params.data
-                                                        ?.CASH_ADVANCE_REQUESTED_DATE
+                                                        ?.cash_advance_detail[0]
+                                                        ?.CASH_ADVANCE_DETAIL_END_DATE
                                                 );
                                             },
                                             cellRenderer: (params: any) => {
@@ -11181,12 +11187,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                             flex: 2,
                                             filter: "agSetColumnFilter",
                                             filterParams: {
-                                                values: ["Execute", "Pending"],
+                                                values: [
+                                                    "Execute Report",
+                                                    "Pending Report",
+                                                ],
                                             },
                                             cellStyle: (params: any) => {
                                                 return calculateDate(
                                                     params.data
-                                                        ?.CASH_ADVANCE_REQUESTED_DATE
+                                                        ?.cash_advance_detail[0]
+                                                        ?.CASH_ADVANCE_DETAIL_END_DATE
                                                 );
                                             },
                                             cellRenderer: (params: any) => {
@@ -11221,8 +11231,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         ?.cash_advance_report
                                                         ?.REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS ===
                                                     6
-                                                        ? "Execute"
-                                                        : "Pending";
+                                                        ? "Execute Report"
+                                                        : "Pending Report";
                                                 return status;
                                             },
                                         },
@@ -11236,7 +11246,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                     cellStyle: (params: any) => {
                                         return calculateDate(
                                             params.data
-                                                ?.CASH_ADVANCE_REQUESTED_DATE
+                                                ?.cash_advance_detail?.[0]
+                                                .CASH_ADVANCE_DETAIL_END_DATE
                                         );
                                     },
                                     cellRenderer: (params: any) => {

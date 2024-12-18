@@ -398,6 +398,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getCOABankTransaction', [BankTransactionController::class, 'getCOABankTransaction'])->name('bankTransaction.getCOABankTransaction');
     Route::post('/bankTransactionAdd', [BankTransactionController::class, 'add'])->name('bankTransaction.bankTransactionAdd');
     Route::patch('/bankTransactionEdit', [BankTransactionController::class, 'edit'])->name('bankTransaction.bankTransactionEdit');
+    Route::patch('/bankTransactionDisableBank', [BankTransactionController::class, 'disable_bank'])->name('bankTransaction.bankTransactionDisableBank');
 
     // Currency
     Route::get('/getCurrency', [CurrencyController::class, 'getCurrency'])->name('getCurrency');

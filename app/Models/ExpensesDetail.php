@@ -19,7 +19,7 @@ class ExpensesDetail extends Model
 
     public $timestamps = false;
 
-    protected $with = ['payment_type','currency','m_expenses_document','relation_organization'];
+    protected $with = ['payment_type','currency','m_expenses_document','relation_organization','cost_classification'];
 
     public function expenses(): BelongsTo
     {
@@ -44,5 +44,10 @@ class ExpensesDetail extends Model
     public function relation_organization(): BelongsTo
     {
         return $this->belongsTo(Relation::class, 'EXPENSES_DETAIL_RELATION_ORGANIZATION_ID');
+    }
+
+    public function cost_classification(): BelongsTo
+    {
+        return $this->belongsTo(COA::class, 'EXPENSES_DETAIL_COST_CLASSIFICATION');
     }
 }

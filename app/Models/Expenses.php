@@ -76,6 +76,7 @@ class Expenses extends Model
     {
         return $this->belongsTo(TEmployee::class, 'EXPENSES_FIRST_APPROVAL_BY');
     }
+    
     public function approval_status(): BelongsTo
     {
         return $this->belongsTo(CashAdvanceStatus::class, 'EXPENSES_FIRST_APPROVAL_STATUS', 'CASH_ADVANCE_STATUS_ID');

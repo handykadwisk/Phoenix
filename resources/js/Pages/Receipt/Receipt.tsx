@@ -452,7 +452,6 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Client Name
-                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -485,7 +484,6 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Payment From
-                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <TextInput
                                 id="RECEIPT_NAME"
@@ -1608,7 +1606,6 @@ export default function Receipt({ auth }: PageProps) {
                             url={"getReceipt"}
                             doubleClickEvent={handleDraftModal}
                             triggeringRefreshData={refreshSuccess}
-                            cellHeight={undefined}
                             colDefs={[
                                 {
                                     headerName: "No.",
@@ -1698,6 +1695,10 @@ export default function Receipt({ auth }: PageProps) {
                                     headerName: "Status",
                                     field: "",
                                     flex: 2,
+                                    filter: "agSetColumnFilter",
+                                    filterParams: {
+                                        values: ["Open", "Draft"],
+                                    },
                                     cellStyle: { textAlign: "center" },
                                     cellRenderer: (params: any) => {
                                         // console.log("Paraamss", params.data);

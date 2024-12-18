@@ -41,6 +41,7 @@ class CashAdvanceController extends Controller
         $query = CashAdvance::query()->with(['cash_advance_report']);
         $sortModel = $request->input('sort');
         $newSearch = json_decode($request->newFilter, true);
+        $filterModel = json_decode($request->input('filter'), true);
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -52,7 +53,6 @@ class CashAdvanceController extends Controller
         }
 
         if ($request->newFilter !== "") {
-            // dd($newSearch);
             if ($newSearch[0]["flag"] !== "") {
                 $query->where('CASH_ADVANCE_ID', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
             }
@@ -220,6 +220,30 @@ class CashAdvanceController extends Controller
                     {
                         $data->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 6);
                     });
+                }
+            }
+        }
+
+        if ($filterModel) {
+            foreach ($filterModel as $filterModelKey) {
+                foreach ($filterModelKey as $filterValue) {
+                    if ($filterValue === 'Execute') {
+                        $query->where('CASH_ADVANCE_SECOND_APPROVAL_STATUS', 5);
+                    } elseif ($filterValue === 'Pending') {
+                        $query->where(function ($subQuery) {
+                            $subQuery->whereNull('CASH_ADVANCE_SECOND_APPROVAL_STATUS')
+                                    ->orWhere('CASH_ADVANCE_SECOND_APPROVAL_STATUS', '!=', 5);
+                        });
+                    } elseif ($filterValue === 'Execute Report') {
+                        $query->whereHas('cash_advance_report', function ($subQuery) {
+                            $subQuery->where('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', 6);
+                        });
+                    } elseif ($filterValue === 'Pending Report') {
+                        $query->where('cash_advance_report', function ($subQuery) {
+                            $subQuery->whereNull('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS')
+                                    ->orWhere('REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS', '!=', 6);
+                        });
+                    }
                 }
             }
         }

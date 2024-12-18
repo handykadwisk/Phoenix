@@ -895,7 +895,6 @@ export default function ExchangeRateController({ auth }: PageProps) {
                             url={"getExchangeRateTax"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
-                            cellHeight={undefined}
                             colDefs={[
                                 {
                                     headerName: "No.",
@@ -904,13 +903,25 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                 },
                                 {
                                     headerName: "Start Date",
-                                    field: "EXCHANGE_RATE_TAX_START_DATE",
                                     flex: 7,
+                                    cellRenderer: (params: any) => {
+                                        return dateFormat(
+                                            params.data
+                                                .EXCHANGE_RATE_TAX_START_DATE,
+                                            "dd-mm-yyyy"
+                                        );
+                                    },
                                 },
                                 {
                                     headerName: "End Date",
-                                    field: "EXCHANGE_RATE_TAX_END_DATE",
                                     flex: 7,
+                                    cellRenderer: (params: any) => {
+                                        return dateFormat(
+                                            params.data
+                                                .EXCHANGE_RATE_TAX_END_DATE,
+                                            "dd-mm-yyyy"
+                                        );
+                                    },
                                 },
                             ]}
                         />

@@ -41,7 +41,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getExpensesRequestStatus();
         getExpensesApprove1Status();
         getExpensesApprove2Status();
-        getExpensesApprove3Status();
+        // getExpensesApprove3Status();
         getExpensesNeedRevisionStatus();
         getExpensesRejectStatus();
     }, []);
@@ -55,7 +55,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getExpensesRequestStatus();
         getExpensesApprove1Status();
         getExpensesApprove2Status();
-        getExpensesApprove3Status();
+        // getExpensesApprove3Status();
         getExpensesNeedRevisionStatus();
         getExpensesRejectStatus();
 
@@ -120,10 +120,9 @@ export default function CashAdvance({ auth }: PageProps) {
         expenses_requested_date: "",
         expenses_requested_by: "",
         expenses_division: "",
-        expenses_cost_center: "",
-        expenses_used_by: "",
         expenses_branch: "",
         expenses_request_for_approval: "",
+        expenses_reff_number: "",
         expenses_request_note: "",
         expenses_method: "",
         expenses_settlement_date: "",
@@ -136,7 +135,7 @@ export default function CashAdvance({ auth }: PageProps) {
                 expenses_detail_currency: "",
                 expenses_detail_amount_value: "",
                 expenses_detail_relation_organization_id: "",
-                expenses_detail_reff_number: "",
+                expenses_detail_cost_classification: "",
                 expenses_detail_description: "",
                 expenses_detail_document: [],
             },
@@ -152,10 +151,9 @@ export default function CashAdvance({ auth }: PageProps) {
             expenses_requested_date: "",
             expenses_requested_by: "",
             expenses_division: "",
-            expenses_cost_center: "",
-            expenses_used_by: "",
             expenses_branch: "",
             expenses_request_for_approval: "",
+            expenses_reff_number: "",
             expenses_request_note: "",
             expenses_method: "",
             expenses_settlement_date: "",
@@ -168,7 +166,7 @@ export default function CashAdvance({ auth }: PageProps) {
                     expenses_detail_currency: "",
                     expenses_detail_amount_value: "",
                     expenses_detail_relation_organization_id: "",
-                    expenses_detail_reff_number: "",
+                    expenses_detail_cost_classification: "",
                     expenses_detail_description: "",
                     expenses_detail_document: [],
                 },
@@ -179,7 +177,7 @@ export default function CashAdvance({ auth }: PageProps) {
         getExpensesRequestStatus();
         getExpensesApprove1Status();
         getExpensesApprove2Status();
-        getExpensesApprove3Status();
+        // getExpensesApprove3Status();
         getExpensesNeedRevisionStatus();
         getExpensesRejectStatus();
         setTimeout(() => {
@@ -202,11 +200,11 @@ export default function CashAdvance({ auth }: PageProps) {
                 ...data.expensesDetail,
                 {
                     expenses_detail_due_date: "",
-                    expenses_detail_type: "",
-                    expenses_detail_currency: "",
+                    expenses_detail_type: 2,
+                    expenses_detail_currency: 1,
                     expenses_detail_amount_value: "",
                     expenses_detail_relation_organization_id: "",
-                    expenses_detail_reff_number: "",
+                    expenses_detail_cost_classification: "",
                     expenses_detail_description: "",
                     expenses_detail_document: [],
                 },
@@ -331,14 +329,14 @@ export default function CashAdvance({ auth }: PageProps) {
                     EXPENSES_DETAIL_AMOUNT_VALUE_APPROVE: "",
                     EXPENSES_DETAIL_APPROVAL: "",
                     EXPENSES_DETAIL_COST_CLASSIFICATION: "",
-                    EXPENSES_DETAIL_CURRENCY: "",
+                    EXPENSES_DETAIL_CURRENCY: 1,
                     EXPENSES_DETAIL_DESCRIPTION: "",
                     EXPENSES_DETAIL_DUE_DATE: "",
                     EXPENSES_DETAIL_ID: "",
                     EXPENSES_DETAIL_REFF_NUMBER: "",
                     EXPENSES_DETAIL_RELATION_ORGANIZATION_ID: "",
                     EXPENSES_DETAIL_REMARKS: "",
-                    EXPENSES_DETAIL_TYPE: "",
+                    EXPENSES_DETAIL_TYPE: 2,
                     EXPENSES_ID: "",
                 },
             ],
@@ -499,10 +497,9 @@ export default function CashAdvance({ auth }: PageProps) {
                 EXPENSES_VENDOR: "",
                 EXPENSES_REQUESTED_BY: "",
                 EXPENSES_DIVISION: "",
-                EXPENSES_USED_BY: "",
                 EXPENSES_START_DATE: "",
                 EXPENSES_END_DATE: "",
-                EXPENSES_COST_CENTER: "",
+                EXPENSES_DETAIL_TYPE: "",
                 EXPENSES_APPROVAL_STATUS: "",
                 flag: "flag",
             },
@@ -534,10 +531,9 @@ export default function CashAdvance({ auth }: PageProps) {
         inputDataSearch("EXPENSES_VENDOR", "", 0);
         inputDataSearch("EXPENSES_REQUESTED_BY", "", 0);
         inputDataSearch("EXPENSES_DIVISION", "", 0);
-        inputDataSearch("EXPENSES_USED_BY", "", 0);
         inputDataSearch("EXPENSES_START_DATE", "", 0);
         inputDataSearch("EXPENSES_END_DATE", "", 0);
-        inputDataSearch("EXPENSES_COST_CENTER", "", 0);
+        inputDataSearch("EXPENSES_DETAIL_TYPE", "", 0);
         inputDataSearch("EXPENSES_APPROVAL_STATUS", "", 0);
         inputDataSearch("flag", "flag", 0);
 
@@ -567,7 +563,7 @@ export default function CashAdvance({ auth }: PageProps) {
                     expenses_detail_currency: 1,
                     expenses_detail_amount_value: "",
                     expenses_detail_relation_organization_id: "",
-                    expenses_detail_reff_number: "",
+                    expenses_detail_cost_classification: "",
                     expenses_detail_description: "",
                     expenses_detail_document: [],
                 },
@@ -809,18 +805,18 @@ export default function CashAdvance({ auth }: PageProps) {
             });
     };
 
-    const [getCountExpensesApprove3Status, setCountExpensesApprove3Status] =
-        useState<any>([]);
-    const getExpensesApprove3Status = async () => {
-        await axios
-            .get(`/getCountExpensesApprove3Status`)
-            .then((res) => {
-                setCountExpensesApprove3Status(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+    // const [getCountExpensesApprove3Status, setCountExpensesApprove3Status] =
+    //     useState<any>([]);
+    // const getExpensesApprove3Status = async () => {
+    //     await axios
+    //         .get(`/getCountExpensesApprove3Status`)
+    //         .then((res) => {
+    //             setCountExpensesApprove3Status(res.data);
+    //         })
+    //         .catch((err) => {
+    //             console.log(err);
+    //         });
+    // };
 
     const [
         getCountExpensesNeedRevisionStatus,
@@ -1055,12 +1051,13 @@ export default function CashAdvance({ auth }: PageProps) {
         });
 
     const selectApproval = employees
-        ?.filter((m: any) =>
-            data.expenses_cost_center?.value === 138
-                ? m.DIVISION_ID === 123
-                : m.DIVISION_ID === data.expenses_cost_center?.value &&
-                  (m.STRUCTURE_ID === 107 || m.STRUCTURE_ID === 108) &&
-                  m.EMPLOYEE_IS_DELETED === 0
+        ?.filter(
+            (m: any) =>
+                // data.expenses_cost_center?.value === 138
+                //     ? m.DIVISION_ID === 123
+                //     : m.DIVISION_ID === data.expenses_cost_center?.value &&
+                //       (m.STRUCTURE_ID === 107 || m.STRUCTURE_ID === 108) &&
+                m.EMPLOYEE_IS_DELETED === 0
         )
         .map((query: any) => {
             return {
@@ -1084,6 +1081,13 @@ export default function CashAdvance({ auth }: PageProps) {
             return selected[0].label;
         }
     };
+
+    const selectOperationalPayment = PaymentType?.map((query: any) => {
+        return {
+            value: query.PAYMENT_TYPE_ID,
+            label: query.PAYMENT_TYPE_NAME,
+        };
+    });
 
     const selectCoa = coa?.map((query: any) => {
         return {
@@ -1116,7 +1120,7 @@ export default function CashAdvance({ auth }: PageProps) {
     // console.log("Data", data);
     // console.log(DataRow);
     // console.log(" Expenses", expenses.data);
-    // console.log("Data By Id", dataById);
+    console.log("Data By Id", dataById);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Expenses"}>
@@ -1260,7 +1264,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     readOnly
                                 />
                             </div>
-                            <div className="w-full mb-1">
+                            {/* <div className="w-full mb-1">
                                 <InputLabel
                                     htmlFor="expenses_cost_center"
                                     className="mb-2"
@@ -1325,7 +1329,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     }
                                     primaryColor={"bg-red-500"}
                                 />
-                            </div>
+                            </div> */}
                             <div className="w-full mb-1">
                                 <InputLabel
                                     htmlFor="expenses_branch"
@@ -1382,14 +1386,35 @@ export default function CashAdvance({ auth }: PageProps) {
                                     options={selectApproval}
                                     isSearchable={true}
                                     placeholder={"Choose Request To"}
-                                    value={data.expenses_first_approval_by}
+                                    value={data.expenses_request_for_approval}
                                     onChange={(val: any) =>
                                         setData({
                                             ...data,
-                                            expenses_first_approval_by: val,
+                                            expenses_request_for_approval: val,
                                         })
                                     }
                                     primaryColor={"bg-red-500"}
+                                />
+                            </div>
+                            <div className="w-full mb-1">
+                                <InputLabel
+                                    htmlFor="expenses_reff_number"
+                                    value="Reff Number"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="expenses_reff_number"
+                                    type="text"
+                                    name="expenses_reff_number"
+                                    value={data.expenses_reff_number}
+                                    onChange={(e) =>
+                                        setData({
+                                            ...data,
+                                            expenses_reff_number:
+                                                e.target.value,
+                                        })
+                                    }
+                                    autoComplete="off"
                                 />
                             </div>
                         </div>
@@ -1401,35 +1426,52 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border px-2"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
                                         />
-                                        <TH className="border py-2">
+                                        <TH className="border px-3 py-2">
                                             Due Date
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
                                         </TH>
-                                        <TH className="border py-2">Type</TH>
-                                        <TH className="border py-2">
+                                        <TH className="border px-3 py-2">
+                                            Type{" "}
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border px-3 py-2">
                                             Currency
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
                                         </TH>
-                                        <TH className="border py-2">
+                                        <TH className="border px-3 py-2">
                                             Value
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border py-2">
+                                        <TH className="border px-3 py-2">
                                             Paid To
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border py-2">
+                                        <TH className="border px-3 py-2">
+                                            Cost Classification
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border px-3 py-2">
                                             Description
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border py-2 px-3">
+                                        <TH className="border px-3 py-2">
                                             Document
                                         </TH>
                                         {data.expensesDetail.length > 1 && (
@@ -1472,6 +1514,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             placeholderText="dd-mm-yyyyy"
                                                             className="border-0 rounded-md shadow-md text-sm h-9 w-[100%] focus:ring-2 focus:ring-inset focus:ring-red-600"
                                                             autoComplete="off"
+                                                            required
                                                         />
                                                     </div>
                                                 </TD>
@@ -1610,6 +1653,41 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         primaryColor="bg-red-500"
                                                     />
                                                 </TD>
+                                                <TD>
+                                                    <Select
+                                                        classNames={{
+                                                            menuButton: () =>
+                                                                `flex w-96 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50",
+                                                            listItem: ({
+                                                                isSelected,
+                                                            }: any) =>
+                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                    isSelected
+                                                                        ? `text-white bg-red-600`
+                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                }`,
+                                                        }}
+                                                        options={selectCoa}
+                                                        isSearchable={true}
+                                                        placeholder={
+                                                            "Choose COA"
+                                                        }
+                                                        value={
+                                                            ed.expenses_detail_cost_classification
+                                                        }
+                                                        onChange={(val: any) =>
+                                                            handleChangeRow(
+                                                                val,
+                                                                "expenses_detail_cost_classification",
+                                                                i
+                                                            )
+                                                        }
+                                                        primaryColor={
+                                                            "bg-red-500"
+                                                        }
+                                                    />
+                                                </TD>
                                                 <TD className="border">
                                                     <div className="w-96">
                                                         <TextInput
@@ -1710,7 +1788,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             <Textarea
                                 id="expenses_request_note"
                                 name="expenses_request_note"
-                                className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600 bg-white"
                                 rows={5}
                                 value={data.expenses_request_note}
                                 onChange={(val) =>
@@ -1966,42 +2044,6 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="expenses_cost_center"
-                                    value="Cost Center"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="expenses_cost_center"
-                                    type="text"
-                                    name="expenses_cost_center"
-                                    value={
-                                        dataById.cost_center
-                                            ?.COMPANY_DIVISION_ALIAS
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="expenses_used_by"
-                                    value="Used By"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="expenses_used_by"
-                                    type="text"
-                                    name="expenses_used_by"
-                                    value={
-                                        dataById.employee_used_by
-                                            ?.EMPLOYEE_FIRST_NAME
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
                                     htmlFor="expenses_branch"
                                     value="Branch"
                                     className="mb-2"
@@ -2019,17 +2061,36 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="expenses_first_approval_by"
+                                    htmlFor="expenses_request_for_approval"
                                     value="Request for Approval"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="expenses_first_approval_by"
+                                    id="expenses_request_for_approval"
                                     type="text"
-                                    name="expenses_first_approval_by"
+                                    name="expenses_request_for_approval"
                                     value={
                                         dataById.employee_approval
                                             ?.EMPLOYEE_FIRST_NAME
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="expenses_reff_number"
+                                    value="Reff Number"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="expenses_reff_number"
+                                    type="text"
+                                    name="expenses_reff_number"
+                                    value={
+                                        dataById?.EXPENSES_REFF_NUMBER
+                                            ? dataById?.EXPENSES_REFF_NUMBER
+                                            : "-"
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2044,18 +2105,33 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border w-10 p-2"
+                                            className="border w-10 px-3 py-2"
                                             rowSpan="2"
                                         />
-                                        <TH className="border p-2">Due Date</TH>
-                                        <TH className="border p-2">Type</TH>
-                                        <TH className="border p-2">Currency</TH>
-                                        <TH className="border p-2">Value</TH>
-                                        <TH className="border p-2">Paid To</TH>
-                                        <TH className="border p-2">
+                                        <TH className="border px-3 py-2">
+                                            Due Date
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Type
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Currency
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Value
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Paid To
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Cost Classification
+                                        </TH>
+                                        <TH className="border px-3 py-2">
                                             Description
                                         </TH>
-                                        <TH className="border p-2">Document</TH>
+                                        <TH className="border px-3 py-2">
+                                            Document
+                                        </TH>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2065,45 +2141,54 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 className="text-center text-gray-700 text-sm"
                                                 key={i}
                                             >
-                                                <TD className="border w-10 p-2">
+                                                <TD className="border w-10 px-3 py-2">
                                                     {i + 1}.
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {dateFormat(
                                                         ed.EXPENSES_DETAIL_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {
                                                         ed.payment_type
                                                             ?.PAYMENT_TYPE_NAME
                                                     }
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {
                                                         ed.currency
                                                             ?.CURRENCY_SYMBOL
                                                     }
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {formatCurrency.format(
                                                         ed.EXPENSES_DETAIL_AMOUNT_VALUE
                                                     )}
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {ed.relation_organization
                                                         ? ed
                                                               .relation_organization
                                                               .RELATION_ORGANIZATION_ALIAS
                                                         : "-"}
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
+                                                    {ed.cost_classification
+                                                        ? ed.cost_classification
+                                                              ?.COA_CODE +
+                                                          " - " +
+                                                          ed.cost_classification
+                                                              ?.COA_TITLE
+                                                        : "-"}
+                                                </TD>
+                                                <TD className="border px-3 py-2">
                                                     {ed.EXPENSES_DETAIL_DESCRIPTION
                                                         ? ed.EXPENSES_DETAIL_DESCRIPTION
                                                         : "-"}
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {ed?.m_expenses_document
                                                         ?.length > 0 ? (
                                                         <button
@@ -2139,7 +2224,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="border p-2 font-bold">
+                                        <TD className="border px-3 py-2 font-bold">
                                             {formatCurrency.format(
                                                 dataById.EXPENSES_TOTAL_AMOUNT
                                             )}
@@ -2210,7 +2295,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             />
                         </div>
 
-                        <div className="mt-10">
+                        {/* <div className="mt-10">
                             <p>Status</p>
                             <ul role="list" className="mt-5">
                                 <li>
@@ -2362,7 +2447,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </li>
                                 )}
                             </ul>
-                        </div>
+                        </div> */}
                     </>
                 }
             />
@@ -2543,42 +2628,6 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="cost_center"
-                                    value="Cost Center"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="cost_center"
-                                    type="text"
-                                    name="cost_center"
-                                    value={
-                                        dataById.cost_center
-                                            ?.COMPANY_DIVISION_ALIAS
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemohon"
-                                    value="Used By"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="namaPemohon"
-                                    type="text"
-                                    name="namaPemohon"
-                                    value={
-                                        dataById.employee_used_by
-                                            ?.EMPLOYEE_FIRST_NAME
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
                                     htmlFor="branch"
                                     value="Branch"
                                     className="mb-2"
@@ -2612,6 +2661,25 @@ export default function CashAdvance({ auth }: PageProps) {
                                     readOnly
                                 />
                             </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="expenses_reff_number"
+                                    value="Reff Number"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="expenses_reff_number"
+                                    type="text"
+                                    name="expenses_reff_number"
+                                    value={
+                                        dataById?.EXPENSES_REFF_NUMBER
+                                            ? dataById?.EXPENSES_REFF_NUMBER
+                                            : "-"
+                                    }
+                                    className="bg-gray-100"
+                                    readOnly
+                                />
+                            </div>
                         </div>
 
                         {/* Table form start */}
@@ -2621,28 +2689,49 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border w-10 p-2"
+                                            className="border w-10 px-3 py-2"
                                             rowSpan="2"
                                         />
-                                        <TH className="border p-2">Due Date</TH>
-                                        <TH className="border p-2">Type</TH>
-                                        <TH className="border p-2">Currency</TH>
-                                        <TH className="border p-2">Value</TH>
-                                        <TH className="border p-2">Paid To</TH>
-                                        <TH className="border p-2">
+                                        <TH className="border px-3 py-2">
+                                            Due Date
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Type
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Currency
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Value
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Paid To
+                                        </TH>
+                                        <TH
+                                            className="border px-3 py-2"
+                                            rowSpan="2"
+                                        >
+                                            Cost Classification
+                                        </TH>
+                                        <TH className="border px-3 py-2">
                                             Description
                                         </TH>
-                                        <TH className="border p-2">Document</TH>
-                                        <TH className="border p-2" rowSpan="2">
+                                        <TH className="border px-3 py-2">
+                                            Document
+                                        </TH>
+                                        <TH
+                                            className="border px-3 py-2"
+                                            rowSpan="2"
+                                        >
                                             Approval
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border p-2" rowSpan="2">
-                                            Cost Classification
-                                        </TH>
-                                        <TH className="border p-2" rowSpan="2">
+                                        <TH
+                                            className="border px-3 py-2"
+                                            rowSpan="2"
+                                        >
                                             Amount Approve
                                             <span className="text-red-600">
                                                 *
@@ -2650,7 +2739,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </TH>
                                         <TH
                                             label="Remarks"
-                                            className="border p-2"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
                                         />
                                     </tr>
@@ -2665,42 +2754,51 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 <TD className="border w-10">
                                                     {i + 1}.
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {dateFormat(
                                                         ed.EXPENSES_DETAIL_DATE,
                                                         "dd-mm-yyyy"
                                                     )}
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {
                                                         ed.payment_type
                                                             ?.PAYMENT_TYPE_NAME
                                                     }
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {
                                                         ed.currency
                                                             ?.CURRENCY_SYMBOL
                                                     }
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {formatCurrency.format(
                                                         ed.EXPENSES_DETAIL_AMOUNT_VALUE
                                                     )}
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {ed.relation_organization
                                                         ? ed
                                                               .relation_organization
                                                               .RELATION_ORGANIZATION_ALIAS
                                                         : "-"}
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
+                                                    {ed.cost_classification
+                                                        ? ed.cost_classification
+                                                              ?.COA_CODE +
+                                                          " - " +
+                                                          ed.cost_classification
+                                                              ?.COA_TITLE
+                                                        : "-"}
+                                                </TD>
+                                                <TD className="border px-3 py-2">
                                                     {ed.EXPENSES_DETAIL_DESCRIPTION
                                                         ? ed.EXPENSES_DETAIL_DESCRIPTION
                                                         : "-"}
                                                 </TD>
-                                                <TD className="border p-2">
+                                                <TD className="border px-3 py-2">
                                                     {ed?.m_expenses_document
                                                         ?.length > 0 ? (
                                                         <button
@@ -2766,44 +2864,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             )
                                                         )}
                                                     </select>
-                                                </TD>
-                                                <TD className="border">
-                                                    <Select
-                                                        classNames={{
-                                                            menuButton: () =>
-                                                                `flex w-96 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50",
-                                                            listItem: ({
-                                                                isSelected,
-                                                            }: any) =>
-                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                                    isSelected
-                                                                        ? `text-white bg-red-600`
-                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                                                }`,
-                                                        }}
-                                                        options={selectCoa}
-                                                        isSearchable={true}
-                                                        placeholder={
-                                                            "Choose COA"
-                                                        }
-                                                        value={{
-                                                            label: getCoaSelect(
-                                                                ed.EXPENSES_DETAIL_COST_CLASSIFICATION
-                                                            ),
-                                                            value: ed.EXPENSES_DETAIL_COST_CLASSIFICATION,
-                                                        }}
-                                                        onChange={(val: any) =>
-                                                            handleChangeApprove(
-                                                                val.value,
-                                                                "EXPENSES_DETAIL_COST_CLASSIFICATION",
-                                                                i
-                                                            )
-                                                        }
-                                                        primaryColor={
-                                                            "bg-red-500"
-                                                        }
-                                                    />
                                                 </TD>
                                                 <TD className="border">
                                                     <CurrencyInput
@@ -2886,7 +2946,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             PROPOSE AMOUNT
                                         </TD>
-                                        <TD className="border font-bold text-center p-2">
+                                        <TD className="border font-bold text-center px-3 py-2">
                                             {formatCurrency.format(
                                                 dataById.EXPENSES_TOTAL_AMOUNT
                                             )}
@@ -2899,7 +2959,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         >
                                             APPROVE AMOUNT
                                         </TD>
-                                        <TD className="border font-bold text-center p-2">
+                                        <TD className="border font-bold text-center px-3 py-2">
                                             {formatCurrency.format(
                                                 approveTotalAmount
                                             )}
@@ -3243,42 +3303,6 @@ export default function CashAdvance({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="cost_center"
-                                    value="Cost Center"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="cost_center"
-                                    type="text"
-                                    name="cost_center"
-                                    value={
-                                        dataById.cost_center
-                                            ?.COMPANY_DIVISION_ALIAS
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
-                                    htmlFor="namaPemohon"
-                                    value="Used By"
-                                    className="mb-2"
-                                />
-                                <TextInput
-                                    id="namaPemohon"
-                                    type="text"
-                                    name="namaPemohon"
-                                    value={
-                                        dataById.employee_used_by
-                                            ?.EMPLOYEE_FIRST_NAME
-                                    }
-                                    className="bg-gray-100"
-                                    readOnly
-                                />
-                            </div>
-                            <div className="w-full p-2">
-                                <InputLabel
                                     htmlFor="branch"
                                     value="Branch"
                                     className="mb-2"
@@ -3312,6 +3336,27 @@ export default function CashAdvance({ auth }: PageProps) {
                                     readOnly
                                 />
                             </div>
+                            <div className="w-full p-2">
+                                <InputLabel
+                                    htmlFor="expenses_reff_number"
+                                    value="Reff Number"
+                                    className="mb-2"
+                                />
+                                <TextInput
+                                    id="expenses_reff_number"
+                                    type="text"
+                                    name="expenses_reff_number"
+                                    value={dataById?.EXPENSES_REFF_NUMBER}
+                                    onChange={(e) =>
+                                        setDataById({
+                                            ...dataById,
+                                            EXPENSES_REFF_NUMBER:
+                                                e.target.value,
+                                        })
+                                    }
+                                    autoComplete="off"
+                                />
+                            </div>
                         </div>
 
                         {/* Table form start */}
@@ -3321,31 +3366,54 @@ export default function CashAdvance({ auth }: PageProps) {
                                     <tr className="text-center">
                                         <TH
                                             label="No."
-                                            className="border p-2"
+                                            className="border px-3 py-2"
                                             rowSpan="2"
                                         />
-                                        <TH className="border p-2">Due Date</TH>
-                                        <TH className="border p-2">Type</TH>
-                                        <TH className="border p-2">Currency</TH>
-                                        <TH className="border p-2">
+                                        <TH className="border px-3 py-2">
+                                            Due Date
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Type
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border px-3 py-2">
+                                            Currency
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border px-3 py-2">
                                             Value
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border p-2">
+                                        <TH className="border px-3 py-2">
                                             Paid To
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border p-2">
+                                        <TH className="border px-3 py-2">
+                                            Cost Classification
+                                            <span className="text-red-600">
+                                                *
+                                            </span>
+                                        </TH>
+                                        <TH className="border px-3 py-2">
                                             Description
                                             <span className="text-red-600">
                                                 *
                                             </span>
                                         </TH>
-                                        <TH className="border p-2">Document</TH>
+                                        <TH className="border px-3 py-2">
+                                            Document
+                                        </TH>
                                         {data.expensesDetail.length > 1 && (
                                             <TH
                                                 label="Action"
@@ -3531,6 +3599,44 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     />
                                                 </TD>
                                                 <TD className="border">
+                                                    <Select
+                                                        classNames={{
+                                                            menuButton: () =>
+                                                                `flex w-96 text-sm text-gray-500 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50",
+                                                            listItem: ({
+                                                                isSelected,
+                                                            }: any) =>
+                                                                `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                                    isSelected
+                                                                        ? `text-white bg-red-600`
+                                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                                }`,
+                                                        }}
+                                                        options={selectCoa}
+                                                        isSearchable={true}
+                                                        placeholder={
+                                                            "Choose COA"
+                                                        }
+                                                        value={{
+                                                            label: getCoaSelect(
+                                                                ed.EXPENSES_DETAIL_COST_CLASSIFICATION
+                                                            ),
+                                                            value: ed.EXPENSES_DETAIL_COST_CLASSIFICATION,
+                                                        }}
+                                                        onChange={(val: any) =>
+                                                            handleChangeRevised(
+                                                                val.value,
+                                                                "EXPENSES_DETAIL_COST_CLASSIFICATION",
+                                                                i
+                                                            )
+                                                        }
+                                                        primaryColor={
+                                                            "bg-red-500"
+                                                        }
+                                                    />
+                                                </TD>
+                                                <TD className="border">
                                                     <div className="w-96">
                                                         <TextInput
                                                             id="EXPENSES_DETAIL_DESCRIPTION"
@@ -3641,7 +3747,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             <Textarea
                                 id="expenses_request_note"
                                 name="expenses_request_note"
-                                className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600 bg-white"
                                 rows={5}
                                 value={dataById.EXPENSES_REQUEST_NOTE || ""}
                                 readOnly
@@ -4096,53 +4202,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                         primaryColor={"bg-red-500"}
                                     />
                                 </div>
-                                <InputSearch
-                                    id="EXPENSES_USED_BY"
-                                    name="EXPENSES_USED_BY"
-                                    type="text"
-                                    placeholder="Used By"
-                                    autoComplete="off"
-                                    value={
-                                        searchExpenses.expenses_search[0]
-                                            .EXPENSES_USED_BY
-                                    }
-                                    onChange={(val: any) => {
-                                        inputDataSearch(
-                                            "EXPENSES_USED_BY",
-                                            val.target.value,
-                                            0
-                                        );
-                                        if (
-                                            searchExpenses.expenses_search[0]
-                                                .EXPENSES_USED_BY === ""
-                                        ) {
-                                            inputDataSearch("flag", "flag", 0);
-                                        } else {
-                                            inputDataSearch("flag", "", 0);
-                                        }
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            const expensesUsedBy =
-                                                searchExpenses
-                                                    .expenses_search[0]
-                                                    .EXPENSES_USED_BY;
-                                            if (expensesUsedBy) {
-                                                inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
-                                                setTimeout(() => {
-                                                    setRefreshSuccess("");
-                                                });
-                                            } else {
-                                                inputDataSearch(
-                                                    "flag",
-                                                    "flag",
-                                                    0
-                                                );
-                                            }
-                                        }
-                                    }}
-                                />
                                 <div className="grid grid-cols-1 mb-5 relative">
                                     <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
                                     <DatePicker
@@ -4276,23 +4335,23 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         : `text-gray-500 hover:bg-red-100 hover:text-black`
                                                 }`,
                                         }}
-                                        options={selectDivision}
+                                        options={selectOperationalPayment}
                                         isSearchable={true}
-                                        placeholder={"Cost Center"}
+                                        placeholder={"Operational Payment"}
                                         value={
                                             searchExpenses.expenses_search[0]
-                                                .EXPENSES_COST_CENTER
+                                                .EXPENSES_DETAIL_TYPE
                                         }
                                         onChange={(val: any) => {
                                             inputDataSearch(
-                                                "EXPENSES_COST_CENTER",
+                                                "EXPENSES_DETAIL_TYPE",
                                                 val,
                                                 0
                                             );
                                             if (
                                                 searchExpenses
                                                     .expenses_search[0]
-                                                    .EXPENSES_COST_CENTER === ""
+                                                    .EXPENSES_DETAIL_TYPE === ""
                                             ) {
                                                 inputDataSearch(
                                                     "flag",
@@ -4474,7 +4533,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </span>
                                         </Button>
                                     </div>
-                                    <div className="flex relative">
+                                    {/* <div className="flex relative">
                                         <Button
                                             className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
                                             onClick={() => {
@@ -4513,7 +4572,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 {getCountExpensesApprove3Status}
                                             </span>
                                         </Button>
-                                    </div>
+                                    </div> */}
                                     <div className="flex relative">
                                         <Button
                                             className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
@@ -4648,7 +4707,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             url={"getExpenses"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
-                            cellHeight={undefined}
+                            rowHeight={130}
                             colDefs={[
                                 {
                                     headerName: "No.",
@@ -4689,11 +4748,10 @@ export default function CashAdvance({ auth }: PageProps) {
                                     headerName: "Approval",
                                     children: [
                                         {
-                                            headerName: "Approve 1",
+                                            headerName: "Approve",
                                             field: "EXPENSES_FIRST_APPROVAL_USER",
                                             flex: 2,
                                             cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
                                             cellRenderer: (params: any) => {
                                                 const first_approval_status =
                                                     params.data
@@ -4729,134 +4787,162 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     title = "Reject";
                                                 }
 
-                                                return (
-                                                    <>
-                                                        <BadgeFlat
-                                                            className={
-                                                                badgeClass
-                                                            }
-                                                            title={title}
-                                                            body={params.value}
-                                                        />
-                                                    </>
-                                                );
-                                            },
-                                        },
-                                        {
-                                            headerName: "Approve 2",
-                                            field: "EXPENSES_SECOND_APPROVAL_USER",
-                                            flex: 2,
-                                            cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
-                                            cellRenderer: (params: any) => {
                                                 const second_approval_status =
                                                     params.data
                                                         .EXPENSES_SECOND_APPROVAL_STATUS;
+                                                const second_approval_user =
+                                                    params.data
+                                                        .EXPENSES_SECOND_APPROVAL_USER;
 
-                                                let badgeClass = "";
-                                                let title = "";
+                                                let badgeClassSecond = "";
+                                                let titleSecond = "";
 
                                                 if (
                                                     second_approval_status === 2
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Approve";
+                                                    titleSecond = "Approve";
                                                 } else if (
                                                     second_approval_status === 3
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-yellow-300 text-white";
-                                                    title = "Need Revision";
+                                                    titleSecond =
+                                                        "Need Revision";
                                                 } else if (
                                                     second_approval_status === 4
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-red-100 text-red-700";
-                                                    title = "Reject";
+                                                    titleSecond = "Reject";
                                                 } else if (
                                                     second_approval_status === 5
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Execute";
+                                                    titleSecond = "Execute";
                                                 } else if (
                                                     second_approval_status === 6
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassSecond =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Complited";
+                                                    titleSecond = "Complited";
                                                 }
 
-                                                return (
-                                                    <>
-                                                        <BadgeFlat
-                                                            className={
-                                                                badgeClass
-                                                            }
-                                                            title={title}
-                                                            body={
-                                                                params.value
-                                                                    ? params.value
-                                                                    : "-"
-                                                            }
-                                                        />
-                                                    </>
-                                                );
-                                            },
-                                        },
-                                        {
-                                            headerName: "Approve 3",
-                                            field: "EXPENSES_THIRD_APPROVAL_USER",
-                                            flex: 2,
-                                            cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
-                                            cellRenderer: (params: any) => {
                                                 const third_approval_status =
                                                     params.data
                                                         .EXPENSES_THIRD_APPROVAL_STATUS;
+                                                const third_approval_user =
+                                                    params.data
+                                                        .EXPENSES_THIRD_APPROVAL_USER;
 
-                                                let badgeClass = "";
-                                                let title = "";
+                                                let badgeClassThird = "";
+                                                let titleThird = "";
 
                                                 if (
                                                     third_approval_status === 2
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-green-100 text-green-700";
-                                                    title = "Approve";
+                                                    titleThird = "Approve";
                                                 } else if (
                                                     third_approval_status === 3
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-yellow-300 text-white";
-                                                    title = "Need Revision";
+                                                    titleThird =
+                                                        "Need Revision";
                                                 } else if (
                                                     third_approval_status === 4
                                                 ) {
-                                                    badgeClass =
+                                                    badgeClassThird =
                                                         "bg-red-100 text-red-700";
-                                                    title = "Reject";
+                                                    titleThird = "Reject";
                                                 }
+
+                                                return (
+                                                    <div className="flex flex-col">
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClass
+                                                                }
+                                                                title={title}
+                                                                body={
+                                                                    params.value
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClassSecond
+                                                                }
+                                                                title={
+                                                                    titleSecond
+                                                                }
+                                                                body={
+                                                                    second_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClassThird
+                                                                }
+                                                                title={
+                                                                    titleThird
+                                                                }
+                                                                body={
+                                                                    third_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            },
+                                        },
+                                        {
+                                            headerName: "Status",
+                                            flex: 2,
+                                            filter: "agSetColumnFilter",
+                                            filterParams: {
+                                                values: ["Execute", "Pending"],
+                                            },
+                                            cellStyle: { textAlign: "center" },
+                                            cellRenderer: (params: any) => {
+                                                const paramsData = params.data;
+                                                const status =
+                                                    paramsData?.EXPENSES_SECOND_APPROVAL_STATUS ===
+                                                    6
+                                                        ? "Execute"
+                                                        : "Pending";
 
                                                 return (
                                                     <>
                                                         <BadgeFlat
                                                             className={
-                                                                badgeClass
+                                                                status ===
+                                                                "Execute"
+                                                                    ? "bg-green-100 text-green-700"
+                                                                    : "bg-yellow-300 text-white"
                                                             }
-                                                            title={title}
-                                                            body={
-                                                                params.value
-                                                                    ? params.value
-                                                                    : "-"
-                                                            }
+                                                            title={status}
+                                                            body={status}
                                                         />
                                                     </>
                                                 );
                                             },
                                         },
                                     ],
+                                },
+                                {
+                                    headerName: "Refference Number",
+                                    field: "EXPENSES_REFF_NUMBER",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
                                 },
                                 {
                                     headerName: "Action",

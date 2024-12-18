@@ -5033,7 +5033,7 @@ export default function Reimburse({ auth }: PageProps) {
                             url={"getReimburse"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
-                            cellHeight={130}
+                            rowHeight={130}
                             colDefs={[
                                 {
                                     headerName: "No.",
@@ -5078,7 +5078,6 @@ export default function Reimburse({ auth }: PageProps) {
                                             field: "REIMBURSE_FIRST_APPROVAL_USER",
                                             flex: 2,
                                             cellHeader: "header-center",
-                                            cellStyle: { textAlign: "center" },
                                             cellRenderer: (params: any) => {
                                                 const first_approval_status =
                                                     params.data
@@ -5260,16 +5259,6 @@ export default function Reimburse({ auth }: PageProps) {
                                                         />
                                                     </>
                                                 );
-                                            },
-                                            valueGetter: (params: any) => {
-                                                // Mengembalikan nilai status untuk digunakan dalam filter
-                                                const status =
-                                                    params.data
-                                                        ?.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                    6
-                                                        ? "Execute"
-                                                        : "Pending";
-                                                return status;
                                             },
                                         },
                                     ],
