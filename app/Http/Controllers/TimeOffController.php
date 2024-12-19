@@ -726,8 +726,8 @@ class TimeOffController extends Controller
         $newSearch = json_decode($request->newFilter, true);       
         $query = DB::table('t_request_time_off_master as rtom')
             ->join('t_employee AS e', 'rtom.EMPLOYEE_ID', '=', 'e.EMPLOYEE_ID')
-            ->where('STATUS', '=', '0')
-            ->where('rtom.IS_CANCELED', '=', '0')
+            ->where('STATUS', '=', '0') // STATUS = REQUEST
+            ->where('rtom.IS_CANCELED', '=', '0') // CANCEL = NO
             // ->where('e.COMPANY_ID', '=', $newSearch['COMPANY_ID'])
             // ->where('e.DIVISION_ID', '=', $newSearch['DIVISION_ID'])
             ->where('rtom.REQUEST_TO', '=', $newSearch['EMPLOYEE_ID'])

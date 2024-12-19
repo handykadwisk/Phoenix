@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\MMedicalDetail;
 use App\Models\MMedicalDocument;
 use App\Models\RTimeOffType;
+use App\Models\TCompany;
 use App\Models\TCompanyDivision;
 use App\Models\TEmployee;
 use App\Models\TMedical;
@@ -379,6 +380,7 @@ class MedicalController extends Controller
                 
         return Inertia::render('Medical/Approval/Index', [
             'selectYear' => $listYear,
+            'companies' => TCompany::get(),
             'listEmployee' => TEmployee::where('EMPLOYEE_IS_DELETED', '=', '0')->get(),
             'listDivision' => TCompanyDivision::get()
         ]);
@@ -412,7 +414,11 @@ class MedicalController extends Controller
 
         if ($request->newFilter != "") {
             foreach ($newSearch[0] as $keyId => $searchValue) {
-                if ($keyId === 'YEAR') {
+                if ($keyId === 'COMPANY_ID') {
+                    if ($searchValue != "") {
+                        $query->where('m.COMPANY_ID', '=', $searchValue);
+                    }                        
+                }elseif ($keyId === 'YEAR') {
                     if ($searchValue != "") {
                         $query->where(DB::raw('year(m.REQUEST_DATE)'), '=', $searchValue);
                     }                        

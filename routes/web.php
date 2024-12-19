@@ -37,6 +37,7 @@ use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\RelationController;
+use App\Http\Controllers\ReportAttendanceController;
 use App\Http\Controllers\TCompanyController;
 use App\Http\Controllers\TCompanyDivisionController;
 use App\Http\Controllers\TCompanyOfficeController;
@@ -638,6 +639,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/getAdditionalAllowanceById/{id}', [AdditionalAllowanceController::class, 'getAdditionalAllowanceById'])->name('getAdditionalAllowanceById');
     Route::post('/editAdditionalAllowance', [AdditionalAllowanceController::class, 'editAdditionalAllowance'])->name('editAdditionalAllowance');
     Route::post('/deleteAdditionalAllowance', [AdditionalAllowanceController::class, 'deleteAdditionalAllowance'])->name('deleteAdditionalAllowance');
+
+
+    // Report Attendance
+    Route::get('/hr/reportAttendance', [ReportAttendanceController::class, 'index'])->name('hr/reportAttendance');
+    Route::get('/getAttendanceAgGrid', [ReportAttendanceController::class, 'getAttendanceAgGrid'])->name('getAttendanceAgGrid');
+    Route::get('/getOfficeByCompanyId/{id}', [ReportAttendanceController::class, 'getOfficeByCompanyId'])->name('getOfficeByCompanyId');
+    Route::get('/detailAttendanceReportAgGrid', [ReportAttendanceController::class, 'detailAttendanceReportAgGrid'])->name('detailAttendanceReportAgGrid');
 
 });
 

@@ -20,7 +20,8 @@ import { ArrowDownTrayIcon, PlusCircleIcon, XMarkIcon } from "@heroicons/react/2
 import { rm } from "fs";
 
 export default function Index({ auth }: PageProps) {
-    const { selectYear, listEmployee, listDivision }: any = usePage().props;
+    const { selectYear, listEmployee, listDivision, companies }: any =
+        usePage().props;
 
     const employee: any = auth.user.employee;
     
@@ -66,6 +67,7 @@ export default function Index({ auth }: PageProps) {
     const [searchDate, setSearchDate] = useState<any>({
         medical_search: [
             {
+                COMPANY_ID: "",
                 YEAR: dateFormat(new Date(), "yyyy"),
                 MONTH: dateFormat(new Date(), "mm"),
             },
@@ -81,6 +83,8 @@ export default function Index({ auth }: PageProps) {
         changeVal[i][name] = value;
         setSearchDate({ ...searchDate, medical_search: changeVal });
     };
+    console.log("searchDate: ", searchDate);
+    
     
     const clearSearch = async (e: FormEvent) => {
         e.preventDefault();
@@ -469,7 +473,7 @@ export default function Index({ auth }: PageProps) {
                 body={
                     <>
                         {Object.keys(reviewMedical).length > 0 && (
-                            <div className="bg-white shadow-md rounded-lg p-2 max-w-4xl mx-auto">
+                            <div className=" overflow-hidden rounded-lg bg-white shadow">
                                 <div className=" p-4 rounded-lg mb-4 border">
                                     <div className="bg-blue-50 rounded-lg flex justify-between items-center mb-2 pb-1">
                                         <h2 className="text-lg font-semibold ">
@@ -527,7 +531,7 @@ export default function Index({ auth }: PageProps) {
                                                     ? "General"
                                                     : "Maternity"}
                                             </p>
-                                            <p>
+                                            {/* <p>
                                                 <span className="font-bold">
                                                     Sisa Medical{" : "}
                                                 </span>
@@ -538,7 +542,7 @@ export default function Index({ auth }: PageProps) {
                                                     minimumFractionDigits: 2,
                                                     maximumFractionDigits: 2,
                                                 })}
-                                            </p>
+                                            </p> */}
                                         </div>
                                     </div>
                                 </div>
@@ -823,6 +827,35 @@ export default function Index({ auth }: PageProps) {
                         </Button>
                     </div> */}
                     <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
+                        <div className="mb-2">
+                            <select
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                value={searchDate.medical_search[0].COMPANY_ID}
+                                onChange={(e) => {
+                                    inputDataSearch(
+                                        "COMPANY_ID",
+                                        e.target.value,
+                                        0
+                                    );
+                                    setSuccessSearch("success");
+                                    setTimeout(() => {
+                                        setSuccessSearch("");
+                                    }, 1000);
+                                }}
+                                required
+                            >
+                                <option value={""}>
+                                    -- <i>Select Company</i> --
+                                </option>
+                                {companies.map((item: any, i: number) => {
+                                    return (
+                                        <option key={i} value={item.COMPANY_ID}>
+                                            {item.COMPANY_NAME}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
                         <div className="grid grid-cols-5 gap-2">
                             <div className="col-span-2">
                                 <select

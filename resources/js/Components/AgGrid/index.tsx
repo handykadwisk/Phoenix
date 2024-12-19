@@ -69,7 +69,7 @@ export default function AGGrid({
 
                 axios
                     .get(
-                        `/${urlNew}page=${page}&perPage=${
+                        `/${urlNew}&page=${page}&perPage=${
                             endRow - startRow
                         }&sort=${sortParams}&filter=${JSON.stringify(
                             filterParams

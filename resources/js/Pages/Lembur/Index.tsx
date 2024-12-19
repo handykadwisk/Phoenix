@@ -824,10 +824,10 @@ export default function Index({ auth }: PageProps) {
                                                             Tanggal
                                                         </th>
                                                         <th className="border px-2 py-1 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                                            Additional Allowance
+                                                            Attendance Activity
                                                         </th>
                                                         <th className="border px-2 py-1 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                                            Kode Lembur
+                                                            Tipe Lembur
                                                         </th>
                                                         <th className="border px-2 py-1 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                                             Shift
@@ -1369,10 +1369,10 @@ export default function Index({ auth }: PageProps) {
                                                         Tanggal
                                                     </th>
                                                     <th className="border px-2 py-1 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                                        Additional Allowance
+                                                        Attendance Activity
                                                     </th>
                                                     <th className="border px-2 py-1 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                                        Kode Lembur
+                                                        Tipe Lembur
                                                     </th>
                                                     <th className="border px-2 py-1 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                                                         Shift

@@ -399,6 +399,20 @@ console.log('tems: ', items)
         });
     };
 
+    const addRowEditDailyOff = (e: FormEvent) => {
+        e.preventDefault();
+        setEditRequestTimeOff({
+            ...editRequestTimeOff,
+            request_time_off: [
+                ...editRequestTimeOff.request_time_off,
+                {
+                    DATE_OF_LEAVE: "",
+                },
+            ],
+        });
+
+    };
+
     // End Edit Time Off
 
 
@@ -1594,7 +1608,9 @@ console.log('tems: ', items)
                                                         href=""
                                                         className="text-xs mt-1 text-white ms-1 py-1.5 px-2 bg-red-500 rounded-md"
                                                         onClick={(e) =>
-                                                            addRowDailyOff(e)
+                                                            addRowEditDailyOff(
+                                                                e
+                                                            )
                                                         }
                                                     >
                                                         + Add Date
@@ -1769,7 +1785,9 @@ console.log('tems: ', items)
                                             )}
                                         </div>
                                     </div>
-                                ) : ""}
+                                ) : (
+                                    ""
+                                )}
                             </div>
 
                             <div className="relative mt-4">
@@ -1971,7 +1989,8 @@ console.log('tems: ', items)
                                         valueGetter: function (params: any) {
                                             if (params.data) {
                                                 if (params.data.DESCRIPTION) {
-                                                    return params.data.DESCRIPTION;
+                                                    return params.data
+                                                        .DESCRIPTION;
                                                 } else {
                                                     return "-";
                                                 }

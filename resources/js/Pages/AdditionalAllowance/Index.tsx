@@ -31,6 +31,7 @@ export default function Index({ auth }: PageProps) {
         ADDITIONAL_ALLOWANCE_NAME: "",
         ADDITIONAL_ALLOWANCE_AMOUNT: 0,
         ADDITIONAL_ALLOWANCE_NOTE: "",
+        ADDITIONAL_ALLOWANCE_UANG_MAKAN:0
     };
     const [dataAdditionalAllowance, setDataAdditionalAllowance] = useState<any>(
       fieldAdditionalAllowance  
@@ -68,13 +69,13 @@ export default function Index({ auth }: PageProps) {
 
     // Edit Additional Allowance
 
-    const [dataEditAdditionalAllowance, setDataEditAdditionalAllowance] = useState<any>(
-        {
+    const [dataEditAdditionalAllowance, setDataEditAdditionalAllowance] =
+        useState<any>({
             ADDITIONAL_ALLOWANCE_NAME: "",
             ADDITIONAL_ALLOWANCE_AMOUNT: 0,
             ADDITIONAL_ALLOWANCE_NOTE: "",
-        }
-    );
+            ADDITIONAL_ALLOWANCE_UANG_MAKAN: 0,
+        });
     const getById = (id: any) => {
         axios
             .get(`/getAdditionalAllowanceById/${id}`)
@@ -276,6 +277,32 @@ export default function Index({ auth }: PageProps) {
                                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                     />
                                 </div>
+                                <div className="mb-4">
+                                    <label className="block text-sm font-bold mb-1 text-gray-700">
+                                        Uang Makan{" "}
+                                        <span className="text-red-600">*</span>
+                                    </label>
+                                    <CurrencyInput
+                                        id="ADDITIONAL_ALLOWANCE_UANG_MAKAN"
+                                        name="ADDITIONAL_ALLOWANCE_UANG_MAKAN"
+                                        value={
+                                            dataAdditionalAllowance.ADDITIONAL_ALLOWANCE_UANG_MAKAN
+                                        }
+                                        decimalScale={2}
+                                        decimalsLimit={2}
+                                        onValueChange={(val: any) =>
+                                            setDataAdditionalAllowance({
+                                                ...dataAdditionalAllowance,
+                                                ADDITIONAL_ALLOWANCE_UANG_MAKAN:
+                                                    val,
+                                            })
+                                        }
+                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                        required
+                                        placeholder="0.00"
+                                        autoComplete="off"
+                                    />
+                                </div>
                             </div>
                         </>
                     }
@@ -378,6 +405,31 @@ export default function Index({ auth }: PageProps) {
                                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 />
                             </div>
+                            <div className="mb-4">
+                                <label className="block text-sm font-bold mb-1 text-gray-700">
+                                    Uang Makan{" "}
+                                    <span className="text-red-600">*</span>
+                                </label>
+                                <CurrencyInput
+                                    id="ADDITIONAL_ALLOWANCE_UANG_MAKAN"
+                                    name="ADDITIONAL_ALLOWANCE_UANG_MAKAN"
+                                    value={
+                                        dataEditAdditionalAllowance.ADDITIONAL_ALLOWANCE_UANG_MAKAN
+                                    }
+                                    decimalScale={2}
+                                    decimalsLimit={2}
+                                    onValueChange={(val: any) =>
+                                        setDataEditAdditionalAllowance({
+                                            ...dataEditAdditionalAllowance,
+                                            ADDITIONAL_ALLOWANCE_UANG_MAKAN: val,
+                                        })
+                                    }
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6 text-right"
+                                    required
+                                    placeholder="0.00"
+                                    autoComplete="off"
+                                />
+                            </div>
                         </div>
                     </>
                 }
@@ -387,7 +439,6 @@ export default function Index({ auth }: PageProps) {
             {/* End Modal Add Additional Allowance */}
 
             <div className="grid grid-cols-4 gap-4  xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4 h-[100%]">
-                
                 <div className="relative col-span-4 bg-white shadow-md rounded-md p-5 max-h-[100rem] xs:mt-4 lg:mt-0">
                     <div className="mb-4">
                         <Button

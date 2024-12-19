@@ -26,6 +26,7 @@ class AdditionalAllowanceController extends Controller
             $lembur = TAdditionalAllowance::create([
                 'ADDITIONAL_ALLOWANCE_NAME'           => $request->ADDITIONAL_ALLOWANCE_NAME,
                 'ADDITIONAL_ALLOWANCE_AMOUNT'         => $request->ADDITIONAL_ALLOWANCE_AMOUNT,
+                'ADDITIONAL_ALLOWANCE_UANG_MAKAN'     => $request->ADDITIONAL_ALLOWANCE_UANG_MAKAN,
                 'ADDITIONAL_ALLOWANCE_CREATED_BY'     => Auth::user()->id,
                 'ADDITIONAL_ALLOWANCE_CREATED_DATE'   => now(),
                 'ADDITIONAL_ALLOWANCE_NOTE'           => $request->ADDITIONAL_ALLOWANCE_NOTE
@@ -91,6 +92,7 @@ class AdditionalAllowanceController extends Controller
                 ->update([
                 'ADDITIONAL_ALLOWANCE_NAME'           => $request->ADDITIONAL_ALLOWANCE_NAME,
                 'ADDITIONAL_ALLOWANCE_AMOUNT'         => $request->ADDITIONAL_ALLOWANCE_AMOUNT,
+                'ADDITIONAL_ALLOWANCE_UANG_MAKAN'     => $request->ADDITIONAL_ALLOWANCE_UANG_MAKAN,
                 'ADDITIONAL_ALLOWANCE_UPDATED_BY'     => Auth::user()->id,
                 'ADDITIONAL_ALLOWANCE_UPDATED_DATE'   => now(),
                 'ADDITIONAL_ALLOWANCE_NOTE'           => $request->ADDITIONAL_ALLOWANCE_NOTE

@@ -405,7 +405,7 @@ export default function Index({ auth }: PageProps) {
                                     </select>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4 mt-2">
+                            {/* <div className="grid grid-cols-2 gap-4 mt-2">
                                 <div className="relative">
                                     <InputLabel
                                         className="absolute"
@@ -486,7 +486,7 @@ export default function Index({ auth }: PageProps) {
                                         />
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="grid grid-cols-2 gap-4 mt-2">
                                 <div className="relative">
@@ -710,6 +710,48 @@ export default function Index({ auth }: PageProps) {
                                 <div className="relative">
                                     <InputLabel
                                         className="absolute"
+                                        value={"Effective Date"}
+                                    />
+                                    <div className="ml-[6.2rem] text-red-600">
+                                        *
+                                    </div>
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                dataWorkAttendance.ATTENDANCE_EFFECTIVE_FROM
+                                            }
+                                            onChange={(date: any) =>
+                                                setDataWorkAttendance({
+                                                    ...dataWorkAttendance,
+                                                    ATTENDANCE_EFFECTIVE_FROM:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
+                                            required
+                                            showMonthDropdown
+                                            showYearDropdown
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd-mm-yyyyy"
+                                            className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                        />
+                                    </div>
+                                </div>
+                                {/* <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
                                         value={"Early Compensation"}
                                     />
                                     <div className="ml-[9rem] text-red-600">
@@ -731,7 +773,7 @@ export default function Index({ auth }: PageProps) {
                                         required
                                         placeholder="Minute"
                                     />
-                                </div>
+                                </div> */}
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
                                 <div className="relative">
