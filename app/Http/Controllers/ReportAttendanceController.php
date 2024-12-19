@@ -6,7 +6,11 @@ use App\Models\MEmployeeAttendance;
 use App\Models\Relation;
 use App\Models\ROffSiteReason;
 use App\Models\TAttendanceSetting;
+use App\Models\TCompany;
+use App\Models\TCompanyOffice;
+use App\Models\TEmployee;
 use App\Models\TEmployeeAttendance;
+use App\Models\TimeOffMaster;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,55 +18,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
-class AttendanceController extends Controller
+class ReportAttendanceController extends Controller
 {
     public function index()
     {        
-        return Inertia::render('Attendance/Index', [
-            
-            // 'policies' => Policy::get(),
-            // 'currency' => RCurrency::get(),
-            // 'clients' => $this->getRelationByRelationType(1),
-            // 'agents' => $this->getRelationByRelationType(3)
+        $listYear = DB::table('t_employee_attendance')
+                ->selectRaw('YEAR(EMPLOYEE_ATTENDANCE_CHECK_IN_DATE) as YEAR')
+                ->groupBy(DB::raw('YEAR(EMPLOYEE_ATTENDANCE_CHECK_IN_DATE)'))->get();
+        return Inertia::render('ReportAttendance/Index', [
+            'selectYear'    => $listYear,
+            'companies'     => TCompany::get(),
         ]);
     }
 
-    public function saveClockIn(Request $request) {
-        // dd($request);  
-        $attendance = TEmployeeAttendance::insertGetId([
-            "ATTENDANCE_SETTING_ID" => $request->ATTENDANCE_SETTING_ID,
-            "EMPLOYEE_ID" => $request->EMPLOYEE_ID,
-            "EMPLOYEE_ATTENDANCE_CHECK_IN_DATE" => $request->EMPLOYEE_ATTENDANCE_CHECK_IN_DATE,
-            "EMPLOYEE_ATTENDANCE_CHECK_IN_TIME" => $request->EMPLOYEE_ATTENDANCE_CHECK_IN_TIME,
-            "EMPLOYEE_ATTENDANCE_CHECK_OUT_DATE" => $request->EMPLOYEE_ATTENDANCE_CHECK_OUT_DATE,
-            "EMPLOYEE_ATTENDANCE_CHECK_OUT_TIME" => $request->EMPLOYEE_ATTENDANCE_CHECK_OUT_TIME,
-            "EMPLOYEE_ATTENDANCE_LOCATION_LATITUDE" => $request->EMPLOYEE_ATTENDANCE_LOCATION_LATITUDE,
-            "EMPLOYEE_ATTENDANCE_LOCATION_LONGITUDE" => $request->EMPLOYEE_ATTENDANCE_LOCATION_LONGITUDE,
-            "EMPLOYEE_ATTENDANCE_LOCATION_TYPE" => $request->EMPLOYEE_ATTENDANCE_LOCATION_TYPE,
-            "EMPLOYEE_ATTENDANCE_MESSAGE_CHECK_IN" => $request->EMPLOYEE_ATTENDANCE_MESSAGE_CHECK_IN,
-            "EMPLOYEE_ATTENDANCE_MESSAGE_CHECK_OUT" => $request->EMPLOYEE_ATTENDANCE_MESSAGE_CHECK_OUT,
-            "EMPLOYEE_ATTENDANCE_LOCATION_SYSTEM_MESSAGE" => $request->EMPLOYEE_ATTENDANCE_LOCATION_SYSTEM_MESSAGE,
-            "LOCATION_DISTANCE" => $request->LOCATION_DISTANCE,
-            "OFF_SITE_REASON_ID" => $request->OFF_SITE_REASON_ID,
-        ]);
-
-
-        // Created Log
-        UserLog::create([
-            'created_by' => Auth::user()->id,
-            'action'     => json_encode([
-                "description" => "Clock In",
-                "module"      => "Attendance",
-                "id"          => $attendance
-            ]),
-            'action_by'  => Auth::user()->user_login
-        ]);
-
-        return new JsonResponse([
-            "msg" => "Clock In Succeed"
-        ], 201, [
-            'X-Inertia' => true
-        ]);
+    function getOfficeByCompanyId($id= null) {
+        $data = TCompanyOffice::where('COMPANY_ID', $id)->get();
+        return response()->json($data);
     }
 
     public function getAttendanceByEmployeeIdAndDate(Request $request){
@@ -106,18 +77,38 @@ class AttendanceController extends Controller
         return response()->json($data);
     }
     
-    public function getAttendanceForEmployeeAgGrid(Request $request)
+    public function getAttendanceAgGrid(Request $request)
     {
         // dd($request);
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
         $sortModel = $request->input('sort');
 
-        // $query = DB::table('t_policy as p')->leftJoin('t_relation as r', 'p.RELATION_ID', '=', 'r.RELATION_ORGANIZATION_ID');
-        $query = TEmployeeAttendance::where('EMPLOYEE_ID', Auth::user()->employee_id)->where('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', '<>',date_format(now(),"Y-m-d"))->orderBy('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', 'desc');
-            // dd($query->toSql());
-        // $filterModel = json_decode($request->input('filter'), true);
-        $newSearch = json_decode($request->newFilter, true);        
+        // $query = TEmployeeAttendance::with('employee');
+        $query = DB::table('t_employee_attendance as ea')
+                ->select(DB::raw('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE, COUNT(ea.EMPLOYEE_ID) AS JUMLAH_ATTENDANCE'))
+                ->leftJoin('t_employee AS e', 'ea.EMPLOYEE_ID', '=','e.EMPLOYEE_ID')
+                ->groupBy('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE');
+            
+        $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);
+        // dd($newSearch[0]);  
+
+        $dataSearch = $newSearch[0];
+
+        if ($dataSearch['YEAR'] == "" && $dataSearch['MONTH'] == "") {
+            return null;
+        } else {
+            if ($dataSearch['COMPANY_ID']) {
+                $query->where('COMPANY_ID', '=', $dataSearch['COMPANY_ID']);
+            }
+            
+            if ($dataSearch['OFFICE_ID']) {
+                $query->where('OFFICE_ID', '=', $dataSearch['OFFICE_ID']);
+            }            
+            $query->where(DB::raw('year(EMPLOYEE_ATTENDANCE_CHECK_IN_DATE)'), '=', $dataSearch['YEAR']);
+            $query->where(DB::raw('month(EMPLOYEE_ATTENDANCE_CHECK_IN_DATE)'), '=', $dataSearch['MONTH']);
+        }
         
         // if ($sortModel) {
         //     $sortModel = explode(';', $sortModel); 
@@ -128,25 +119,55 @@ class AttendanceController extends Controller
         // } else {
         //     $query->orderBy('POLICY_ID', 'DESC'); 
         // }
-
-        // if ($request->newFilter != "") {
-        //     foreach ($newSearch[0] as $keyId => $searchValue) {
-        //         if ($keyId === 'DATE') {
-        //             if ($searchValue != "") {
-        //                 $query->where('REQUEST_DATE', '=', $searchValue);
-        //             }                        
-        //         // }elseif ($keyId === 'CLIENT_ID'){
-        //         //     if ($searchValue != "") {
-        //         //         $query->where('RELATION_ID', $searchValue);
-        //         //     }
-        //         }
-        //     }
-        // }
+        // print_r($query->toSql());
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
         
         return $data;
     }
+
+    public function detailAttendanceReportAgGrid(Request $request)
+    {
+        // dd($request);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+        $sortModel = $request->input('sort');
+
+        // $query = TEmployeeAttendance::where('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', $request->id)->with('employee', 'attendanceSetting');
+            
+        $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);
+        // dd($newSearch[0]);  
+
+        $dataSearch = $newSearch[0];
+        if ($dataSearch['ON_TIME']) {
+            // echo "ON_TIME";
+           $query = TEmployeeAttendance::leftJoin('t_attendance_setting AS ats', 't_employee_attendance.ATTENDANCE_SETTING_ID', '=', 'ats.ATTENDANCE_SETTING_ID')
+           ->where('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', $request->id)
+            ->whereRaw('TIME(ats.ATTENDANCE_CHECK_IN_TIME) <= ADDTIME(ats.ATTENDANCE_CHECK_IN_TIME, CONCAT( "00:", ats.ATTENDANCE_LATE_COMPENSATION ) )');
+        //    ->where(DB::raw('TIME(ats.ATTENDANCE_CHECK_IN_TIME)'), '<=', 'ADDTIME( ats.ATTENDANCE_CHECK_IN_TIME, \'00:06\')');
+        // $query = DB::table('t_employee_attendance AS ea')->select(DB::raw('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE, COUNT(ea.EMPLOYEE_ID) AS JUMLAH_ATTENDANCE'))->leftJoin('t_attendance_setting AS ats', 'ea.ATTENDANCE_SETTING_ID', '=', 'ats.ATTENDANCE_SETTING_ID')->where('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', "'".$request->id."'")->where(DB::raw('TIME(ats.ATTENDANCE_CHECK_IN_TIME)'), '<=', 'ADDTIME( ats.ATTENDANCE_CHECK_IN_TIME, CONCAT(\'00:\', ats.ATTENDANCE_LATE_COMPENSATION ))');
+        } elseif ($dataSearch['LATE_ARRIVAL']) {
+            // echo "LATE_ARRIVAL";
+            $query = TEmployeeAttendance::leftJoin('t_attendance_setting AS ats', 't_employee_attendance.ATTENDANCE_SETTING_ID', '=', 'ats.ATTENDANCE_SETTING_ID')
+           ->where('EMPLOYEE_ATTENDANCE_CHECK_IN_DATE', $request->id)
+            ->whereRaw('TIME(ats.ATTENDANCE_CHECK_IN_TIME) >= ADDTIME(ats.ATTENDANCE_CHECK_IN_TIME, CONCAT( "00:", ats.ATTENDANCE_LATE_COMPENSATION ) )');
+        } elseif ($dataSearch['ABSENT']) {
+            // echo "ABSENT";
+            $query = TEmployee::where('EMPLOYEE_IS_DELETED', '=', '0')
+            ->whereRaw('EMPLOYEE_ID NOT IN ( (SELECT ea.EMPLOYEE_ID FROM t_employee_attendance AS ea WHERE ea.EMPLOYEE_ATTENDANCE_CHECK_IN_DATE = '.$request->id.') )');
+        } elseif ($dataSearch['TIME_OFF']) {
+            // echo "TIME_OFF";
+            $query = TimeOffMaster::leftJoin('t_request_time_off AS rto', 't_request_time_off_master.REQUEST_TIME_OFF_MASTER_ID', '=', 'rto.REQUEST_TIME_OFF_MASTER_ID')
+            ->where("rto.DATE_OF_LEAVE", $request->id)->with('employee');
+        }
+// print_r($query->get());
+// dd($query->toSql());
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        
+        return $data;
+    }
+    
 
     function getOffSiteReason() {
         $query = ROffSiteReason::get();

@@ -17,4 +17,15 @@ class TEmployeeAttendance extends Model
     ];
 
     public $timestamps = false;
+
+    protected $with = ['employee', 'attendanceSetting'];
+
+
+    public function employee(){
+        return $this->hasOne(TEmployee::class, 'EMPLOYEE_ID', 'EMPLOYEE_ID');
+    }
+
+    public function attendanceSetting(){
+        return $this->hasOne(TAttendanceSetting::class, 'ATTENDANCE_SETTING_ID', 'ATTENDANCE_SETTING_ID');
+    }
 }

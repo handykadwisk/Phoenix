@@ -61,7 +61,7 @@ export default function AGGrid({
                         filterParams[colId] = filterModel[colId].dateFrom;
                     }
                 }
-                
+
                 let urlNew: string = "";
 
                 if (withParam !== "") {
@@ -72,7 +72,9 @@ export default function AGGrid({
 
                 axios
                     .get(
-                        `/${urlNew}&page=${page}&perPage=${endRow - startRow}&sort=${sortParams}&filter=${JSON.stringify(
+                        `/${urlNew}&page=${page}&perPage=${
+                            endRow - startRow
+                        }&sort=${sortParams}&filter=${JSON.stringify(
                             filterParams
                         )}&newFilter=${JSON.stringify(searchParam)}`
                     )
