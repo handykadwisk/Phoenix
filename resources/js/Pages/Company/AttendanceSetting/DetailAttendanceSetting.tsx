@@ -19,6 +19,7 @@ export default function DetailAttendanceSetting({
     setDetailCompanyNew,
     attendanceType,
     companies,
+    // arrTime,
 }: PropsWithChildren<{
     attendanceSettingId: any;
     setIsSuccess: any | string | null;
@@ -26,6 +27,7 @@ export default function DetailAttendanceSetting({
     setDetailCompanyNew: any;
     attendanceType: any;
     companies: any;
+    // arrTime: any;
 }>) {
     // load otomatis detail relation
     useEffect(() => {
@@ -36,7 +38,6 @@ export default function DetailAttendanceSetting({
         []
     );
 
-   
     // get Detail Attendance Setting
     const getDetailAttendanceSetting = async (attendanceSettingId: string) => {
         await axios
@@ -49,7 +50,6 @@ export default function DetailAttendanceSetting({
             });
     };
 
-    
     const [modalEdit, setModalEdit] = useState<any>({
         modalEditWorkAttendce: false,
     });
@@ -57,12 +57,49 @@ export default function DetailAttendanceSetting({
     const [dataEditAttendanceSetting, setDataEditAttendanceSetting] =
         useState<any>({});
 
+    console.log("dataEditAttendanceSetting: ", dataEditAttendanceSetting);
+    
     const handleClickEditAttendanceSetting = async (
         e: FormEvent,
         companyId: string
     ) => {
         e.preventDefault();
         setDataEditAttendanceSetting(detailAttendanceSetting);
+        
+        setHourTimeIn(
+            detailAttendanceSetting.ATTENDANCE_CHECK_IN_TIME &&
+                detailAttendanceSetting.ATTENDANCE_CHECK_IN_TIME.split(":")[0]
+        );
+        setHourTimeOut(
+            detailAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME &&
+                detailAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME.split(":")[0]
+        );
+        setHourBreakStart(
+            detailAttendanceSetting.ATTENDANCE_BREAK_START_TIME &&
+                detailAttendanceSetting.ATTENDANCE_BREAK_START_TIME.split(":")[0]
+        );
+        setHourBreakEnd(
+            detailAttendanceSetting.ATTENDANCE_BREAK_END_TIME &&
+                detailAttendanceSetting.ATTENDANCE_BREAK_END_TIME.split(":")[0]
+        );
+        setMinuteTimeIn(
+            detailAttendanceSetting.ATTENDANCE_CHECK_IN_TIME &&
+                detailAttendanceSetting.ATTENDANCE_CHECK_IN_TIME.split(":")[1]
+        );
+        setMinuteTimeOut(
+            detailAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME &&
+                detailAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME.split(":")[1]
+        );
+        setMinuteBreakStart(
+            detailAttendanceSetting.ATTENDANCE_BREAK_START_TIME &&
+                detailAttendanceSetting.ATTENDANCE_BREAK_START_TIME.split(":")[1]
+        );
+        setMinuteBreakEnd(
+            detailAttendanceSetting.ATTENDANCE_BREAK_END_TIME &&
+                detailAttendanceSetting.ATTENDANCE_BREAK_END_TIME.split(":")[1]
+        );
+        
+
         setModalEdit({
             modalEditWorkAttendce: !modalEdit.modalEditWorkAttendce,
         });
@@ -71,7 +108,7 @@ export default function DetailAttendanceSetting({
         setIsSuccess("");
         if (message != "") {
             getDetailAttendanceSetting(message["id"]);
-            
+
             setIsSuccess(message["msg"]);
             setTimeout(() => {
                 setIsSuccess("");
@@ -79,7 +116,60 @@ export default function DetailAttendanceSetting({
         }
     };
 
-    
+     // State to store selected hour and minute
+    const [hourTimeIn, setHourTimeIn] = useState("00");
+    const [hourTimeOut, setHourTimeOut] = useState("00");
+    const [hourBreakStart, setHourBreakStart] = useState("00");
+    const [hourBreakEnd, setHourBreakEnd] = useState("00");
+    const [minuteTimeIn, setMinuteTimeIn] = useState("00");
+    const [minuteTimeOut, setMinuteTimeOut] = useState("00");
+    const [minuteBreakStart, setMinuteBreakStart] = useState("00");
+    const [minuteBreakEnd, setMinuteBreakEnd] = useState("00");
+
+    // Generate the options for hours and minutes
+    const hours = Array.from({ length: 24 }, (_, i) =>
+        String(i).padStart(2, "0")
+    ); // 00 to 23
+    const minutes = Array.from({ length: 60 }, (_, i) =>
+        String(i).padStart(2, "0")
+    ); // 00 to 59
+
+    const handleTimeChange = (val: string, name: string, field: string) => {
+        // setHour(val);
+        const data = { ...dataEditAttendanceSetting };
+        console.log("name: ", name, " value: ", val, " field: ", field);
+        let time = "";
+        if (name == "hourTimeIn") {
+            time = val + ":" + minuteTimeIn;
+            setHourTimeIn(val);
+        } else if (name == "minuteTimeIn") {
+            time = hourTimeIn + ":" + val;
+            setMinuteTimeIn(val);
+        } else if (name == "hourTimeOut") {
+            time = val + ":" + minuteTimeOut;
+            setHourTimeOut(val);
+        } else if (name == "minuteTimeOut") {
+            time = hourTimeOut + ":" + val;
+            setMinuteTimeOut(val);
+        } else if (name == "hourBreakStart") {
+            time = val + ":" + minuteBreakStart;
+            setHourBreakStart(val);
+        } else if (name == "minuteBreakStart") {
+            time = hourBreakStart + ":" + val;
+            setMinuteBreakStart(val);
+        } else if (name == "hourBreakEnd") {
+            time = val + ":" + minuteBreakEnd;
+            setHourBreakEnd(val);
+        } else if (name == "minuteBreakEnd") {
+            time = hourBreakEnd + ":" + val;
+            setMinuteBreakEnd(val);
+        }
+        console.log("time: ", time);
+
+        data[field] = time;
+        setDataEditAttendanceSetting(data);
+    };
+
     return (
         <>
             {/* Modal Edit work attendance */}
@@ -207,7 +297,7 @@ export default function DetailAttendanceSetting({
                                     </select>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4 mt-2">
+                            {/* <div className="grid grid-cols-2 gap-4 mt-2">
                                 <div className="relative">
                                     <InputLabel
                                         className="absolute"
@@ -250,7 +340,7 @@ export default function DetailAttendanceSetting({
                                         />
                                     </div>
                                 </div>
-                                <div className="relative">
+                                 <div className="relative">
                                     <InputLabel
                                         className="absolute"
                                         value={"Effective Last"}
@@ -287,8 +377,8 @@ export default function DetailAttendanceSetting({
                                             className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
                                         />
                                     </div>
-                                </div>
-                            </div>
+                                </div> 
+                            </div> */}
                             <div className="grid grid-cols-2 gap-4 mt-2">
                                 <div className="relative">
                                     <InputLabel
@@ -298,22 +388,84 @@ export default function DetailAttendanceSetting({
                                     <div className="ml-[6.4rem] text-red-600">
                                         *
                                     </div>
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div>
+                                        <select
+                                            id="hourTimeIn"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataEditAttendanceSetting.ATTENDANCE_CHECK_IN_TIME &&
+                                                dataEditAttendanceSetting.ATTENDANCE_CHECK_IN_TIME.split(
+                                                    ":"
+                                                )[0]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "hourTimeIn",
+                                                    "ATTENDANCE_CHECK_IN_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {hours.map((h) => (
+                                                <option key={h} value={h}>
+                                                    {h}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <select
+                                            id="minuteTimeIn"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataEditAttendanceSetting.ATTENDANCE_CHECK_IN_TIME &&
+                                                dataEditAttendanceSetting.ATTENDANCE_CHECK_IN_TIME.split(
+                                                    ":"
+                                                )[1]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "minuteTimeIn",
+                                                    "ATTENDANCE_CHECK_IN_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {minutes.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {/* <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataEditAttendanceSetting.ATTENDANCE_CHECK_IN_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataEditAttendanceSetting({
                                                     ...dataEditAttendanceSetting,
                                                     ATTENDANCE_CHECK_IN_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
+                                    </div> */}
                                 </div>
                                 <div className="relative">
                                     <InputLabel
@@ -323,22 +475,84 @@ export default function DetailAttendanceSetting({
                                     <div className="ml-[7.2rem] text-red-600">
                                         *
                                     </div>
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div>
+                                        <select
+                                            id="hourTimeOut"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataEditAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME &&
+                                                dataEditAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME.split(
+                                                    ":"
+                                                )[0]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "hourTimeOut",
+                                                    "ATTENDANCE_CHECK_OUT_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {hours.map((h) => (
+                                                <option key={h} value={h}>
+                                                    {h}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <select
+                                            id="minuteTimeOut"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataEditAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME &&
+                                                dataEditAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME.split(
+                                                    ":"
+                                                )[1]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "minuteTimeOut",
+                                                    "ATTENDANCE_CHECK_OUT_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {minutes.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {/* <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataEditAttendanceSetting.ATTENDANCE_CHECK_OUT_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataEditAttendanceSetting({
                                                     ...dataEditAttendanceSetting,
                                                     ATTENDANCE_CHECK_OUT_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
@@ -370,6 +584,48 @@ export default function DetailAttendanceSetting({
                                 <div className="relative">
                                     <InputLabel
                                         className="absolute"
+                                        value={"Effective Date"}
+                                    />
+                                    <div className="ml-[6.2rem] text-red-600">
+                                        *
+                                    </div>
+                                    <div className="relative max-w-sm">
+                                        <div className="absolute inset-y-0 z-99999 start-0 flex items-center px-3  pointer-events-none">
+                                            <svg
+                                                className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                                                aria-hidden="true"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                            </svg>
+                                        </div>
+                                        <DatePicker
+                                            selected={
+                                                dataEditAttendanceSetting.ATTENDANCE_EFFECTIVE_FROM
+                                            }
+                                            onChange={(date: any) =>
+                                                setDataEditAttendanceSetting({
+                                                    ...dataEditAttendanceSetting,
+                                                    ATTENDANCE_EFFECTIVE_FROM:
+                                                        date.toLocaleDateString(
+                                                            "en-CA"
+                                                        ),
+                                                })
+                                            }
+                                            required
+                                            showMonthDropdown
+                                            showYearDropdown
+                                            dateFormat={"dd-MM-yyyy"}
+                                            placeholderText="dd-mm-yyyyy"
+                                            className="border-0 rounded-md shadow-md px-10 text-sm h-9 w-full focus:ring-2 focus:ring-inset focus:ring-red-600"
+                                        />
+                                    </div>
+                                </div>
+                                {/* <div className="relative">
+                                    <InputLabel
+                                        className="absolute"
                                         value={"Early Compensation"}
                                     />
                                     <div className="ml-[9rem] text-red-600">
@@ -391,7 +647,7 @@ export default function DetailAttendanceSetting({
                                         required
                                         placeholder="Minute"
                                     />
-                                </div>
+                                </div> */}
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
                                 <div className="relative">
@@ -399,44 +655,168 @@ export default function DetailAttendanceSetting({
                                         className=""
                                         value={"Break Time Start"}
                                     />
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div>
+                                        <select
+                                            id="hourBreakStart"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataEditAttendanceSetting.ATTENDANCE_BREAK_START_TIME &&
+                                                dataEditAttendanceSetting.ATTENDANCE_BREAK_START_TIME.split(
+                                                    ":"
+                                                )[0]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "hourBreakStart",
+                                                    "ATTENDANCE_BREAK_START_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {hours.map((h) => (
+                                                <option key={h} value={h}>
+                                                    {h}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <select
+                                            id="minuteBreakStart"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataEditAttendanceSetting.ATTENDANCE_BREAK_START_TIME &&
+                                                dataEditAttendanceSetting.ATTENDANCE_BREAK_START_TIME.split(
+                                                    ":"
+                                                )[1]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "minuteBreakStart",
+                                                    "ATTENDANCE_BREAK_START_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {minutes.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {/* <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataEditAttendanceSetting.ATTENDANCE_BREAK_START_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataEditAttendanceSetting({
                                                     ...dataEditAttendanceSetting,
                                                     ATTENDANCE_BREAK_START_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
+                                    </div> */}
                                 </div>
                                 <div className="relative">
                                     <InputLabel
                                         className=""
                                         value={"Break Time End"}
                                     />
-                                    <div className="inputfield">
-                                        <input
-                                            className="rounded-md border-0 py-1.5 text-gray-900 shadow-md placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                    <div>
+                                        <select
+                                            id="hourBreakEnd"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataEditAttendanceSetting.ATTENDANCE_BREAK_END_TIME &&
+                                                dataEditAttendanceSetting.ATTENDANCE_BREAK_END_TIME.split(
+                                                    ":"
+                                                )[0]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "hourBreakEnd",
+                                                    "ATTENDANCE_BREAK_END_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {hours.map((h) => (
+                                                <option key={h} value={h}>
+                                                    {h}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <select
+                                            id="minuteBreakEnd"
+                                            className=" w-20 mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                                            value={
+                                                dataEditAttendanceSetting.ATTENDANCE_BREAK_END_TIME &&
+                                                dataEditAttendanceSetting.ATTENDANCE_BREAK_END_TIME.split(
+                                                    ":"
+                                                )[1]
+                                            }
+                                            onChange={(e) => {
+                                                handleTimeChange(
+                                                    e.target.value,
+                                                    "minuteBreakEnd",
+                                                    "ATTENDANCE_BREAK_END_TIME"
+                                                );
+                                            }}
+                                        >
+                                            {minutes.map((m) => (
+                                                <option key={m} value={m}>
+                                                    {m}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {/* <div className="relative w-24">
+                                        <select
+                                            className="block w-full mx-auto rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
                                             value={
                                                 dataEditAttendanceSetting.ATTENDANCE_BREAK_END_TIME
                                             }
-                                            type="time"
-                                            onChange={(e) =>
+                                            onChange={(e) => {
                                                 setDataEditAttendanceSetting({
                                                     ...dataEditAttendanceSetting,
                                                     ATTENDANCE_BREAK_END_TIME:
                                                         e.target.value,
-                                                })
-                                            }
-                                        />
-                                    </div>
+                                                });
+                                            }}
+                                        >
+                                            <option value={""}>--:--</option>
+                                            {arrTime.map(
+                                                (time: any, i: number) => {
+                                                    return (
+                                                        <option
+                                                            key={i}
+                                                            value={time.id}
+                                                        >
+                                                            {time.name}
+                                                        </option>
+                                                    );
+                                                }
+                                            )}
+                                        </select>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 mt-2">
@@ -565,7 +945,7 @@ export default function DetailAttendanceSetting({
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-2">
+                {/* <div className="grid grid-cols-2 gap-4 mt-2">
                     <div className="">
                         <div className="grid grid-cols-4 gap-4">
                             <div className="">
@@ -598,7 +978,7 @@ export default function DetailAttendanceSetting({
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
                 <div className="grid grid-cols-2 gap-4 mt-2">
                     <div className="">
                         <div className="grid grid-cols-4 gap-4">
@@ -646,6 +1026,21 @@ export default function DetailAttendanceSetting({
                     <div className="">
                         <div className="grid grid-cols-4 gap-4">
                             <div className="">
+                                <span>Effective Date</span>
+                            </div>
+                            <div className=" col-span-3">
+                                <span className="font-normal text-gray-500">
+                                    {dateFormat(
+                                        detailAttendanceSetting.ATTENDANCE_EFFECTIVE_FROM,
+                                        "dd-mm-yyyy"
+                                    )}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {/* <div className="">
+                        <div className="grid grid-cols-4 gap-4">
+                            <div className="">
                                 <span>Early Compensation</span>
                             </div>
                             <div className=" col-span-3">
@@ -655,7 +1050,7 @@ export default function DetailAttendanceSetting({
                                 </span>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-2">
                     <div className="">

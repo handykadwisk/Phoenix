@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdditionalAllowanceController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\BankTransactionController;
@@ -7,11 +8,14 @@ use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
 use App\Http\Controllers\CoBrokingController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\CollectiveLeaveController;
 use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\ExchangeRateBIController;
 use App\Http\Controllers\ExchangeRateTaxController;
 use App\Http\Controllers\InsurancePanelController;
+use App\Http\Controllers\LemburController;
+use App\Http\Controllers\MedicalController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MRelationFBIPKSController;
 use App\Http\Controllers\ExpensesController;
@@ -41,6 +45,7 @@ use App\Http\Controllers\RelationController;
 use App\Http\Controllers\RoleAccesMenuController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\RUserTypeController;
+use App\Http\Controllers\ReportAttendanceController;
 use App\Http\Controllers\TCompanyController;
 use App\Http\Controllers\TCompanyDivisionController;
 use App\Http\Controllers\TCompanyOfficeController;
@@ -59,8 +64,10 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Models\UserLog;
 use App\Http\Middleware\Language;
+use App\Mail\SendEmail;
 use App\Models\TCompanyDivision;
 use App\Models\TEmployee;
+use Illuminate\Support\Facades\Mail;
 
 Route::get('/', function () {
     return Inertia::render('Auth/Login', [

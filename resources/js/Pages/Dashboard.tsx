@@ -29,7 +29,7 @@ export default function Dashboard({ auth, language }: any) {
                     >
                         <dt className="truncate text-sm font-medium text-gray-500">
                             {/* {item.name} */}
-                            {"Attendance"}
+                            {"Employee Activity"}
                         </dt>
                         <dd className="mt-3 text-sm font-semibold tracking-tight text-gray-900">
                             {"Click "}
@@ -43,7 +43,21 @@ export default function Dashboard({ auth, language }: any) {
                                 here
                             </a>
 
-                            {" for attendance"}
+                            {" for Attendance"}
+                        </dd>
+                        <dd className="mt-3 text-sm font-semibold tracking-tight text-gray-900">
+                            {"Click "}
+                            <a
+                                className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 text-white bg-red-600 rounded-md"
+                                href="timeOff"
+                                arial-label="your link text"
+                                title="your link text"
+                                target="_blank"
+                            >
+                                here
+                            </a>
+
+                            {" for Requesting Time Off"}
                         </dd>
                     </div>
                     {stats.map((item) => (
