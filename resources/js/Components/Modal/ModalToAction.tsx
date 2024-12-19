@@ -26,11 +26,6 @@ export default function ModalToAction({
     toggleMenuDeleteStatus,
     buttonEdit,
     actionEdit,
-    buttonAddOns,
-    actionDelete,
-    toggleMenuDeleteStatus,
-    buttonEdit,
-    actionEdit,
 }: PropsWithChildren<{
     show: boolean;
     closeable?: boolean;
