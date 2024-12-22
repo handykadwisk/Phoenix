@@ -237,7 +237,6 @@ export default function Receipt({ auth }: PageProps) {
         receipt_search: [
             {
                 RECEIPT_ID: "",
-                RECEIPT_NAME: "",
                 CLIENT_NAME: "",
                 flag: "flag",
             },
@@ -265,7 +264,6 @@ export default function Receipt({ auth }: PageProps) {
     // Clear Search Start
     const clearSearchReceipt = () => {
         inputDataSearch("RECEIPT_ID", "", 0);
-        inputDataSearch("RECEIPT_NAME", "", 0);
         inputDataSearch("CLIENT_NAME", "", 0);
         inputDataSearch("flag", "flag", 0);
 
@@ -344,20 +342,31 @@ export default function Receipt({ auth }: PageProps) {
             });
     };
 
-    const selectBankAccount = BankAccount.map((account: any) => {
-        return {
-            value: account.BANK_TRANSACTION_ID,
-            label: account.BANK_TRANSACTION_NAME,
-        };
-    });
+    const [searchQuery, setSearchQuery] = useState("");
+    const filteredBankAccount = BankAccount.filter(
+        (bank: any) =>
+            // console.log("Bank", bank)
+            bank.options[0].label
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) || null
+    );
+
+    // console.log("Search Query", searchQuery);
 
     const getBankAccountSelect = (value: any) => {
         if (value) {
-            const selected = selectBankAccount.filter(
-                (option: any) => option.value === value
-            );
-            return selected[0].label;
+            for (const group of BankAccount) {
+                const selected = group.options.find(
+                    (option: any) => option.value === value
+                );
+
+                if (selected) {
+                    return selected.label;
+                }
+            }
         }
+
+        return null;
     };
 
     // Function Format Currency
@@ -381,6 +390,22 @@ export default function Receipt({ auth }: PageProps) {
         } else if (selectedValue === "print") {
             handlePrint(id, e);
         }
+    };
+
+    const handleRowStatus = (
+        bankTransactionStatus: number,
+        textAlign: string = ""
+    ) => {
+        if (bankTransactionStatus === 1) {
+            return {
+                backgroundColor: "#fcd9d9",
+                textAlign: textAlign,
+            };
+        }
+
+        return {
+            textAlign: textAlign,
+        };
     };
 
     // console.log("Data", data);
@@ -552,8 +577,12 @@ export default function Receipt({ auth }: PageProps) {
                                                 : `text-gray-500 hover:bg-red-100 hover:text-black`
                                         }`,
                                 }}
-                                options={selectBankAccount}
+                                options={filteredBankAccount}
                                 isSearchable={true}
+                                searchInputPlaceholder="Search Bank"
+                                onSearchInputChange={(e) =>
+                                    setSearchQuery(e.target.value)
+                                }
                                 placeholder={"Choose Bank Name"}
                                 value={data.RECEIPT_BANK_ID}
                                 onChange={(val: any) =>
@@ -562,6 +591,7 @@ export default function Receipt({ auth }: PageProps) {
                                         RECEIPT_BANK_ID: val,
                                     })
                                 }
+                                menuIsOpen={false}
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
@@ -689,7 +719,6 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Client Name
-                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -728,7 +757,6 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Payment From
-                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <TextInput
                                 id="RECEIPT_NAME"
@@ -802,7 +830,7 @@ export default function Receipt({ auth }: PageProps) {
                                                 : `text-gray-500 hover:bg-red-100 hover:text-black`
                                         }`,
                                 }}
-                                options={selectBankAccount}
+                                options={BankAccount}
                                 isSearchable={true}
                                 placeholder={"Choose Bank Name"}
                                 value={{
@@ -947,7 +975,6 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Client Name
-                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <Select
                                 classNames={{
@@ -986,7 +1013,6 @@ export default function Receipt({ auth }: PageProps) {
                                 className="w-full md:w-1/4 mb-2"
                             >
                                 Payment From
-                                <span className="text-red-600">*</span>
                             </InputLabel>
                             <TextInput
                                 id="RECEIPT_NAME"
@@ -1060,7 +1086,7 @@ export default function Receipt({ auth }: PageProps) {
                                                 : `text-gray-500 hover:bg-red-100 hover:text-black`
                                         }`,
                                 }}
-                                options={selectBankAccount}
+                                options={BankAccount}
                                 isSearchable={true}
                                 placeholder={"Choose Bank Name"}
                                 value={{
@@ -1306,152 +1332,11 @@ export default function Receipt({ auth }: PageProps) {
                 search={
                     <>
                         <div className="grid grid-cols-1 relative">
-                            {/* <InputSearch
-                                id="receipt_number"
-                                name="receipt_number"
-                                type="text"
-                                placeholder="Receipt Number"
-                                autoComplete="off"
-                                value={
-                                    searchReceipt.receipt_search[0]
-                                        .RECEIPT_NUMBER
-                                }
-                                onChange={(val: any) => {
-                                    inputDataSearch(
-                                        "RECEIPT_NUMBER",
-                                        val.target.value,
-                                        0
-                                    );
-                                    if (
-                                        searchReceipt.receipt_search[0]
-                                            .RECEIPT_NUMBER === ""
-                                    ) {
-                                        inputDataSearch("flag", "flag", 0);
-                                    } else {
-                                        inputDataSearch("flag", "", 0);
-                                    }
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        const title =
-                                            searchReceipt.receipt_search[0]
-                                                .RECEIPT_NUMBER;
-                                        const id =
-                                            searchReceipt.receipt_search[0]
-                                                .RECEIPT_ID;
-                                        if (title || id) {
-                                            inputDataSearch("flag", "", 0);
-                                            setRefreshSuccess("success");
-                                            setTimeout(() => {
-                                                setRefreshSuccess("");
-                                            });
-                                        } else {
-                                            inputDataSearch("flag", "flag", 0);
-                                        }
-                                    }
-                                }}
-                            />
-                            <div className="grid grid-cols-1 mb-5 relative">
-                                <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
-                                <DatePicker
-                                    name="EXPENSES_START_DATE"
-                                    selected={
-                                        searchReceipt.receipt_search[0]
-                                            .EXPENSES_START_DATE
-                                    }
-                                    onChange={(val: any) => {
-                                        inputDataSearch(
-                                            "EXPENSES_START_DATE",
-                                            val.toLocaleDateString("en-CA"),
-                                            0
-                                        );
-                                        if (
-                                            searchReceipt.receipt_search[0]
-                                                .EXPENSES_START_DATE === ""
-                                        ) {
-                                            inputDataSearch("flag", "flag", 0);
-                                        } else {
-                                            inputDataSearch("flag", "", 0);
-                                        }
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            const expensesStartDate =
-                                                searchReceipt.expenses_search[0]
-                                                    .EXPENSES_START_DATE;
-                                            if (expensesStartDate) {
-                                                inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
-                                                setTimeout(() => {
-                                                    setRefreshSuccess("");
-                                                });
-                                            } else {
-                                                inputDataSearch(
-                                                    "flag",
-                                                    "flag",
-                                                    0
-                                                );
-                                            }
-                                        }
-                                    }}
-                                    dateFormat={"dd-MM-yyyy"}
-                                    placeholderText="dd-mm-yyyyy (Start Date)"
-                                    className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
-                                />
-                            </div>
-                            <div className="grid grid-cols-1 mb-5 relative">
-                                <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
-                                <DatePicker
-                                    name="expenses_end_date"
-                                    selected={
-                                        searchReceipt.receipt_search[0]
-                                            .EXPENSES_END_DATE
-                                    }
-                                    onChange={(val: any) => {
-                                        inputDataSearch(
-                                            "EXPENSES_END_DATE",
-                                            val.toLocaleDateString("en-CA"),
-                                            0
-                                        );
-                                        if (
-                                            searchReceipt.receipt_search[0]
-                                                .EXPENSES_END_DATE === ""
-                                        ) {
-                                            inputDataSearch("flag", "flag", 0);
-                                        } else {
-                                            inputDataSearch("flag", "", 0);
-                                        }
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            const expensesEndDate =
-                                                searchReceipt.expenses_search[0]
-                                                    .EXPENSES_END_DATE;
-                                            if (expensesEndDate) {
-                                                inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
-                                                setTimeout(() => {
-                                                    setRefreshSuccess("");
-                                                });
-                                            } else {
-                                                inputDataSearch(
-                                                    "flag",
-                                                    "flag",
-                                                    0
-                                                );
-                                            }
-                                        }
-                                    }}
-                                    dateFormat={"dd-MM-yyyy"}
-                                    placeholderText="dd-mm-yyyy (End Date)"
-                                    className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
-                                />
-                            </div> */}
                             <InputSearch
                                 id="client_name"
                                 name="client_name"
                                 type="text"
-                                placeholder="Client Name"
+                                placeholder="Receipt Number - Client Name - Bank"
                                 autoComplete="off"
                                 value={
                                     searchReceipt.receipt_search[0].CLIENT_NAME
@@ -1491,78 +1376,6 @@ export default function Receipt({ auth }: PageProps) {
                                     }
                                 }}
                             />
-                            {/* <Select
-                                classNames={{
-                                    menuButton: () =>
-                                        `flex items-center text-xs sm:text-sm text-gray-400 mb-5 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                    listItem: ({ isSelected }: any) =>
-                                        `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                            isSelected
-                                                ? `text-white bg-red-600`
-                                                : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                        }`,
-                                }}
-                                options={selectCurrency}
-                                isSearchable={true}
-                                placeholder={"Currency"}
-                                value={
-                                    searchReceipt.receipt_search[0]
-                                        .EXPENSES_COST_CENTER
-                                }
-                                onChange={(val: any) => {
-                                    inputDataSearch(
-                                        "EXPENSES_COST_CENTER",
-                                        val,
-                                        0
-                                    );
-                                    if (
-                                        searchReceipt.receipt_search[0]
-                                            .EXPENSES_COST_CENTER === ""
-                                    ) {
-                                        inputDataSearch("flag", "flag", 0);
-                                    } else {
-                                        inputDataSearch("flag", "", 0);
-                                    }
-                                }}
-                                primaryColor={"bg-red-500"}
-                            />
-                            <Select
-                                classNames={{
-                                    menuButton: () =>
-                                        `flex items-center text-xs sm:text-sm text-gray-400 mb-5 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                    menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                    listItem: ({ isSelected }: any) =>
-                                        `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                            isSelected
-                                                ? `text-white bg-red-600`
-                                                : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                        }`,
-                                }}
-                                options={selectBankAccount}
-                                isSearchable={true}
-                                placeholder={"Bank"}
-                                value={
-                                    searchReceipt.receipt_search[0]
-                                        .EXPENSES_COST_CENTER
-                                }
-                                onChange={(val: any) => {
-                                    inputDataSearch(
-                                        "EXPENSES_COST_CENTER",
-                                        val,
-                                        0
-                                    );
-                                    if (
-                                        searchReceipt.receipt_search[0]
-                                            .EXPENSES_COST_CENTER === ""
-                                    ) {
-                                        inputDataSearch("flag", "flag", 0);
-                                    } else {
-                                        inputDataSearch("flag", "", 0);
-                                    }
-                                }}
-                                primaryColor={"bg-red-500"}
-                            /> */}
                         </div>
                         <div className="flex flex-col md:flex-row justify-end gap-2">
                             <Button
@@ -1606,25 +1419,41 @@ export default function Receipt({ auth }: PageProps) {
                             url={"getReceipt"}
                             doubleClickEvent={handleDraftModal}
                             triggeringRefreshData={refreshSuccess}
+                            // buttonExcelExport={true}
+                            suppressCsvExport={true}
                             colDefs={[
                                 {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
                                     flex: 1,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "center"
+                                        );
+                                    },
                                 },
                                 {
                                     headerName: "Receipt Number",
                                     field: "RECEIPT_NUMBER",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "center"
+                                        );
+                                    },
                                 },
                                 {
                                     headerName: "Receipt Date",
-                                    field: "",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
-                                    cellRenderer: (params: any) => {
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "center"
+                                        );
+                                    },
+                                    valueGetter: (params: any) => {
                                         return dateFormat(
                                             params.RECEIPT_DATE,
                                             "dd-mm-yyyy"
@@ -1633,76 +1462,105 @@ export default function Receipt({ auth }: PageProps) {
                                 },
                                 {
                                     headerName: "Client Name",
-                                    field: "",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
-                                    cellRenderer: (params: any) => {
-                                        return params.data.relation_organization
-                                            .RELATION_ORGANIZATION_NAME
-                                            ? params.data.relation_organization
-                                                  .RELATION_ORGANIZATION_NAME
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "center"
+                                        );
+                                    },
+                                    valueGetter: (params: any) => {
+                                        return params.data
+                                            ?.relation_organization
+                                            ?.RELATION_ORGANIZATION_NAME
+                                            ? params.data?.relation_organization
+                                                  ?.RELATION_ORGANIZATION_NAME
                                             : "-";
                                     },
                                 },
                                 {
                                     headerName: "Currency",
-                                    field: "",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
-                                    cellRenderer: (params: any) => {
-                                        return params.data.currency
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "center"
+                                        );
+                                    },
+                                    valueGetter: (params: any) => {
+                                        return params.data?.currency
                                             .CURRENCY_SYMBOL
-                                            ? params.data.currency
+                                            ? params.data?.currency
                                                   .CURRENCY_SYMBOL
                                             : "-";
                                     },
                                 },
                                 {
                                     headerName: "Value",
-                                    field: "",
                                     flex: 2,
-                                    cellStyle: { textAlign: "right" },
-                                    cellRenderer: (params: any) => {
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "right"
+                                        );
+                                    },
+                                    valueGetter: (params: any) => {
                                         return formatCurrency.format(
-                                            params.data.RECEIPT_VALUE
+                                            params.data?.RECEIPT_VALUE
                                         );
                                     },
                                 },
                                 {
                                     headerName: "Bank Name",
-                                    field: "",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
-                                    cellRenderer: (params: any) => {
-                                        return params.data.bank_account
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "center"
+                                        );
+                                    },
+                                    valueGetter: (params: any) => {
+                                        return params.data?.bank_account
                                             .BANK_TRANSACTION_NAME
-                                            ? params.data.bank_account
+                                            ? params.data?.bank_account
                                                   .BANK_TRANSACTION_NAME
                                             : "-";
                                     },
                                 },
                                 {
                                     headerName: "Description",
-                                    field: "",
                                     flex: 2,
-                                    cellRenderer: (params: any) => {
-                                        return params.data.RECEIPT_MEMO
-                                            ? params.data.RECEIPT_MEMO
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS
+                                        );
+                                    },
+                                    valueGetter: (params: any) => {
+                                        return params.data?.RECEIPT_MEMO
+                                            ? params.data?.RECEIPT_MEMO
                                             : "-";
                                     },
                                 },
                                 {
                                     headerName: "Status",
-                                    field: "",
                                     flex: 2,
                                     filter: "agSetColumnFilter",
                                     filterParams: {
                                         values: ["Open", "Draft"],
                                     },
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "center"
+                                        );
+                                    },
+                                    valueGetter: (params: any) => {
+                                        return params.data?.RECEIPT_STATUS === 1
+                                            ? "Draft"
+                                            : "Open";
+                                    },
                                     cellRenderer: (params: any) => {
-                                        // console.log("Paraamss", params.data);
-                                        return params.data.RECEIPT_STATUS ===
+                                        return params.data?.RECEIPT_STATUS ===
                                             1 ? (
                                             <BadgeFlat
                                                 className=" bg-red-600 text-white"
@@ -1720,10 +1578,15 @@ export default function Receipt({ auth }: PageProps) {
                                 },
                                 {
                                     headerName: "Action",
-                                    field: "",
                                     flex: 2,
-                                    cellStyle: { textAlign: "center" },
+                                    cellStyle: (params: any) => {
+                                        return handleRowStatus(
+                                            params.data?.RECEIPT_STATUS,
+                                            "center"
+                                        );
+                                    },
                                     autoHeight: true,
+                                    suppressExcelExport: true,
                                     cellRenderer: (params: any) => {
                                         return (
                                             <>

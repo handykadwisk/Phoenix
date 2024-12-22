@@ -677,23 +677,13 @@ export default function CashAdvance({ auth }: PageProps) {
             EXPENSES_FIRST_APPROVAL_STATUS: status,
         });
 
-        if (auth.user.employee?.division?.COMPANY_DIVISION_ID === 132) {
+        if (auth.user.employee?.division?.COMPANY_DIVISION_ID === 122) {
             setDataById({
                 ...dataById,
                 EXPENSES_SECOND_APPROVAL_BY: auth.user.employee?.EMPLOYEE_ID,
                 EXPENSES_SECOND_APPROVAL_USER:
                     auth.user.employee?.EMPLOYEE_FIRST_NAME,
                 EXPENSES_SECOND_APPROVAL_STATUS: status,
-            });
-        }
-
-        if (auth.user.employee?.division?.COMPANY_DIVISION_ID === 122) {
-            setDataById({
-                ...dataById,
-                EXPENSES_THIRD_APPROVAL_BY: auth.user.employee?.EMPLOYEE_ID,
-                EXPENSES_THIRD_APPROVAL_USER:
-                    auth.user.employee?.EMPLOYEE_FIRST_NAME,
-                EXPENSES_THIRD_APPROVAL_STATUS: status,
             });
         }
     };
@@ -804,19 +794,6 @@ export default function CashAdvance({ auth }: PageProps) {
                 console.log(err);
             });
     };
-
-    // const [getCountExpensesApprove3Status, setCountExpensesApprove3Status] =
-    //     useState<any>([]);
-    // const getExpensesApprove3Status = async () => {
-    //     await axios
-    //         .get(`/getCountExpensesApprove3Status`)
-    //         .then((res) => {
-    //             setCountExpensesApprove3Status(res.data);
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-    // };
 
     const [
         getCountExpensesNeedRevisionStatus,
@@ -1120,7 +1097,7 @@ export default function CashAdvance({ auth }: PageProps) {
     // console.log("Data", data);
     // console.log(DataRow);
     // console.log(" Expenses", expenses.data);
-    console.log("Data By Id", dataById);
+    // console.log("Data By Id", dataById);
 
     return (
         <AuthenticatedLayout user={auth.user} header={"Expenses"}>
@@ -2295,7 +2272,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             />
                         </div>
 
-                        {/* <div className="mt-10">
+                        <div className="mt-10">
                             <p>Status</p>
                             <ul role="list" className="mt-5">
                                 <li>
@@ -2388,37 +2365,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                         </div>
                                     </li>
                                 )}
-                                {dataById.EXPENSES_THIRD_APPROVAL_STATUS !==
-                                    null && (
-                                    <li>
-                                        <div className="relative pb-8">
-                                            <span
-                                                aria-hidden="true"
-                                                className="absolute left-4 top-4 -ml-px h-12 w-0.5 bg-red-300"
-                                            />
-                                            <div className="relative flex space-x-5">
-                                                <div>
-                                                    <span className="bg-red-600 flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white"></span>
-                                                </div>
-                                                <div className="flex min-w-0 justify-between space-x-6 pt-1.5">
-                                                    <div>
-                                                        <p className="text-sm text-gray-500">
-                                                            Approve 3
-                                                        </p>
-                                                    </div>
-                                                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                                                        <time>
-                                                            {dateFormat(
-                                                                dataById.EXPENSES_THIRD_APPROVAL_CHANGE_STATUS_DATE,
-                                                                "dd-mm-yyyy"
-                                                            )}
-                                                        </time>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                )}
                                 {dataById.EXPENSES_SECOND_APPROVAL_STATUS ===
                                     6 && (
                                     <li>
@@ -2447,7 +2393,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                     </li>
                                 )}
                             </ul>
-                        </div> */}
+                        </div>
                     </>
                 }
             />
@@ -4337,7 +4283,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         }}
                                         options={selectOperationalPayment}
                                         isSearchable={true}
-                                        placeholder={"Operational Payment"}
+                                        placeholder={"Payment Type"}
                                         value={
                                             searchExpenses.expenses_search[0]
                                                 .EXPENSES_DETAIL_TYPE
@@ -4940,9 +4886,14 @@ export default function CashAdvance({ auth }: PageProps) {
                                 },
                                 {
                                     headerName: "Refference Number",
-                                    field: "EXPENSES_REFF_NUMBER",
                                     flex: 2,
                                     cellStyle: { textAlign: "center" },
+                                    cellRenderer: (params: any) => {
+                                        const reff_number =
+                                            params.data.EXPENSES_REFF_NUMBER;
+
+                                        return reff_number ? reff_number : "-";
+                                    },
                                 },
                                 {
                                     headerName: "Action",

@@ -34,6 +34,7 @@ class ReceiptController extends Controller
         $query = Receipt::query();
         $sortModel = $request->input('sort');
         $newSearch = json_decode($request->newFilter, true);
+        $filterModel = json_decode($request->input('filter'), true);
 
         if ($sortModel) {
             $sortModel = explode(';', $sortModel); 
@@ -51,16 +52,36 @@ class ReceiptController extends Controller
 
             foreach ($newSearch as $searchValue) {
                 if ($searchValue['CLIENT_NAME']) {
-                    $query->whereHas('relation_organization',
-                    function($data) use($searchValue)
-                    {
-                        $data->where('RELATION_ORGANIZATION_NAME', 'like', '%'. $searchValue['CLIENT_NAME'] .'%');
-                    });
+                    $query->where('RECEIPT_NUMBER', 'LIKE', '%'. $searchValue['CLIENT_NAME'] .'%')
+                    ->orWhereHas('relation_organization', function($client) use ($searchValue) {
+                        $client->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%'. $searchValue['CLIENT_NAME'] .'%');
+                    })
+                    ->orWhereHas('bank_account', function($bank_account) use ($searchValue) {
+                        $bank_account->whereHas('bank', function($bank) use ($searchValue) {
+                            $bank->where('BANK_NAME', 'LIKE', '%' . $searchValue['CLIENT_NAME'] . '%')
+                                 ->orWhere('BANK_ABBREVIATION', 'LIKE', '%' . $searchValue['CLIENT_NAME'] . '%');
+                        });
+                    })
+                    ;
                 }
             }
         }
 
-        $query->whereNull('deleted_at')->orderBy('RECEIPT_ID', 'desc');
+        if ($filterModel) {
+            foreach ($filterModel as $filterModelKey) {
+                foreach ($filterModelKey as $filterValue) {
+                    if ($filterValue === "Open") {
+                        $query->where('RECEIPT_STATUS', 2);
+                    } else if ($filterValue === "Draft") {
+                        $query->where('RECEIPT_STATUS', 1);
+                    }
+                }
+            }
+        }
+
+        $query->whereNull('deleted_at')
+              ->orderBy('RECEIPT_STATUS', 'asc')
+              ->orderBy('RECEIPT_NUMBER', 'desc');
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -96,7 +117,31 @@ class ReceiptController extends Controller
 
     public function getBankAccount()
     { 
-        $data = RBankTransaction::all();
+        // Ambil data dengan kondisi
+        $premi = RBankTransaction::where('BANK_TRANSACTION_NAME', 'like', '%premi%')->get();
+        $nonPremi = RBankTransaction::where('BANK_TRANSACTION_NAME', 'not like', '%premi%')->get();
+
+        // Strukturkan data untuk frontend
+        $data = [
+            [
+                'label' => 'Premi',
+                'options' => $premi->map(function ($item) {
+                    return [
+                        'value' => $item->BANK_TRANSACTION_ID,
+                        'label' => $item->BANK_TRANSACTION_NAME,
+                    ];
+                }),
+            ],
+            [
+                'label' => 'Operasional',
+                'options' => $nonPremi->map(function ($item) {
+                    return [
+                        'value' => $item->BANK_TRANSACTION_ID,
+                        'label' => $item->BANK_TRANSACTION_NAME,
+                    ];
+                }),
+            ],
+        ];
 
         return response()->json($data);
     }
@@ -237,9 +282,9 @@ class ReceiptController extends Controller
             'JOURNAL_MEMO' => $journalMemo,
             'JOURNAL_IS_POSTED' => 1,
             'JOURNAL_POSTED_BY' => $userId,
-            'JOURNAL_POSTED_AT' => $dateTime,
+            'JOURNAL_POSTED_DATE' => $dateTime,
             'JOURNAL_CREATED_BY' => $userId,
-            'JOURNAL_CREATED_AT' => $dateTime
+            'JOURNAL_CREATED_DATE' => $dateTime
         ];
 
         $checkJournalAddReceipt = $this->check_journal_add_receipt($receiptId);
@@ -276,7 +321,7 @@ class ReceiptController extends Controller
                     'JOURNAL_DETAIL_SUM' => $journalDetailSum,
                     'JOURNAL_DETAIL_SIDE' => $journalDetailSide,
                     'JOURNAL_DETAIL_CREATED_BY' => $userId,
-                    'JOURNAL_DETAIL_CREATED_AT' => $dateTime
+                    'JOURNAL_DETAIL_CREATED_DATE' => $dateTime
                 ];
 
                 if ($checkJournalAddReceipt) {
@@ -311,7 +356,7 @@ class ReceiptController extends Controller
                     'JOURNAL_DETAIL_SUM' => $journalDetailSum,
                     'JOURNAL_DETAIL_SIDE' => $journalDetailSide,
                     'JOURNAL_DETAIL_CREATED_BY' => $userId,
-                    'JOURNAL_DETAIL_CREATED_AT' => $dateTime
+                    'JOURNAL_DETAIL_CREATED_DATE' => $dateTime
                 ];
 
                 if ($checkJournalAddReceipt) {
@@ -363,15 +408,12 @@ class ReceiptController extends Controller
     public function add(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'RECEIPT_RELATION_ORGANIZATION_ID' => 'required',
-            'RECEIPT_NAME' => 'required',
+            'RECEIPT_DATE' => 'required',
             'RECEIPT_CURRENCY_ID' => 'required',
             'RECEIPT_BANK_ID' => 'required',
-            'RECEIPT_DATE' => 'required',
             'RECEIPT_VALUE' => 'required',
         ], [
-            'RECEIPT_RELATION_ORGANIZATION_ID.required' => 'The client name field is required',
-            'RECEIPT_NAME.required' => 'The payment from field is required',
+            'RECEIPT_DATE.required' => 'The date field is required',
             'RECEIPT_CURRENCY_ID.required' => 'The currency field is required',
             'RECEIPT_BANK_ID.required' => 'The bank name field is required',
             'RECEIPT_VALUE.required' => 'The value field is required'
@@ -392,15 +434,11 @@ class ReceiptController extends Controller
             $receiptStatus = $request->RECEIPT_STATUS;
             $dateTime = now();
 
-            if ($receiptStatus === 2) {
-                $year = date('y', strtotime($request->RECEIPT_DATE));
-                $month = date('m', strtotime($request->RECEIPT_DATE));
+            $year = date('y', strtotime($request->RECEIPT_DATE));
+            $month = date('m', strtotime($request->RECEIPT_DATE));
                 
-                $receiptNumber = $this->generateReceiptNumber($year, $month);
-            } else {
-                $receiptNumber = null;
-            }
-
+            $receiptNumber = $this->generateReceiptNumber($year, $month);
+            $receipt_relation_organization_id = isset($request->RECEIPT_RELATION_ORGANIZATION_ID) ? $request->RECEIPT_RELATION_ORGANIZATION_ID['value'] : null;
             $currency = $request->RECEIPT_CURRENCY_ID['value'];
             $receiptCountedAs = Str::title(Number::spell($request->RECEIPT_VALUE, locale: 'id'));
             $receiptCountedAs = $this->switch_currency($currency, $receiptCountedAs);
@@ -417,7 +455,7 @@ class ReceiptController extends Controller
                 $receipt = Receipt::create([
                     'RECEIPT_CURRENCY_ID' => $currency,
                     'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID['value'],
-                    'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID['value'],
+                    'RECEIPT_RELATION_ORGANIZATION_ID' => $receipt_relation_organization_id,
                     'RECEIPT_NUMBER' => $receiptNumber,
                     'RECEIPT_NAME' => $request->RECEIPT_NAME,
                     'RECEIPT_DATE' => $request->RECEIPT_DATE,
@@ -427,7 +465,7 @@ class ReceiptController extends Controller
                     'RECEIPT_MEMO' => $request->RECEIPT_MEMO,
                     'RECEIPT_STATUS' => $receiptStatus,
                     'RECEIPT_CREATED_BY' => $userId,
-                    'RECEIPT_CREATED_AT' => $dateTime
+                    'RECEIPT_CREATED_DATE' => $dateTime
                 ])->RECEIPT_ID;
                 
                 // Create log Receipt
@@ -461,13 +499,12 @@ class ReceiptController extends Controller
     public function draft(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'RECEIPT_RELATION_ORGANIZATION_ID' => 'required',
+            'RECEIPT_DATE' => 'required',
             'RECEIPT_CURRENCY_ID' => 'required',
             'RECEIPT_BANK_ID' => 'required',
-            'RECEIPT_DATE' => 'required',
             'RECEIPT_VALUE' => 'required',
         ], [
-            'RECEIPT_RELATION_ORGANIZATION_ID.required' => 'The client name field is required',
+            'RECEIPT_DATE.required' => 'The date field is required',
             'RECEIPT_CURRENCY_ID.required' => 'The currency field is required',
             'RECEIPT_BANK_ID.required' => 'The bank name field is required',
             'RECEIPT_VALUE.required' => 'The value field is required'
@@ -486,15 +523,8 @@ class ReceiptController extends Controller
 
             $receipt_id = $request->RECEIPT_ID;
             $receipt_status = $request->RECEIPT_STATUS;
-            if ($receipt_status === 2) {
-                $year = date('y', strtotime($request->RECEIPT_DATE));
-                $month = date('m', strtotime($request->RECEIPT_DATE));
-                
-                $receipt_number = $this->generateReceiptNumber($year, $month);
-            } else {
-                $receipt_number = null;
-            }
 
+            $receipt_relation_organization_id = isset($request->RECEIPT_RELATION_ORGANIZATION_ID) ? $request->RECEIPT_RELATION_ORGANIZATION_ID : null;
             $currency = $request->RECEIPT_CURRENCY_ID;
             $receipt_counted_as = Str::title(Number::spell($request->RECEIPT_VALUE, locale: 'id'));
             $receipt_counted_as = $this->switch_currency($currency, $receipt_counted_as);
@@ -510,14 +540,15 @@ class ReceiptController extends Controller
                 Receipt::where('RECEIPT_ID', $receipt_id)->update([
                     'RECEIPT_CURRENCY_ID' => $currency,
                     'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID,
-                    'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID,
-                    'RECEIPT_NUMBER' => $receipt_number,
+                    'RECEIPT_RELATION_ORGANIZATION_ID' => $receipt_relation_organization_id,
                     'RECEIPT_NAME' => $request->RECEIPT_NAME,
                     'RECEIPT_DATE' => $request->RECEIPT_DATE,
                     'RECEIPT_VALUE' => $request->RECEIPT_VALUE,
                     'RECEIPT_COUNTED_AS' => $receipt_counted_as,
                     'RECEIPT_MEMO' => $request->RECEIPT_MEMO,
-                    'RECEIPT_STATUS' => $receipt_status
+                    'RECEIPT_STATUS' => $receipt_status,
+                    'RECEIPT_UPDATED_BY' => Auth::user()->id,
+                    'RECEIPT_UPDATED_DATE' => now()
                 ]);
                 
                 // Create log Receipt
@@ -551,13 +582,12 @@ class ReceiptController extends Controller
     public function edit(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'RECEIPT_RELATION_ORGANIZATION_ID' => 'required',
+            'RECEIPT_DATE' => 'required',
             'RECEIPT_CURRENCY_ID' => 'required',
             'RECEIPT_BANK_ID' => 'required',
-            'RECEIPT_DATE' => 'required',
             'RECEIPT_VALUE' => 'required',
         ], [
-            'RECEIPT_RELATION_ORGANIZATION_ID.required' => 'The client name field is required',
+            'RECEIPT_DATE.required' => 'The date field is required',
             'RECEIPT_CURRENCY_ID.required' => 'The currency field is required',
             'RECEIPT_BANK_ID.required' => 'The bank name field is required',
             'RECEIPT_VALUE.required' => 'The value field is required'
@@ -575,6 +605,7 @@ class ReceiptController extends Controller
             $setting = RSetting::where('SETTING_VARIABLE', 'auto_journal_add_receipt')->first();
 
             $receipt_id = $request->RECEIPT_ID;
+            $receipt_relation_organization_id = isset($request->RECEIPT_RELATION_ORGANIZATION_ID) ? $request->RECEIPT_RELATION_ORGANIZATION_ID : null;
             $currency = $request->RECEIPT_CURRENCY_ID;
             $receipt_counted_as = Str::title(Number::spell($request->RECEIPT_VALUE, locale: 'id'));
             $receipt_counted_as = $this->switch_currency($currency, $receipt_counted_as);
@@ -591,13 +622,15 @@ class ReceiptController extends Controller
                 Receipt::where('RECEIPT_ID', $receipt_id)->update([
                     'RECEIPT_CURRENCY_ID' => $currency,
                     'RECEIPT_BANK_ID' => $request->RECEIPT_BANK_ID,
-                    'RECEIPT_RELATION_ORGANIZATION_ID' => $request->RECEIPT_RELATION_ORGANIZATION_ID,
+                    'RECEIPT_RELATION_ORGANIZATION_ID' => $receipt_relation_organization_id,
                     'RECEIPT_NAME' => $request->RECEIPT_NAME,
                     'RECEIPT_DATE' => $request->RECEIPT_DATE,
                     'RECEIPT_VALUE' => $request->RECEIPT_VALUE,
                     'RECEIPT_COUNTED_AS' => $receipt_counted_as,
                     'RECEIPT_MEMO' => $request->RECEIPT_MEMO,
-                    'RECEIPT_STATUS' => $receipt_status
+                    'RECEIPT_STATUS' => $receipt_status,
+                    'RECEIPT_UPDATED_BY' => Auth::user()->id,
+                    'RECEIPT_UPDATED_DATE' => now()
                 ]);
                 
                 // Create log Receipt
@@ -664,11 +697,11 @@ class ReceiptController extends Controller
                     'JOURNAL_MEMO' => $journal->JOURNAL_MEMO,
                     'JOURNAL_IS_POSTED' => $journal->JOURNAL_IS_POSTED,
                     'JOURNAL_POSTED_BY' => $journal->JOURNAL_POSTED_BY,
-                    'JOURNAL_POSTED_AT' => $journal->JOURNAL_POSTED_AT,
+                    'JOURNAL_POSTED_DATE' => $journal->JOURNAL_POSTED_DATE,
                     'JOURNAL_CREATED_BY' => $journal->JOURNAL_CREATED_BY,
-                    'JOURNAL_CREATED_AT' => $journal->JOURNAL_CREATED_AT,
+                    'JOURNAL_CREATED_DATE' => $journal->JOURNAL_CREATED_DATE,
                     'JOURNAL_UPDATED_BY' => $journal->JOURNAL_UPDATED_BY,
-                    'JOURNAL_UPDATED_AT' => $journal->JOURNAL_UPDATED_AT,
+                    'JOURNAL_UPDATED_DATE' => $journal->JOURNAL_UPDATED_DATE,
                     'TEMP' => $journal->TEMP,
                     'JOURNAL_NOTES' => $journal->JOURNAL_NOTES,
                     'JOURNAL_DELETED_BY' => $userId,
@@ -695,9 +728,9 @@ class ReceiptController extends Controller
                         'JOURNAL_DETAIL_SUM' => $value->JOURNAL_DETAIL_SUM,
                         'JOURNAL_DETAIL_SIDE' => $value->JOURNAL_DETAIL_SIDE,
                         'JOURNAL_DETAIL_CREATED_BY' => $value->JOURNAL_DETAIL_CREATED_BY,
-                        'JOURNAL_DETAIL_CREATED_AT' => $value->JOURNAL_DETAIL_CREATED_AT,
+                        'JOURNAL_DETAIL_CREATED_DATE' => $value->JOURNAL_DETAIL_CREATED_DATE,
                         'JOURNAL_DETAIL_UPDATED_BY' => $value->JOURNAL_DETAIL_UPDATED_BY,
-                        'JOURNAL_DETAIL_UPDATED_AT' => $value->JOURNAL_DETAIL_UPDATED_AT,
+                        'JOURNAL_DETAIL_UPDATED_DATE' => $value->JOURNAL_DETAIL_UPDATED_DATE,
                         'JOURNAL_DETAIL_DELETED_BY' => $userId,
                         'JOURNAL_DETAIL_DELETED_DATE' => $dateTime
                     ]);

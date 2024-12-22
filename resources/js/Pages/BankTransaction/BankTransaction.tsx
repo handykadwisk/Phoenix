@@ -301,12 +301,8 @@ export default function BankTransaction({ auth }: PageProps) {
     const [rowSelectedData, setRowSelectedData] = useState<any>([]);
 
     const onSelectionChanged = (dataSelected: any) => {
-        console.log("ada", dataSelected);
-
         setRowSelectedData(dataSelected);
     };
-
-    console.log("Row Selected Data", rowSelectedData);
 
     const handleDisableBank = async (dataSelected: any) => {
         console.log("Data Selected", dataSelected);
@@ -347,13 +343,17 @@ export default function BankTransaction({ auth }: PageProps) {
     ) => {
         if (bankTransactionStatus === 1) {
             return {
-                backgroundColor: "#FFBFAA",
+                backgroundColor: "#fcd9d9",
                 textAlign: textAlign,
             };
         }
+
+        return {
+            textAlign: textAlign,
+        };
     };
 
-    console.log("Data", data);
+    // console.log("Data", data);
     // console.log("Bank Transaction", bankTransaction.data);
 
     return (
@@ -1110,7 +1110,9 @@ export default function BankTransaction({ auth }: PageProps) {
                                     flex: 1,
                                     cellStyle: (params: any) => {
                                         return handleRowStatus(
-                                            params.data?.BANK_TRANSACTION_STATUS
+                                            params.data
+                                                ?.BANK_TRANSACTION_STATUS,
+                                            "center"
                                         );
                                     },
                                     cellRenderer: (params: any) => {
@@ -1126,7 +1128,9 @@ export default function BankTransaction({ auth }: PageProps) {
                                     flex: 1,
                                     cellStyle: (params: any) => {
                                         return handleRowStatus(
-                                            params.data?.BANK_TRANSACTION_STATUS
+                                            params.data
+                                                ?.BANK_TRANSACTION_STATUS,
+                                            "center"
                                         );
                                     },
                                     cellRenderer: (params: any) => {
@@ -1173,7 +1177,9 @@ export default function BankTransaction({ auth }: PageProps) {
                                     },
                                     cellStyle: (params: any) => {
                                         return handleRowStatus(
-                                            params.data?.BANK_TRANSACTION_STATUS
+                                            params.data
+                                                ?.BANK_TRANSACTION_STATUS,
+                                            "center"
                                         );
                                     },
                                     cellRenderer: (params: any) => {
@@ -1209,7 +1215,9 @@ export default function BankTransaction({ auth }: PageProps) {
                                     },
                                     cellStyle: (params: any) => {
                                         return handleRowStatus(
-                                            params.data?.BANK_TRANSACTION_STATUS
+                                            params.data
+                                                ?.BANK_TRANSACTION_STATUS,
+                                            "center"
                                         );
                                     },
                                     cellRenderer: (params: any) => {

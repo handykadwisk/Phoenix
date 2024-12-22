@@ -511,31 +511,18 @@ class ExpensesController extends Controller
             $userDivisionId = Auth::user()->employee->division->COMPANY_DIVISION_ID;
 
             // Start logic condition revised
-            if ($userDivisionId !== 132 && $userDivisionId !== 122 && $request->EXPENSES_FIRST_APPROVAL_STATUS == 3) {
+            if ($userDivisionId !== 122 && $request->EXPENSES_FIRST_APPROVAL_STATUS == 3) {
                 $updateData['EXPENSES_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['EXPENSES_FIRST_APPROVAL_STATUS'] = 3;
             }
 
-            if ($userDivisionId === 132 && $request->EXPENSES_SECOND_APPROVAL_STATUS == 3) {
+            if ($userDivisionId === 122 && $request->EXPENSES_SECOND_APPROVAL_STATUS == 3) {
                 $updateData['EXPENSES_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['EXPENSES_FIRST_APPROVAL_STATUS'] = 3;
-                $updateData['EXPENSES_SECOND_APPROVAL_BY'] = null;
-                $updateData['EXPENSES_SECOND_APPROVAL_USER'] = null;
-                $updateData['EXPENSES_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['EXPENSES_SECOND_APPROVAL_STATUS'] = null;
-            }
-
-            if ($userDivisionId === 122 && $request->EXPENSES_THIRD_APPROVAL_STATUS == 3) {
-                $updateData['EXPENSES_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['EXPENSES_FIRST_APPROVAL_STATUS'] = 3;
-                $updateData['EXPENSES_SECOND_APPROVAL_BY'] = null;
-                $updateData['EXPENSES_SECOND_APPROVAL_USER'] = null;
-                $updateData['EXPENSES_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['EXPENSES_SECOND_APPROVAL_STATUS'] = null;
-                // $updateData['EXPENSES_THIRD_APPROVAL_BY'] = null;
-                // $updateData['EXPENSES_THIRD_APPROVAL_USER'] = null;
-                // $updateData['EXPENSES_THIRD_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                // $updateData['EXPENSES_THIRD_APPROVAL_STATUS'] = null;
+                // $updateData['EXPENSES_SECOND_APPROVAL_BY'] = null;
+                // $updateData['EXPENSES_SECOND_APPROVAL_USER'] = null;
+                // $updateData['EXPENSES_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
+                // $updateData['EXPENSES_SECOND_APPROVAL_STATUS'] = null;
             }
             // End logic condition revised
             
@@ -545,40 +532,26 @@ class ExpensesController extends Controller
                 $updateData['EXPENSES_FIRST_APPROVAL_STATUS'] = $request->EXPENSES_FIRST_APPROVAL_STATUS;
             }
 
-            // if ($userDivisionId === 122) {
+            if ($userDivisionId === 122 && $request->EXPENSES_SECOND_APPROVAL_STATUS == 2) {
                 $updateData['EXPENSES_SECOND_APPROVAL_BY'] = $request->EXPENSES_SECOND_APPROVAL_BY;
                 $updateData['EXPENSES_SECOND_APPROVAL_USER'] = $request->EXPENSES_SECOND_APPROVAL_USER;
                 $updateData['EXPENSES_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = now();
                 $updateData['EXPENSES_SECOND_APPROVAL_STATUS'] = $request->EXPENSES_SECOND_APPROVAL_STATUS;
-            // }
-
-            // if ($userDivisionId === 122 && $request->EXPENSES_THIRD_APPROVAL_STATUS == 2) {
-            //     $updateData['EXPENSES_THIRD_APPROVAL_BY'] = $request->EXPENSES_THIRD_APPROVAL_BY;
-            //     $updateData['EXPENSES_THIRD_APPROVAL_USER'] = $request->EXPENSES_THIRD_APPROVAL_USER;
-            //     $updateData['EXPENSES_THIRD_APPROVAL_CHANGE_STATUS_DATE'] = now();
-            //     $updateData['EXPENSES_THIRD_APPROVAL_STATUS'] = $request->EXPENSES_THIRD_APPROVAL_STATUS;
-            // }
+            }
             // End logic condition approve
 
             // Start logic condition reject
-            if ($userDivisionId !== 132 && $userDivisionId !== 122 && $request->EXPENSES_FIRST_APPROVAL_STATUS == 4) {
+            if ($userDivisionId !== 122 && $request->EXPENSES_FIRST_APPROVAL_STATUS == 4) {
                 $updateData['EXPENSES_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = now();
                 $updateData['EXPENSES_FIRST_APPROVAL_STATUS'] = $request->EXPENSES_FIRST_APPROVAL_STATUS;
             }
 
-            if ($userDivisionId === 132 && $request->EXPENSES_SECOND_APPROVAL_STATUS == 4) {
+            if ($userDivisionId === 122 && $request->EXPENSES_SECOND_APPROVAL_STATUS == 4) {
                 $updateData['EXPENSES_SECOND_APPROVAL_BY'] = $request->EXPENSES_SECOND_APPROVAL_BY;
                 $updateData['EXPENSES_SECOND_APPROVAL_USER'] = $request->EXPENSES_SECOND_APPROVAL_USER;
                 $updateData['EXPENSES_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = now();
                 $updateData['EXPENSES_SECOND_APPROVAL_STATUS'] = $request->EXPENSES_SECOND_APPROVAL_STATUS;
             }
-
-            // if ($userDivisionId === 122 && $request->EXPENSES_THIRD_APPROVAL_STATUS == 4) {
-            //     $updateData['EXPENSES_THIRD_APPROVAL_BY'] = $request->EXPENSES_THIRD_APPROVAL_BY;
-            //     $updateData['EXPENSES_THIRD_APPROVAL_USER'] = $request->EXPENSES_THIRD_APPROVAL_USER;
-            //     $updateData['EXPENSES_THIRD_APPROVAL_CHANGE_STATUS_DATE'] = now();
-            //     $updateData['EXPENSES_THIRD_APPROVAL_STATUS'] = $request->EXPENSES_THIRD_APPROVAL_STATUS;
-            // }
             // End logic condition reject
 
             Expenses::where('EXPENSES_ID', $expenses_id)->update($updateData);
@@ -589,21 +562,13 @@ class ExpensesController extends Controller
             $expenses_detail = $request->expenses_detail;
             if (is_array($expenses_detail) && !empty($expenses_detail)) {
                 foreach ($expenses_detail as $ed) {
-                    // $cost_classification = $ed['EXPENSES_DETAIL_COST_CLASSIFICATION'];
-    
                     $expenses_detail_id = $ed['EXPENSES_DETAIL_ID'];
                     $expenses_detail_approval = $ed['EXPENSES_DETAIL_APPROVAL'];
                     $expenses_detail_amount_value_approve = $ed['EXPENSES_DETAIL_AMOUNT_VALUE_APPROVE'];
                     $expenses_detail_remarks = $ed['EXPENSES_DETAIL_REMARKS'];
-                    // $expenses_detail_cost_classification = $ed['EXPENSES_DETAIL_COST_CLASSIFICATION'];
-                    
-                    // if ($cost_classification != null || $cost_classification != "") {
-                    //     $expenses_detail_cost_classification = $cost_classification;
-                    // }
                     
                     ExpensesDetail::where('EXPENSES_DETAIL_ID', $expenses_detail_id)->update([
                         'EXPENSES_DETAIL_APPROVAL' => $expenses_detail_approval,
-                        // 'EXPENSES_DETAIL_COST_CLASSIFICATION' => $expenses_detail_cost_classification,
                         'EXPENSES_DETAIL_AMOUNT_VALUE_APPROVE' => $expenses_detail_amount_value_approve,
                         'EXPENSES_DETAIL_REMARKS' => $expenses_detail_remarks
                     ]);

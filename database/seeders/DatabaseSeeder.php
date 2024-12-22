@@ -541,11 +541,12 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path19)
         );
 
-        $file_path20 = resource_path('../database/LogDB/2024_07_31_m_role_access_menu.sql');
+        // $file_path20 = resource_path('../database/LogDB/2024_07_31_m_role_access_menu.sql');
 
-        DB::unprepared(
-            file_get_contents($file_path20)
-        );
+        // DB::unprepared(
+        //     file_get_contents($file_path20)
+        // );
+        
         // create 2024_16_05_r_salutation
         $r_salutation = resource_path('../database/LogDB/2024_16_05_r_salutation.sql');
 
@@ -604,10 +605,10 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path32)
         );
 
-        $file_path33 = resource_path('../database/LogDB/2024_07_31_t_menu.sql');
+        // $file_path33 = resource_path('../database/LogDB/2024_07_31_t_menu.sql');
 
-        DB::unprepared(
-            file_get_contents($file_path33)
-        );
+        // DB::unprepared(
+        //     file_get_contents($file_path33)
+        // );
     }
 }

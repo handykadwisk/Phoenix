@@ -519,8 +519,6 @@ class ReimburseController extends Controller
 
             $userDivisionId = Auth::user()->employee->division->COMPANY_DIVISION_ID;
 
-            // dd($userDivisionId . " " . $request->REIMBURSE_SECOND_APPROVAL_STATUS);
-
             // Start logic condition revised
             if ($userDivisionId !== 132 && $userDivisionId !== 122 && $request->REIMBURSE_FIRST_APPROVAL_STATUS == 3) {
                 $updateData['REIMBURSE_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = null;

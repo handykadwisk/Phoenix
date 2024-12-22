@@ -2310,7 +2310,7 @@ export default function CashAdvance({ auth }: PageProps) {
         const days = calculateBusinessDays(requestedDate, new Date());
         if (days > 3) {
             return {
-                backgroundColor: "#FFBFAA",
+                backgroundColor: "#fcd9d9",
                 textAlign: "center",
             };
         } else if (days > 1) {
