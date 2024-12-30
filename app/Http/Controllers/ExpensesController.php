@@ -494,7 +494,7 @@ class ExpensesController extends Controller
 
     public function approve(Request $request)
     {
-        DB::transaction(function () use ($request) {
+        $expensesStatus = DB::transaction(function () use ($request) {
             $expenses_id = $request->EXPENSES_ID;
             $expenses_type = $request->EXPENSES_TYPE;
             $expenses_total_amount = $request->EXPENSES_TOTAL_AMOUNT;
@@ -519,10 +519,6 @@ class ExpensesController extends Controller
             if ($userDivisionId === 122 && $request->EXPENSES_SECOND_APPROVAL_STATUS == 3) {
                 $updateData['EXPENSES_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['EXPENSES_FIRST_APPROVAL_STATUS'] = 3;
-                // $updateData['EXPENSES_SECOND_APPROVAL_BY'] = null;
-                // $updateData['EXPENSES_SECOND_APPROVAL_USER'] = null;
-                // $updateData['EXPENSES_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                // $updateData['EXPENSES_SECOND_APPROVAL_STATUS'] = null;
             }
             // End logic condition revised
             
@@ -577,11 +573,28 @@ class ExpensesController extends Controller
                     user_log_create("Approve (Expenses Detail).", "Expenses", $expenses_detail_id);
                 }
             }
-    
+            
+            if ($userDivisionId !== 122) {
+                return $request->EXPENSES_FIRST_APPROVAL_STATUS;
+            }
+            
+            if ($userDivisionId === 122) {
+                return $request->EXPENSES_SECOND_APPROVAL_STATUS;
+            }  
         });
 
+        if ($expensesStatus === 2) {
+            $alertText = "Expenses has been approved";
+        } else if ($expensesStatus === 3) {
+            $alertText = "Expenses needs to be revised";
+        } else if ($expensesStatus === 4) {
+            $alertText = "Expenses rejected";
+        } else {
+            $alertText = "Expenses status not found";
+        }
+
         return new JsonResponse([
-            'Expenses has been approved.'
+            $alertText
         ], 201, [
             'X-Inertia' => true
         ]);

@@ -267,9 +267,9 @@ export default function Receipt({ auth }: PageProps) {
         inputDataSearch("CLIENT_NAME", "", 0);
         inputDataSearch("flag", "flag", 0);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Clear Search End
@@ -341,17 +341,6 @@ export default function Receipt({ auth }: PageProps) {
                 console.log(err);
             });
     };
-
-    const [searchQuery, setSearchQuery] = useState("");
-    const filteredBankAccount = BankAccount.filter(
-        (bank: any) =>
-            // console.log("Bank", bank)
-            bank.options[0].label
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase()) || null
-    );
-
-    // console.log("Search Query", searchQuery);
 
     const getBankAccountSelect = (value: any) => {
         if (value) {
@@ -441,7 +430,7 @@ export default function Receipt({ auth }: PageProps) {
                 submitButtonName=""
                 body={
                     <div className="mt-4">
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_DATE"
                                 className="w-full md:w-1/4 mb-2"
@@ -471,7 +460,7 @@ export default function Receipt({ auth }: PageProps) {
                                 />
                             </div>
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_RELATION_ORGANIZATION_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -503,7 +492,7 @@ export default function Receipt({ auth }: PageProps) {
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_NAME"
                                 className="w-full md:w-1/4 mb-2"
@@ -524,7 +513,7 @@ export default function Receipt({ auth }: PageProps) {
                                 }
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_CURRENCY_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -557,7 +546,7 @@ export default function Receipt({ auth }: PageProps) {
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_BANK_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -577,12 +566,9 @@ export default function Receipt({ auth }: PageProps) {
                                                 : `text-gray-500 hover:bg-red-100 hover:text-black`
                                         }`,
                                 }}
-                                options={filteredBankAccount}
+                                options={BankAccount}
                                 isSearchable={true}
                                 searchInputPlaceholder="Search Bank"
-                                onSearchInputChange={(e) =>
-                                    setSearchQuery(e.target.value)
-                                }
                                 placeholder={"Choose Bank Name"}
                                 value={data.RECEIPT_BANK_ID}
                                 onChange={(val: any) =>
@@ -591,11 +577,10 @@ export default function Receipt({ auth }: PageProps) {
                                         RECEIPT_BANK_ID: val,
                                     })
                                 }
-                                menuIsOpen={false}
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_VALUE"
                                 className="w-full md:w-1/4 mb-2"
@@ -617,7 +602,7 @@ export default function Receipt({ auth }: PageProps) {
                                 autoComplete="off"
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_MEMO"
                                 className="w-full md:w-1/4 mb-2"
@@ -683,7 +668,7 @@ export default function Receipt({ auth }: PageProps) {
                 submitButtonName=""
                 body={
                     <div className="mt-4">
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_DATE"
                                 className="w-full md:w-1/4 mb-2"
@@ -713,7 +698,7 @@ export default function Receipt({ auth }: PageProps) {
                                 />
                             </div>
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_RELATION_ORGANIZATION_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -751,7 +736,7 @@ export default function Receipt({ auth }: PageProps) {
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_NAME"
                                 className="w-full md:w-1/4 mb-2"
@@ -772,7 +757,7 @@ export default function Receipt({ auth }: PageProps) {
                                 }
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_CURRENCY_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -810,7 +795,7 @@ export default function Receipt({ auth }: PageProps) {
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_BANK_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -848,7 +833,7 @@ export default function Receipt({ auth }: PageProps) {
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_VALUE"
                                 className="w-full md:w-1/4 mb-2"
@@ -873,7 +858,7 @@ export default function Receipt({ auth }: PageProps) {
                                 autoComplete="off"
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_MEMO"
                                 className="w-full md:w-1/4 mb-2"
@@ -939,7 +924,7 @@ export default function Receipt({ auth }: PageProps) {
                 submitButtonName="Save"
                 body={
                     <div className="mt-4">
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_DATE"
                                 className="w-full md:w-1/4 mb-2"
@@ -969,7 +954,7 @@ export default function Receipt({ auth }: PageProps) {
                                 />
                             </div>
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_RELATION_ORGANIZATION_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -1007,7 +992,7 @@ export default function Receipt({ auth }: PageProps) {
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_NAME"
                                 className="w-full md:w-1/4 mb-2"
@@ -1028,7 +1013,7 @@ export default function Receipt({ auth }: PageProps) {
                                 }
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_CURRENCY_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -1066,7 +1051,7 @@ export default function Receipt({ auth }: PageProps) {
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_BANK_ID"
                                 className="w-full md:w-1/4 mb-2"
@@ -1104,7 +1089,7 @@ export default function Receipt({ auth }: PageProps) {
                                 primaryColor={"bg-red-500"}
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_VALUE"
                                 className="w-full md:w-1/4 mb-2"
@@ -1129,7 +1114,7 @@ export default function Receipt({ auth }: PageProps) {
                                 autoComplete="off"
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_MEMO"
                                 className="w-full md:w-1/4 mb-2"
@@ -1171,7 +1156,7 @@ export default function Receipt({ auth }: PageProps) {
                 submitButtonName="Save"
                 body={
                     <div className="mt-4">
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_NAME"
                                 className="w-full md:w-2/12 mb-2"
@@ -1188,7 +1173,7 @@ export default function Receipt({ auth }: PageProps) {
                                 readOnly
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_VALUE"
                                 className="w-full md:w-2/12 mb-2"
@@ -1209,7 +1194,7 @@ export default function Receipt({ auth }: PageProps) {
                                 readOnly
                             />
                         </div>
-                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-6">
+                        <div className="block md:flex md:items-center md:space-x-4 w-full mb-3 lg:mb-6">
                             <InputLabel
                                 htmlFor="RECEIPT_RELATION_ORGANIZATION_ID"
                                 className="w-full md:w-2/12 mb-2"
@@ -1366,9 +1351,9 @@ export default function Receipt({ auth }: PageProps) {
                                                 .RECEIPT_ID;
                                         if (title || id) {
                                             inputDataSearch("flag", "", 0);
-                                            setRefreshSuccess("success");
+                                            setRefreshSuccess("");
                                             setTimeout(() => {
-                                                setRefreshSuccess("");
+                                                setRefreshSuccess("success");
                                             });
                                         } else {
                                             inputDataSearch("flag", "flag", 0);
@@ -1392,9 +1377,9 @@ export default function Receipt({ auth }: PageProps) {
                                         inputDataSearch("flag", "", 0);
                                     }
 
-                                    setRefreshSuccess("success");
+                                    setRefreshSuccess("");
                                     setTimeout(() => {
-                                        setRefreshSuccess("");
+                                        setRefreshSuccess("success");
                                     }, 1000);
                                 }}
                             >
@@ -1421,6 +1406,7 @@ export default function Receipt({ auth }: PageProps) {
                             triggeringRefreshData={refreshSuccess}
                             // buttonExcelExport={true}
                             suppressCsvExport={true}
+                            noRowsOverlayComponent={true}
                             colDefs={[
                                 {
                                     headerName: "No.",
@@ -1586,7 +1572,6 @@ export default function Receipt({ auth }: PageProps) {
                                         );
                                     },
                                     autoHeight: true,
-                                    suppressExcelExport: true,
                                     cellRenderer: (params: any) => {
                                         return (
                                             <>

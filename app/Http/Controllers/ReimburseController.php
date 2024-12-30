@@ -503,7 +503,7 @@ class ReimburseController extends Controller
 
     public function approve(Request $request)
     {
-        DB::transaction(function () use ($request) {
+        $reimburseStatus = DB::transaction(function () use ($request) {
             $reimburse_id = $request->REIMBURSE_ID;
             $reimburse_type = $request->REIMBURSE_TYPE;
             $reimburse_total_amount = $request->REIMBURSE_TOTAL_AMOUNT;
@@ -528,10 +528,6 @@ class ReimburseController extends Controller
             if ($userDivisionId === 132 && $request->REIMBURSE_SECOND_APPROVAL_STATUS == 3) {
                 $updateData['REIMBURSE_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['REIMBURSE_FIRST_APPROVAL_STATUS'] = 3;
-                $updateData['REIMBURSE_SECOND_APPROVAL_BY'] = null;
-                $updateData['REIMBURSE_SECOND_APPROVAL_USER'] = null;
-                $updateData['REIMBURSE_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['REIMBURSE_SECOND_APPROVAL_STATUS'] = null;
             }
 
             if ($userDivisionId === 122 && $request->REIMBURSE_THIRD_APPROVAL_STATUS == 3) {
@@ -541,10 +537,6 @@ class ReimburseController extends Controller
                 $updateData['REIMBURSE_SECOND_APPROVAL_USER'] = null;
                 $updateData['REIMBURSE_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['REIMBURSE_SECOND_APPROVAL_STATUS'] = null;
-                $updateData['REIMBURSE_THIRD_APPROVAL_BY'] = null;
-                $updateData['REIMBURSE_THIRD_APPROVAL_USER'] = null;
-                $updateData['REIMBURSE_THIRD_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['REIMBURSE_THIRD_APPROVAL_STATUS'] = null;
             }
             // End logic condition revised
             
@@ -621,11 +613,32 @@ class ReimburseController extends Controller
                     user_log_create("Approve (Reimburse Detail).", "Reimburse", $reimburse_detail_id);
                 }
             }
-    
+            
+            if ($userDivisionId !== 132 && $userDivisionId !== 122) {
+                return $request->REIMBURSE_FIRST_APPROVAL_STATUS;
+            }
+            
+            if ($userDivisionId === 132) {
+                return $request->REIMBURSE_SECOND_APPROVAL_STATUS;
+            }
+            
+            if ($userDivisionId === 122) {
+                return $request->REIMBURSE_THIRD_APPROVAL_STATUS;
+            }  
         });
+
+        if ($reimburseStatus === 2) {
+            $alertText = "Reimburse has been approved";
+        } else if ($reimburseStatus === 3) {
+            $alertText = "Reimburse needs to be revised";
+        } else if ($reimburseStatus === 4) {
+            $alertText = "Reimburse rejected";
+        } else {
+            $alertText = "Reimburse status not found";
+        }
         
         return new JsonResponse([
-            'Reimburse has been approved.'
+            $alertText
         ], 201, [
             'X-Inertia' => true
         ]);

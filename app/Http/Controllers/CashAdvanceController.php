@@ -663,7 +663,7 @@ class CashAdvanceController extends Controller
 
     public function cash_advance_approve(Request $request)
     {
-        DB::transaction(function () use ($request) {
+        $cashAdvanceStatus = DB::transaction(function () use ($request) {
             $cash_advance_id = $request->CASH_ADVANCE_ID;
             $cash_advance_to_bank_account = $request->CASH_ADVANCE_TO_BANK_ACCOUNT;
             $cash_advance_delivery_method_transfer = $request->CASH_ADVANCE_DELIVERY_METHOD_TRANSFER;
@@ -690,10 +690,6 @@ class CashAdvanceController extends Controller
             if ($userDivisionId === 132 && $request->CASH_ADVANCE_SECOND_APPROVAL_STATUS == 3) {
                 $updateData['CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['CASH_ADVANCE_FIRST_APPROVAL_STATUS'] = 3;
-                $updateData['CASH_ADVANCE_SECOND_APPROVAL_BY'] = null;
-                $updateData['CASH_ADVANCE_SECOND_APPROVAL_USER'] = null;
-                $updateData['CASH_ADVANCE_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['CASH_ADVANCE_SECOND_APPROVAL_STATUS'] = null;
             }
 
             if ($userDivisionId === 122 && $request->CASH_ADVANCE_THIRD_APPROVAL_STATUS == 3) {
@@ -703,10 +699,6 @@ class CashAdvanceController extends Controller
                 $updateData['CASH_ADVANCE_SECOND_APPROVAL_USER'] = null;
                 $updateData['CASH_ADVANCE_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['CASH_ADVANCE_SECOND_APPROVAL_STATUS'] = null;
-                $updateData['CASH_ADVANCE_THIRD_APPROVAL_BY'] = null;
-                $updateData['CASH_ADVANCE_THIRD_APPROVAL_USER'] = null;
-                $updateData['CASH_ADVANCE_THIRD_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['CASH_ADVANCE_THIRD_APPROVAL_STATUS'] = null;
             }
             // End logic condition revised
             
@@ -770,10 +762,32 @@ class CashAdvanceController extends Controller
                     user_log_create("Approve (Cash Advance Detail).", "Cash Advance", $cash_advance_detail_id);
                 }
             }
+
+            if ($userDivisionId !== 132 && $userDivisionId !== 122) {
+                return $request->CASH_ADVANCE_FIRST_APPROVAL_STATUS;
+            }
+            
+            if ($userDivisionId === 132) {
+                return $request->CASH_ADVANCE_SECOND_APPROVAL_STATUS;
+            }
+            
+            if ($userDivisionId === 122) {
+                return $request->CASH_ADVANCE_THIRD_APPROVAL_STATUS;
+            }
         });
-        
+
+        if ($cashAdvanceStatus === 2) {
+            $alertText = "Cash Advance has been approved";
+        } else if ($cashAdvanceStatus === 3) {
+            $alertText = "Cash Advance needs to be revised";
+        } else if ($cashAdvanceStatus === 4) {
+            $alertText = "Cash Advance rejected";
+        } else {
+            $alertText = "Cash Advance status not found";
+        }
+
         return new JsonResponse([
-            'Cash Advance has been approved.'
+            $alertText
         ], 201, [
             'X-Inertia' => true
         ]);

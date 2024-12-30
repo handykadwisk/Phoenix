@@ -291,9 +291,9 @@ export default function BankTransaction({ auth }: PageProps) {
         inputDataSearch("BANK_TRANSACTION_NAME", "", 0);
         inputDataSearch("flag", "flag", 0);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Clear Search End
@@ -952,7 +952,7 @@ export default function BankTransaction({ auth }: PageProps) {
                             id="BANK_TRANSACTION_NAME"
                             name="BANK_TRANSACTION_NAME"
                             type="text"
-                            placeholder="Bank Name / Currency / Account Number"
+                            placeholder="Bank Name - Currency - Account Number"
                             autoComplete="off"
                             value={
                                 searchBankTransaction.bank_transaction_search[0]
@@ -986,9 +986,9 @@ export default function BankTransaction({ auth }: PageProps) {
                                             .BANK_TRANSACTION_ID;
                                     if (title || id) {
                                         inputDataSearch("flag", "", 0);
-                                        setRefreshSuccess("success");
+                                        setRefreshSuccess("");
                                         setTimeout(() => {
-                                            setRefreshSuccess("");
+                                            setRefreshSuccess("success");
                                         });
                                     } else {
                                         inputDataSearch("flag", "flag", 0);
@@ -1013,9 +1013,9 @@ export default function BankTransaction({ auth }: PageProps) {
                                         inputDataSearch("flag", "", 0);
                                     }
 
-                                    setRefreshSuccess("success");
+                                    setRefreshSuccess("");
                                     setTimeout(() => {
-                                        setRefreshSuccess("");
+                                        setRefreshSuccess("success");
                                     }, 1000);
                                 }}
                             >
@@ -1055,6 +1055,7 @@ export default function BankTransaction({ auth }: PageProps) {
                             rowSelection={"multiple"}
                             onSelectionChanged={onSelectionChanged}
                             suppressRowClickSelection={true}
+                            noRowsOverlayComponent={true}
                             colDefs={[
                                 {
                                     checkboxSelection: (params: any) => {

@@ -110,41 +110,6 @@ class CashAdvanceReportController extends Controller
         return response()->json($data);
     }
 
-    public function RemoveSpecialChar($str) 
-    {
-        $replace = Str::of($str)->replace(
-            [
-                '`',
-                '~',
-                ' ',
-                '!',
-                '@',
-                '#',
-                '$',
-                '%',
-                '^',
-                '&',
-                '*',
-                '(',
-                ')',
-                '+',
-                '=',
-                '<',
-                '>',
-                '{',
-                '}',
-                '[',
-                ']',
-                '?',
-                '/',
-                ':',
-                ';'
-            ], 
-            '-'
-        );
-        return $replace;
-    }
-
     public function generateCashAdvanceReportNumber()
     {
         // Format kode
@@ -418,7 +383,7 @@ class CashAdvanceReportController extends Controller
 
     public function cash_advance_report_approve(Request $request)
     {
-        DB::transaction(function () use ($request) {
+        $cashAdvanceReportStatus = DB::transaction(function () use ($request) {
             $cash_advance_detail_report = $request->cash_advance_detail_report;
     
             $total_amount_approve = 0;
@@ -455,10 +420,6 @@ class CashAdvanceReportController extends Controller
             if ($userDivisionId === 132 && $request->REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS == 3) {
                 $updateData['REPORT_CASH_ADVANCE_FIRST_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS'] = 3;
-                $updateData['REPORT_CASH_ADVANCE_SECOND_APPROVAL_BY'] = null;
-                $updateData['REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER'] = null;
-                $updateData['REPORT_CASH_ADVANCE_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS'] = null;
             }
 
             if ($userDivisionId === 122 && $request->REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS == 3) {
@@ -468,10 +429,6 @@ class CashAdvanceReportController extends Controller
                 $updateData['REPORT_CASH_ADVANCE_SECOND_APPROVAL_USER'] = null;
                 $updateData['REPORT_CASH_ADVANCE_SECOND_APPROVAL_CHANGE_STATUS_DATE'] = null;
                 $updateData['REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS'] = null;
-                $updateData['REPORT_CASH_ADVANCE_THIRD_APPROVAL_BY'] = null;
-                $updateData['REPORT_CASH_ADVANCE_THIRD_APPROVAL_USER'] = null;
-                $updateData['REPORT_CASH_ADVANCE_THIRD_APPROVAL_CHANGE_STATUS_DATE'] = null;
-                $updateData['REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS'] = null;
             }
             // End logic condition revised
             
@@ -546,10 +503,32 @@ class CashAdvanceReportController extends Controller
                     user_log_create("Approve (Cash Advance Report Detail).", "Cash Advance Report", $report_cash_advance_detail_id);
                 }
             }
+
+            if ($userDivisionId !== 132 && $userDivisionId !== 122) {
+                return $request->REPORT_CASH_ADVANCE_FIRST_APPROVAL_STATUS;
+            }
+            
+            if ($userDivisionId === 132) {
+                return $request->REPORT_CASH_ADVANCE_SECOND_APPROVAL_STATUS;
+            }
+            
+            if ($userDivisionId === 122) {
+                return $request->REPORT_CASH_ADVANCE_THIRD_APPROVAL_STATUS;
+            }
         });
+
+        if ($cashAdvanceReportStatus === 2) {
+            $alertText = "Cash Advance Report has been approved";
+        } else if ($cashAdvanceReportStatus === 3) {
+            $alertText = "Cash Advance Report needs to be revised";
+        } else if ($cashAdvanceReportStatus === 4) {
+            $alertText = "Cash Advance Report rejected";
+        } else {
+            $alertText = "Cash Advance Report status not found";
+        }
         
         return new JsonResponse([
-            'Cash Advance Report has been approved.'
+            $alertText
         ], 201, [
             'X-Inertia' => true
         ]);

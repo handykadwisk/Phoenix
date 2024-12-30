@@ -673,9 +673,9 @@ export default function Reimburse({ auth }: PageProps) {
         inputDataSearch("REIMBURSE_APPROVAL_STATUS", "", 0);
         inputDataSearch("flag", "flag", 0);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Clear Search End
@@ -4370,9 +4370,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     .REIMBURSE_NUMBER;
                                             if (reimburseNumber) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -4417,9 +4419,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     .REIMBURSE_REQUESTED_BY;
                                             if (reimburseRequestedBy) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -4507,9 +4511,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     .REIMBURSE_USED_BY;
                                             if (reimburseUsedBy) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -4561,11 +4567,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                         "",
                                                         0
                                                     );
-                                                    setRefreshSuccess(
-                                                        "success"
-                                                    );
+                                                    setRefreshSuccess("");
                                                     setTimeout(() => {
-                                                        setRefreshSuccess("");
+                                                        setRefreshSuccess(
+                                                            "success"
+                                                        );
                                                     });
                                                 } else {
                                                     inputDataSearch(
@@ -4579,6 +4585,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         dateFormat={"dd-MM-yyyy"}
                                         placeholderText="dd-mm-yyyyy (Start Date)"
                                         className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                        autoComplete="off"
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 mb-5 relative">
@@ -4621,11 +4628,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                         "",
                                                         0
                                                     );
-                                                    setRefreshSuccess(
-                                                        "success"
-                                                    );
+                                                    setRefreshSuccess("");
                                                     setTimeout(() => {
-                                                        setRefreshSuccess("");
+                                                        setRefreshSuccess(
+                                                            "success"
+                                                        );
                                                     });
                                                 } else {
                                                     inputDataSearch(
@@ -4639,6 +4646,7 @@ export default function Reimburse({ auth }: PageProps) {
                                         dateFormat={"dd-MM-yyyy"}
                                         placeholderText="dd-mm-yyyy (End Date)"
                                         className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                        autoComplete="off"
                                     />
                                 </div>
                                 <div className="mb-5">
@@ -4702,9 +4710,9 @@ export default function Reimburse({ auth }: PageProps) {
                                                 inputDataSearch("flag", "", 0);
                                             }
 
-                                            setRefreshSuccess("success");
+                                            setRefreshSuccess("");
                                             setTimeout(() => {
-                                                setRefreshSuccess("");
+                                                setRefreshSuccess("success");
                                             }, 1000);
                                         }}
                                     >
@@ -5034,6 +5042,7 @@ export default function Reimburse({ auth }: PageProps) {
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
                             rowHeight={130}
+                            noRowsOverlayComponent={true}
                             colDefs={[
                                 {
                                     headerName: "No.",

@@ -375,9 +375,9 @@ export default function ExchangeRateController({ auth }: PageProps) {
         inputDataSearch("EXCHANGE_RATE_TAX_DATE", "", 0);
         inputDataSearch("flag", "flag", 0);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Clear Search End
@@ -835,9 +835,9 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                                 .EXCHANGE_RATE_TAX_ID;
                                         if (title || id) {
                                             inputDataSearch("flag", "", 0);
-                                            setRefreshSuccess("success");
+                                            setRefreshSuccess("");
                                             setTimeout(() => {
-                                                setRefreshSuccess("");
+                                                setRefreshSuccess("success");
                                             });
                                         } else {
                                             inputDataSearch("flag", "flag", 0);
@@ -866,9 +866,9 @@ export default function ExchangeRateController({ auth }: PageProps) {
                                     } else {
                                         inputDataSearch("flag", "", 0);
                                     }
-                                    setRefreshSuccess("success");
+                                    setRefreshSuccess("");
                                     setTimeout(() => {
-                                        setRefreshSuccess("");
+                                        setRefreshSuccess("success");
                                     }, 1000);
                                 }}
                             >
@@ -895,6 +895,7 @@ export default function ExchangeRateController({ auth }: PageProps) {
                             url={"getExchangeRateTax"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
+                            noRowsOverlayComponent={true}
                             colDefs={[
                                 {
                                     headerName: "No.",

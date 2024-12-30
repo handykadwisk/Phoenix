@@ -537,9 +537,9 @@ export default function CashAdvance({ auth }: PageProps) {
         inputDataSearch("EXPENSES_APPROVAL_STATUS", "", 0);
         inputDataSearch("flag", "flag", 0);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Clear Search End
@@ -1043,6 +1043,9 @@ export default function CashAdvance({ auth }: PageProps) {
             };
         });
 
+    const [searchSelectApproval, setSearchSelectApproval] =
+        useState<string>("");
+
     const selectRelation = relations?.map((query: any) => {
         return {
             value: query.RELATION_ORGANIZATION_ID,
@@ -1360,8 +1363,16 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     : `text-gray-500 hover:bg-red-100 hover:text-black`
                                             }`,
                                     }}
-                                    options={selectApproval}
+                                    options={
+                                        searchSelectApproval
+                                            ? selectApproval
+                                            : []
+                                    }
                                     isSearchable={true}
+                                    onSearchInputChange={(e) =>
+                                        setSearchSelectApproval(e.target.value)
+                                    }
+                                    noOptionsMessage="Please Search Request for Approval"
                                     placeholder={"Choose Request To"}
                                     value={data.expenses_request_for_approval}
                                     onChange={(val: any) =>
@@ -3997,9 +4008,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     .EXPENSES_NUMBER;
                                             if (expensesNumber) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -4044,9 +4057,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     .EXPENSES_VENDOR;
                                             if (expensesVendor) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -4091,9 +4106,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     .EXPENSES_REQUESTED_BY;
                                             if (expensesRequestedBy) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -4188,11 +4205,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         "",
                                                         0
                                                     );
-                                                    setRefreshSuccess(
-                                                        "success"
-                                                    );
+                                                    setRefreshSuccess("");
                                                     setTimeout(() => {
-                                                        setRefreshSuccess("");
+                                                        setRefreshSuccess(
+                                                            "success"
+                                                        );
                                                     });
                                                 } else {
                                                     inputDataSearch(
@@ -4206,6 +4223,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         dateFormat={"dd-MM-yyyy"}
                                         placeholderText="dd-mm-yyyyy (Start Date)"
                                         className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                        autoComplete="off"
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 mb-5 relative">
@@ -4248,11 +4266,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         "",
                                                         0
                                                     );
-                                                    setRefreshSuccess(
-                                                        "success"
-                                                    );
+                                                    setRefreshSuccess("");
                                                     setTimeout(() => {
-                                                        setRefreshSuccess("");
+                                                        setRefreshSuccess(
+                                                            "success"
+                                                        );
                                                     });
                                                 } else {
                                                     inputDataSearch(
@@ -4266,6 +4284,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                         dateFormat={"dd-MM-yyyy"}
                                         placeholderText="dd-mm-yyyy (End Date)"
                                         className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                        autoComplete="off"
                                     />
                                 </div>
                                 <div className="mb-5">
@@ -4328,9 +4347,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 inputDataSearch("flag", "", 0);
                                             }
 
-                                            setRefreshSuccess("success");
+                                            setRefreshSuccess("");
                                             setTimeout(() => {
-                                                setRefreshSuccess("");
+                                                setRefreshSuccess("success");
                                             }, 1000);
                                         }}
                                     >
@@ -4654,6 +4673,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
                             rowHeight={130}
+                            noRowsOverlayComponent={true}
                             colDefs={[
                                 {
                                     headerName: "No.",

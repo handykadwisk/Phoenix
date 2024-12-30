@@ -1269,9 +1269,9 @@ export default function CashAdvance({ auth }: PageProps) {
         inputDataSearch("CASH_ADVANCE_APPROVAL_STATUS", "", 0);
         inputDataSearch("flag", "flag", 0);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
 
@@ -9721,9 +9721,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     .CASH_ADVANCE_NUMBER;
                                             if (cashAdvanceNumber) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -9770,9 +9772,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     .CASH_ADVANCE_REQUESTED_BY;
                                             if (cashAdvanceRequestedBy) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -9863,9 +9867,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     .CASH_ADVANCE_USED_BY;
                                             if (cashAdvanceUsedBy) {
                                                 inputDataSearch("flag", "", 0);
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 });
                                             } else {
                                                 inputDataSearch(
@@ -9919,11 +9925,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         "",
                                                         0
                                                     );
-                                                    setRefreshSuccess(
-                                                        "success"
-                                                    );
+                                                    setRefreshSuccess("");
                                                     setTimeout(() => {
-                                                        setRefreshSuccess("");
+                                                        setRefreshSuccess(
+                                                            "success"
+                                                        );
                                                     });
                                                 } else {
                                                     inputDataSearch(
@@ -9982,11 +9988,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                         "",
                                                         0
                                                     );
-                                                    setRefreshSuccess(
-                                                        "success"
-                                                    );
+                                                    setRefreshSuccess("");
                                                     setTimeout(() => {
-                                                        setRefreshSuccess("");
+                                                        setRefreshSuccess(
+                                                            "success"
+                                                        );
                                                     });
                                                 } else {
                                                     inputDataSearch(
@@ -10102,9 +10108,9 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 inputDataSearch("flag", "", 0);
                                             }
 
-                                            setRefreshSuccess("success");
+                                            setRefreshSuccess("");
                                             setTimeout(() => {
-                                                setRefreshSuccess("");
+                                                setRefreshSuccess("success");
                                             }, 1000);
                                         }}
                                     >
@@ -10721,8 +10727,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
                             rowHeight={130}
-                            rowSelection={""}
-                            onSelectionChanged={""}
+                            noRowsOverlayComponent={true}
                             colDefs={[
                                 {
                                     headerName: "No.",

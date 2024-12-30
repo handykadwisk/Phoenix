@@ -116,28 +116,26 @@ class ReceiptController extends Controller
     }
 
     public function getBankAccount()
-    { 
-        // Ambil data dengan kondisi
+    {
         $premi = RBankTransaction::where('BANK_TRANSACTION_NAME', 'like', '%premi%')->get();
         $nonPremi = RBankTransaction::where('BANK_TRANSACTION_NAME', 'not like', '%premi%')->get();
 
-        // Strukturkan data untuk frontend
         $data = [
             [
                 'label' => 'Premi',
-                'options' => $premi->map(function ($item) {
+                'options' => $premi->map(function ($bankTransaction) {
                     return [
-                        'value' => $item->BANK_TRANSACTION_ID,
-                        'label' => $item->BANK_TRANSACTION_NAME,
+                        'value' => $bankTransaction->BANK_TRANSACTION_ID,
+                        'label' => $bankTransaction->BANK_TRANSACTION_NAME . " - " . $bankTransaction->BANK_TRANSACTION_ACCOUNT_NUMBER
                     ];
                 }),
             ],
             [
                 'label' => 'Operasional',
-                'options' => $nonPremi->map(function ($item) {
+                'options' => $nonPremi->map(function ($bankTransaction) {
                     return [
-                        'value' => $item->BANK_TRANSACTION_ID,
-                        'label' => $item->BANK_TRANSACTION_NAME,
+                        'value' => $bankTransaction->BANK_TRANSACTION_ID,
+                        'label' => $bankTransaction->BANK_TRANSACTION_NAME . " - " . $bankTransaction->BANK_TRANSACTION_ACCOUNT_NUMBER
                     ];
                 }),
             ],
@@ -573,7 +571,7 @@ class ReceiptController extends Controller
         }
 
         return new JsonResponse([
-            'msg' => 'New receipt has been added.'
+            'msg' => 'Receipt has been edited'
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -655,7 +653,7 @@ class ReceiptController extends Controller
         }
 
         return new JsonResponse([
-            'msg' => 'New receipt has been added.'
+            'msg' => 'Receipt has been edited'
         ], 201, [
             'X-Inertia' => true
         ]);
