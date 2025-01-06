@@ -32,6 +32,7 @@ export default function Employee({
     const handleAddModel = async (e: FormEvent) => {
         e.preventDefault();
         getPersonRelationship();
+        getPersonRelationshipFamily();
         getStructure(idCompany);
         getDivision(idCompany);
         getOffice(idCompany);
@@ -131,6 +132,16 @@ export default function Employee({
             .get(`/getPersonRelationship`)
             .then((res) => {
                 setDataRelationship(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const getPersonRelationshipFamily = async () => {
+        await axios
+            .get(`/getPersonRelationshipFamily`)
+            .then((res) => {
                 setDataRelationshipFamily(res.data);
             })
             .catch((err) => {
@@ -242,6 +253,7 @@ export default function Employee({
             EMPLOYEE_ID: data.EMPLOYEE_ID,
         });
         getPersonRelationship();
+        getPersonRelationshipFamily();
         getStructure(idCompany);
         getDivision(idCompany);
         getOffice(idCompany);
@@ -705,39 +717,27 @@ export default function Employee({
                                                                             Member
                                                                             --
                                                                         </option>
-                                                                        {dataRelationshipFamily
-                                                                            ?.filter(
-                                                                                (
-                                                                                    m: any
-                                                                                ) =>
-                                                                                    m.PERSON_RELATIONSHIP_ID ===
-                                                                                        12 ||
-                                                                                    m.PERSON_RELATIONSHIP_ID ===
-                                                                                        13 ||
-                                                                                    m.PERSON_RELATIONSHIP_ID ===
-                                                                                        16
-                                                                            )
-                                                                            .map(
-                                                                                (
-                                                                                    getPersonRelation: any,
-                                                                                    i: number
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <option
-                                                                                            key={
-                                                                                                i
-                                                                                            }
-                                                                                            value={
-                                                                                                getPersonRelation.PERSON_RELATIONSHIP_ID
-                                                                                            }
-                                                                                        >
-                                                                                            {
-                                                                                                getPersonRelation.PERSON_RELATIONSHIP_NAME
-                                                                                            }
-                                                                                        </option>
-                                                                                    );
-                                                                                }
-                                                                            )}
+                                                                        {dataRelationshipFamily?.map(
+                                                                            (
+                                                                                getPersonRelation: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        key={
+                                                                                            i
+                                                                                        }
+                                                                                        value={
+                                                                                            getPersonRelation.PERSON_RELATIONSHIP_ID
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            getPersonRelation.PERSON_RELATIONSHIP_NAME
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )}
                                                                     </select>
                                                                 </td>
                                                                 <td className="w-1">
@@ -1088,6 +1088,7 @@ export default function Employee({
                             structure={structure}
                             office={office}
                             dataRelationship={dataRelationship}
+                            dataRelationshipFamily={dataRelationshipFamily}
                             setIsSuccess={setIsSuccess}
                         />
                     </>

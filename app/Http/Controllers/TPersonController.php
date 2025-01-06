@@ -73,6 +73,13 @@ class TPersonController extends Controller
         return response()->json($pRelationship);
     }
 
+    public function getPersonRelationshipFamily()
+    {
+        $pRelationship = RPersonRelationship::where('PERSON_RELATIONSHIP_IS_FAMILY_MEMBER', 1)->get();
+
+        return response()->json($pRelationship);
+    }
+
     public function getTStatus()
     {
         $taxStatus = RTaxStatus::get();
@@ -1689,7 +1696,9 @@ class TPersonController extends Controller
                     TPic::create([
                         "PERSON_ID"                 => $idPersonByIndividual->PERSON_ID,
                         "RELATION_ORGANIZATION_ID"  => $request->RELATION_ORGANIZATION_ID,
-                        "PIC_IS_DELETED"            => "0"
+                        "PIC_IS_DELETED"            => "0",
+                        "PIC_CREATED_BY"            => Auth::user()->id,
+                        "PIC_CREATED_DATE"          => now()
                     ]);
                     // $idLog = $person;
                 }

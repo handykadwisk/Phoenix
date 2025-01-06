@@ -38,6 +38,7 @@ export default function DetailEmployee({
     division,
     structure,
     office,
+    dataRelationshipFamily,
 }: PropsWithChildren<{
     idEmployee: any;
     dataRelationship: any;
@@ -45,6 +46,7 @@ export default function DetailEmployee({
     division: any;
     structure: any;
     office: any;
+    dataRelationshipFamily: any;
 }>) {
     // load data structure
     useEffect(() => {
@@ -1168,39 +1170,27 @@ export default function DetailEmployee({
                                                                             Relationship
                                                                             --
                                                                         </option>
-                                                                        {dataRelationship
-                                                                            ?.filter(
-                                                                                (
-                                                                                    m: any
-                                                                                ) =>
-                                                                                    m.PERSON_RELATIONSHIP_ID ===
-                                                                                        12 ||
-                                                                                    m.PERSON_RELATIONSHIP_ID ===
-                                                                                        13 ||
-                                                                                    m.PERSON_RELATIONSHIP_ID ===
-                                                                                        16
-                                                                            )
-                                                                            .map(
-                                                                                (
-                                                                                    getPersonRelation: any,
-                                                                                    i: number
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <option
-                                                                                            key={
-                                                                                                i
-                                                                                            }
-                                                                                            value={
-                                                                                                getPersonRelation.PERSON_RELATIONSHIP_ID
-                                                                                            }
-                                                                                        >
-                                                                                            {
-                                                                                                getPersonRelation.PERSON_RELATIONSHIP_NAME
-                                                                                            }
-                                                                                        </option>
-                                                                                    );
-                                                                                }
-                                                                            )}
+                                                                        {dataRelationshipFamily?.map(
+                                                                            (
+                                                                                getPersonRelation: any,
+                                                                                i: number
+                                                                            ) => {
+                                                                                return (
+                                                                                    <option
+                                                                                        key={
+                                                                                            i
+                                                                                        }
+                                                                                        value={
+                                                                                            getPersonRelation.PERSON_RELATIONSHIP_ID
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            getPersonRelation.PERSON_RELATIONSHIP_NAME
+                                                                                        }
+                                                                                    </option>
+                                                                                );
+                                                                            }
+                                                                        )}
                                                                     </select>
                                                                 </td>
                                                                 <td className="w-1">
@@ -1966,13 +1956,6 @@ export default function DetailEmployee({
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    {/* {i !==
-                                                    dataDetailEmployee
-                                                        .t_employment_family_member
-                                                        ?.length -
-                                                        1 ? (
-                                                        <hr className="mt-2" />
-                                                    ) : null} */}
                                                 </div>
                                             );
                                         }
@@ -1984,15 +1967,15 @@ export default function DetailEmployee({
                     <hr className="mt-5" />
                     <div>
                         <div className="grid grid-cols-3 gap-1 mt-1">
-                            <div className="p-2 grid grid-cols-3 gap-1 relative">
-                                <div className="flex justify-center">
-                                    <UserGroupIcon className="w-12 text-red-600" />
-                                </div>
-                                <div className="col-span-2 text-sm font-semibold flex items-center">
-                                    <div className="absolute">
+                            <div className="p-2 flex justify-center text-sm font-semibold">
+                                <div>
+                                    <div className="flex justify-center items-center">
+                                        <UserGroupIcon className="w-12 text-red-600" />
+                                    </div>
+                                    <div className="flex justify-center items-center">
                                         <span>Structure</span>
                                     </div>
-                                    <div className="mt-7 text-[12px] text-gray-500">
+                                    <div className="flex justify-center items-center text-[12px] text-gray-500">
                                         <span className="">
                                             {dataDetailEmployee.STRUCTURE_ID ===
                                             null
@@ -2003,15 +1986,15 @@ export default function DetailEmployee({
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-2 grid grid-cols-3 gap-1 relative">
-                                <div className="flex justify-center">
-                                    <IdentificationIcon className="w-12 text-red-600" />
-                                </div>
-                                <div className="col-span-2 text-sm font-semibold flex items-center">
-                                    <div className="absolute">
+                            <div className="p-2 flex justify-center text-sm font-semibold">
+                                <div>
+                                    <div className="flex justify-center items-center">
+                                        <IdentificationIcon className="w-12 text-red-600" />
+                                    </div>
+                                    <div className="flex justify-center items-center">
                                         <span>Division</span>
                                     </div>
-                                    <div className="mt-8 text-[12px] text-gray-500">
+                                    <div className="flex justify-center items-center text-[12px] text-gray-500">
                                         <span className="">
                                             {dataDetailEmployee.DIVISION_ID ===
                                             null
@@ -2023,15 +2006,18 @@ export default function DetailEmployee({
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-2 grid grid-cols-3 gap-1 relative">
-                                <div className="flex justify-center">
-                                    <MapIcon className="w-12 text-red-600" />
-                                </div>
-                                <div className="col-span-2 text-sm font-semibold flex items-center">
-                                    <div className="absolute">
+                            <div className="p-2 flex justify-center text-sm font-semibold">
+                                {/* <div>
+                                    <UserGroupIcon className="w-12 text-red-600" />
+                                </div> */}
+                                <div>
+                                    <div className="flex justify-center items-center">
+                                        <MapIcon className="w-12 text-red-600" />
+                                    </div>
+                                    <div className="flex justify-center items-center">
                                         <span>Address & Location</span>
                                     </div>
-                                    <div className="mt-8 text-[12px] text-gray-500">
+                                    <div className="flex justify-center items-center text-[12px] text-gray-500">
                                         <span className="">
                                             {dataDetailEmployee.OFFICE_ID ===
                                             null

@@ -191,6 +191,7 @@ Route::middleware('auth')->group(function () {
     // Person
     Route::post('/getPersons', [TPersonController::class, 'getPersonJson'])->name('getPersons.getPersonJson');
     Route::get('getPersonRelationship', [TPersonController::class, 'getDataPersonRelationship'])->name('getPersonRelationship.getDataPersonRelationship');
+    Route::get('getPersonRelationshipFamily', [TPersonController::class, 'getPersonRelationshipFamily'])->name('getPersonRelationshipFamily.getPersonRelationshipFamily');
     Route::post('/person', [TPersonController::class, 'store'])->name('person.store');
     Route::post('/editPersonRelation', [TPersonController::class, 'edit_person_relation'])->name('editPersonRelation.edit_person_relation');
     Route::post('/editPersons', [TPersonController::class, 'edit'])->name('editPersons.edit');
