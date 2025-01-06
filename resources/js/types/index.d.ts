@@ -9,7 +9,7 @@ export interface User {
         COMPANY_ID: string;
         DIVISION_ID: string;
         division: {
-            COMPANY_DIVISION_ID: string;
+            COMPANY_DIVISION_ID: number;
             COMPANY_DIVISION_ALIAS: string;
             COMPANY_DIVISION_INITIAL: string;
         };

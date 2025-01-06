@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { ThreeDots } from "react-loader-spinner";
@@ -18,8 +18,15 @@ export default function AGGrid({
     withParam,
     searchParam,
     triggeringRefreshData,
-    doubleClickEvent = () => { },
-    addButtonModalState = () => { },
+    doubleClickEvent = () => {},
+    addButtonModalState = () => {},
+    rowHeight,
+    rowSelection,
+    onSelectionChanged,
+    suppressRowClickSelection,
+    buttonExcelExport,
+    suppressCsvExport,
+    noRowsOverlayComponent,
 }: PropsWithChildren<{
     colDefs: any;
     url: string;
@@ -30,6 +37,13 @@ export default function AGGrid({
     triggeringRefreshData: string;
     doubleClickEvent: CallableFunction | undefined;
     addButtonModalState: CallableFunction | undefined;
+    rowHeight?: number | undefined;
+    rowSelection?: any;
+    onSelectionChanged?: any;
+    suppressRowClickSelection?: boolean;
+    buttonExcelExport?: boolean;
+    suppressCsvExport?: boolean;
+    noRowsOverlayComponent?: boolean;
 }>) {
     // console.log("searchParamAGGRid", searchParam);
 
@@ -59,6 +73,8 @@ export default function AGGrid({
                         filterParams[colId] = filterModel[colId].filter;
                     } else if (filterModel[colId].filterType === "date") {
                         filterParams[colId] = filterModel[colId].dateFrom;
+                    } else if (filterModel[colId].filterType === "set") {
+                        filterParams[colId] = filterModel[colId].values;
                     }
                 }
 
@@ -69,6 +85,9 @@ export default function AGGrid({
                 } else {
                     urlNew = `${url}?`;
                 }
+
+                // console.log("Filter model from AG Grid:", filterModel);
+                // console.log("Filter params sent to API:", filterParams);
 
                 axios
                     .get(
@@ -83,6 +102,11 @@ export default function AGGrid({
                             rowData: res.data.data,
                             rowCount: res.data.total,
                         });
+                        if (res.data.data.length === 0) {
+                            params.api.showNoRowsOverlay();
+                        } else {
+                            params.api.hideOverlay();
+                        }
                     })
                     .catch((err) => console.log(err));
 
@@ -94,18 +118,46 @@ export default function AGGrid({
     const onGridReady = (params: GridReadyEvent<any, any>) => {
         var dataSource = getServerSideDatasource();
         params.api!.setGridOption("serverSideDatasource", dataSource);
-        // params.api!.sizeColumnsToFit()
     };
 
     const doubleClicked = (params: any) => {
         doubleClickEvent(params.data);
     };
 
+    const handleRowSelectedChange = (params: any) => {
+        const dataSelected = params.api.getSelectedRows();
+        // console.log("Selected Row", dataSelected);
+        onSelectionChanged(dataSelected);
+    };
+
+    const handleButtonExcelExport = useCallback(() => {
+        if (gridRef.current?.api) {
+            gridRef.current.api.exportDataAsExcel({
+                fileName: "Receipt",
+            });
+        }
+    }, []);
+
+    const customNoRowsOverlayComponent = () => {
+        return (
+            <>
+                {noRowsOverlayComponent && (
+                    <div className="text-slate-500 font-bold text-xl">
+                        No Data Available
+                    </div>
+                )}
+            </>
+        );
+    };
+
     useEffect(() => {
         if (triggeringRefreshData !== "") {
             gridRef.current!.api!.refreshServerSide({ purge: true });
+            gridRef.current!.api!.deselectAll();
         }
-    }, [triggeringRefreshData, gridRef]);
+    }, [triggeringRefreshData]);
+
+    console.log("Trigger Refresh Data", triggeringRefreshData);
 
     return (
         // <div className="rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
@@ -133,9 +185,9 @@ export default function AGGrid({
                     }}
                     suppressServerSideFullWidthLoadingRow={true}
                     pagination={true}
-                    paginationPageSize={25}
-                    // paginationAutoPageSize={true}
-                    cacheBlockSize={25}
+                    paginationPageSize={10}
+                    paginationAutoPageSize={true}
+                    cacheBlockSize={10}
                     paginationPageSizeSelector={[1, 10, 25, 50, 100]}
                     onGridReady={onGridReady}
                     rowModelType="serverSide"
