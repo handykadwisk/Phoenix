@@ -12,26 +12,49 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 
+use function App\Helpers\user_log_create;
+
 class ExchangeRateBIController extends Controller
 {
-    public function getExchangeRateBIData($dataPerPage = 2, $searchQuery = null)
+    public function getExchangeRateBIData($request)
     {
-        $exchange_rate_bi_date = $searchQuery->exchange_rate_bi_date;
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
-        $data = ExchangeRateBI::orderBy('EXCHANGE_RATE_BI_DATE', 'desc');
-        
-        if ($searchQuery) {
-            if ($searchQuery->input('exchange_rate_bi_date')) {
-                $data->where('EXCHANGE_RATE_BI_DATE', 'like', '%'. $exchange_rate_bi_date .'%');;
+        $query = ExchangeRateBI::query();
+        $sortModel = $request->input('sort');
+        $newSearch = json_decode($request->newFilter, true);
+
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel); 
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection); 
             }
         }
 
-        return $data->paginate($dataPerPage);
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('EXCHANGE_RATE_BI_ID', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            }else{
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'EXCHANGE_RATE_BI_DATE') {
+                        $query->where('EXCHANGE_RATE_BI_DATE', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
+
+        $query->orderBy('EXCHANGE_RATE_BI_DATE', 'desc');
+
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+        
+        return $data;
     }
     
     public function getExchangeRateBI(Request $request)
     {
-        $data = $this->getExchangeRateBIData(10, $request);
+        $data = $this->getExchangeRateBIData($request);
         
         return response()->json($data);
     }
@@ -91,16 +114,8 @@ class ExchangeRateBIController extends Controller
                 'EXCHANGE_RATE_BI_CREATED_AT' => $exchange_rate_bi_created_at
             ])->EXCHANGE_RATE_BI_ID;
 
-            // Created Log CA
-            UserLog::create([
-                'created_by' => $user->id,
-                'action'     => json_encode([
-                    "description" => "Created (Exchange Rate BI).",
-                    "module"      => "Exchange Rate BI",
-                    "id"          => $exchange_rate_bi
-                ]),
-                'action_by'  => $user->user_login
-            ]);
+            // Created Log Exchange Rate BI
+            user_log_create("Created (Exchange Rate BI).", "Exchange Rate BI", $exchange_rate_bi);
 
             foreach ($exchange_rate_bi_detail as $value) {
                 $exchange_rate_bi_detail_currency_id = isset($value['EXCHANGE_RATE_BI_DETAIL_CURRENCY_ID']) ? $value['EXCHANGE_RATE_BI_DETAIL_CURRENCY_ID'] : $value['CURRENCY_ID'];
@@ -118,19 +133,10 @@ class ExchangeRateBIController extends Controller
                     'EXCHANGE_RATE_BI_DETAIL_CREATED_BY' => $exchange_rate_bi_detail_created_by,
                     'EXCHANGE_RATE_BI_DETAIL_CREATED_AT' => $exchange_rate_bi_detail_created_at
 
-                ]
-            );
-            
-                // Created Log CA
-                UserLog::create([
-                    'created_by' => $user->id,
-                    'action'     => json_encode([
-                        "description" => "Created (Exchange Rate BI Detail).",
-                        "module"      => "Exchange Rate BI Detail",
-                        "id"          => $exchange_rate_bi
-                    ]),
-                    'action_by'  => $user->user_login
                 ]);
+            
+                // Created Log Exchange Rate BI Detail
+                user_log_create("Created (Exchange Rate BI Detail).", "Exchange Rate BI", $exchange_rate_bi);
             }
             return $exchange_rate_bi;
         });
@@ -158,15 +164,7 @@ class ExchangeRateBIController extends Controller
             ]);
 
             // Created Log Exchange Rate BI
-            UserLog::create([
-                'created_by' => $user->id,
-                'action'     => json_encode([
-                    "description" => "Created (Exchange Rate BI).",
-                    "module"      => "Exchange Rate BI",
-                    "id"          => $exchange_rate_bi_id
-                ]),
-                'action_by'  => $user->user_login
-            ]);
+            user_log_create("Edit (Exchange Rate BI).", "Exchange Rate BI", $exchange_rate_bi_id);
 
             ExchangeRateBIDetail::where('EXCHANGE_RATE_BI_DETAIL_ID', $exchange_rate_bi_detail_id)->update([
                 'EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE' => $request->EXCHANGE_RATE_BI_DETAIL_EXCHANGE_RATE,
@@ -175,15 +173,7 @@ class ExchangeRateBIController extends Controller
             ]);
 
             // Created Log Exchange Rate BI Detail
-            UserLog::create([
-                'created_by' => $user->id,
-                'action'     => json_encode([
-                    "description" => "Created (Exchange Rate BI Detail).",
-                    "module"      => "Exchange Rate BI Detail",
-                    "id"          => $exchange_rate_bi_detail_id
-                ]),
-                'action_by'  => $user->user_login
-            ]);
+            user_log_create("Edit (Exchange Rate BI Detail).", "Exchange Rate BI", $exchange_rate_bi_detail_id);
         });
 
         return new JsonResponse([

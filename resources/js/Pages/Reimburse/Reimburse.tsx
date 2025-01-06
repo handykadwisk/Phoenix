@@ -28,6 +28,8 @@ import BadgeFlat from "@/Components/BadgeFlat";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import InputSearch from "@/Components/InputSearch";
 import ModalToDocument from "@/Components/Modal/ModalToDocument";
+import Content from "@/Components/Content";
+import AGGrid from "@/Components/AgGrid";
 
 export default function Reimburse({ auth }: PageProps) {
     useEffect(() => {
@@ -43,7 +45,6 @@ export default function Reimburse({ auth }: PageProps) {
     }, []);
 
     const handleRefresh = () => {
-        getReimburse();
         getReimburseRequestStatus();
         getReimburseApprove1Status();
         getReimburseApprove2Status();
@@ -53,6 +54,11 @@ export default function Reimburse({ auth }: PageProps) {
         getReimburseApproval();
         getReimburseNotes();
         getReimburseMethod();
+
+        setRefreshSuccess("success");
+        setTimeout(() => {
+            setRefreshSuccess("");
+        }, 1000);
     };
 
     // Modal Add Start
@@ -164,7 +170,7 @@ export default function Reimburse({ auth }: PageProps) {
         });
 
         setIsSuccess(message[0]);
-        getReimburse();
+
         getReimburseRequestStatus();
         getReimburseApprove1Status();
         getReimburseApprove2Status();
@@ -177,6 +183,11 @@ export default function Reimburse({ auth }: PageProps) {
         setTimeout(() => {
             setIsSuccess("");
         }, 5000);
+
+        setRefreshSuccess("success");
+        setTimeout(() => {
+            setRefreshSuccess("");
+        }, 1000);
     };
     // Handle Success End
 
@@ -610,63 +621,62 @@ export default function Reimburse({ auth }: PageProps) {
     };
     // Handle Remove Row Proof of Document Row End
 
-    const [reimburse, setReimburse] = useState<any>([]);
+    // For refresh AG Grid data
+    const [refreshSuccess, setRefreshSuccess] = useState<string>("");
 
     // Search Start
     const [searchReimburse, setSearchReimburse] = useState<any>({
-        reimburse_requested_by: "",
-        reimburse_used_by: "",
-        reimburse_start_date: "",
-        reimburse_end_date: "",
-        reimburse_division: "",
-        reimburse_cost_center: "",
+        reimburse_search: [
+            {
+                REIMBURSE_ID: "",
+                REIMBURSE_NUMBER: "",
+                REIMBURSE_REQUESTED_BY: "",
+                REIMBURSE_DIVISION: "",
+                REIMBURSE_USED_BY: "",
+                REIMBURSE_START_DATE: "",
+                REIMBURSE_END_DATE: "",
+                REIMBURSE_COST_CENTER: "",
+                REIMBURSE_APPROVAL_STATUS: "",
+                flag: "flag",
+            },
+        ],
     });
-    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const getReimburse = async (
-        pageNumber = "page=1",
-        status = "",
-        status_type = ""
+    // console.log("Search", searchReimburse);
+    // Search End
+
+    // OnChange Input Search Start
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
     ) => {
-        await axios
-            .post(`/getReimburse?${pageNumber}`, {
-                reimburse_requested_by: searchReimburse.reimburse_requested_by,
-                reimburse_used_by: searchReimburse.reimburse_used_by,
-                reimburse_start_date: searchReimburse.reimburse_start_date,
-                reimburse_end_date: searchReimburse.reimburse_end_date,
-                reimburse_division: searchReimburse.reimburse_division,
-                reimburse_cost_center: searchReimburse.reimburse_cost_center,
-                status: status,
-                status_type: status_type,
-            })
-            .then((res) => {
-                setReimburse(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        const changeVal: any = [...searchReimburse.reimburse_search];
+        changeVal[i][name] = value;
+        setSearchReimburse({
+            ...searchReimburse,
+            reimburse_search: changeVal,
+        });
     };
+    // OnChange Input Search End
 
     // Clear Search Start
-    const clearSearchReimburse = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getReimburse?${pageNumber}`)
-            .then((res) => {
-                setReimburse(res.data);
-                setSearchReimburse({
-                    reimburse_requested_by: "",
-                    reimburse_used_by: "",
-                    reimburse_start_date: "",
-                    reimburse_end_date: "",
-                    reimburse_division: "",
-                    reimburse_cost_center: "",
-                    status: "",
-                    status_type: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const clearSearchReimburse = () => {
+        inputDataSearch("REIMBURSE_ID", "", 0);
+        inputDataSearch("REIMBURSE_NUMBER", "", 0);
+        inputDataSearch("REIMBURSE_REQUESTED_BY", "", 0);
+        inputDataSearch("REIMBURSE_DIVISION", "", 0);
+        inputDataSearch("REIMBURSE_USED_BY", "", 0);
+        inputDataSearch("REIMBURSE_START_DATE", "", 0);
+        inputDataSearch("REIMBURSE_END_DATE", "", 0);
+        inputDataSearch("REIMBURSE_COST_CENTER", "", 0);
+        inputDataSearch("REIMBURSE_APPROVAL_STATUS", "", 0);
+        inputDataSearch("flag", "flag", 0);
+
+        setRefreshSuccess("");
+        setTimeout(() => {
+            setRefreshSuccess("success");
+        }, 1000);
     };
     // Clear Search End
 
@@ -715,10 +725,12 @@ export default function Reimburse({ auth }: PageProps) {
     const handleAddModal = async (e: FormEvent) => {
         e.preventDefault();
 
-        setData(
-            "reimburse_division",
-            auth.user.employee.division?.COMPANY_DIVISION_ID
-        );
+        setData({
+            ...data,
+            reimburse_division:
+                auth.user.employee?.division?.COMPANY_DIVISION_ID,
+            reimburse_requested_by: auth.user.employee?.EMPLOYEE_ID,
+        });
 
         setModal({
             add: true,
@@ -743,7 +755,7 @@ export default function Reimburse({ auth }: PageProps) {
             .get(`/getReimburseById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -770,7 +782,7 @@ export default function Reimburse({ auth }: PageProps) {
             .get(`/getReimburseById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -797,7 +809,7 @@ export default function Reimburse({ auth }: PageProps) {
             .get(`/getReimburseById/${id}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -819,14 +831,12 @@ export default function Reimburse({ auth }: PageProps) {
     // Handle Execute End
 
     // Handle Show Start
-    const handleShowModal = async (e: FormEvent, id: number) => {
-        e.preventDefault();
-
+    const handleShowModal = async (data: any) => {
         await axios
-            .get(`/getReimburseById/${id}`)
+            .get(`/getReimburseById/${data.REIMBURSE_ID}`)
             .then((res) => {
                 setDataById(res.data);
-                console.log(res.data);
+                // console.log(res.data);
             })
             .catch((err) => console.log(err));
 
@@ -851,29 +861,22 @@ export default function Reimburse({ auth }: PageProps) {
             REIMBURSE_FIRST_APPROVAL_STATUS: status,
         });
 
-        if (
-            auth.user.employee.division?.COMPANY_DIVISION_ALIAS === "Finance" &&
-            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "FIN"
-        ) {
+        if (auth.user.employee?.division?.COMPANY_DIVISION_ID === 132) {
             setDataById({
                 ...dataById,
-                REIMBURSE_SECOND_APPROVAL_BY: auth.user.employee.EMPLOYEE_ID,
+                REIMBURSE_SECOND_APPROVAL_BY: auth.user.employee?.EMPLOYEE_ID,
                 REIMBURSE_SECOND_APPROVAL_USER:
-                    auth.user.employee.EMPLOYEE_FIRST_NAME,
+                    auth.user.employee?.EMPLOYEE_FIRST_NAME,
                 REIMBURSE_SECOND_APPROVAL_STATUS: status,
             });
         }
 
-        if (
-            auth.user.employee.division?.COMPANY_DIVISION_ALIAS ===
-                "Directors" &&
-            auth.user.employee.division?.COMPANY_DIVISION_INITIAL === "DIR"
-        ) {
+        if (auth.user.employee?.division?.COMPANY_DIVISION_ID === 122) {
             setDataById({
                 ...dataById,
-                REIMBURSE_THIRD_APPROVAL_BY: auth.user.employee.EMPLOYEE_ID,
+                REIMBURSE_THIRD_APPROVAL_BY: auth.user.employee?.EMPLOYEE_ID,
                 REIMBURSE_THIRD_APPROVAL_USER:
-                    auth.user.employee.EMPLOYEE_FIRST_NAME,
+                    auth.user.employee?.EMPLOYEE_FIRST_NAME,
                 REIMBURSE_THIRD_APPROVAL_STATUS: status,
             });
         }
@@ -889,7 +892,7 @@ export default function Reimburse({ auth }: PageProps) {
             responseType: "blob",
         })
             .then((response) => {
-                console.log(response);
+                // console.log(response);
                 const url = window.URL.createObjectURL(
                     new Blob([response.data])
                 );
@@ -923,7 +926,7 @@ export default function Reimburse({ auth }: PageProps) {
             responseType: "blob",
         })
             .then((response) => {
-                console.log(response);
+                // console.log(response);
                 const url = window.URL.createObjectURL(
                     new Blob([response.data])
                 );
@@ -1148,7 +1151,8 @@ export default function Reimburse({ auth }: PageProps) {
         ?.filter(
             (m: any) =>
                 m.DIVISION_ID === data.reimburse_cost_center.value &&
-                m.STRUCTURE_ID === 5
+                m.STRUCTURE_ID === 136 &&
+                m.EMPLOYEE_IS_DELETED === 0
         )
         .map((query: any) => {
             return {
@@ -1167,10 +1171,12 @@ export default function Reimburse({ auth }: PageProps) {
         });
 
     const selectApproval = employees
-        ?.filter(
-            (m: any) =>
-                m.DIVISION_ID === data.reimburse_cost_center.value &&
-                (m.STRUCTURE_ID === 3 || m.STRUCTURE_ID === 4)
+        ?.filter((m: any) =>
+            data.reimburse_cost_center?.value === 138
+                ? m.DIVISION_ID === 123
+                : m.DIVISION_ID === data.reimburse_cost_center?.value &&
+                  (m.STRUCTURE_ID === 107 || m.STRUCTURE_ID === 108) &&
+                  m.EMPLOYEE_IS_DELETED === 0
         )
         .map((query: any) => {
             return {
@@ -1201,6 +1207,27 @@ export default function Reimburse({ auth }: PageProps) {
             label: query.COA_CODE + " - " + query.COA_TITLE,
         };
     });
+
+    const getCoaSelect = (value: any) => {
+        if (value) {
+            const selected = selectCoa.filter(
+                (option: any) => option.value === value
+            );
+            return selected[0].label;
+        }
+    };
+
+    const handleSelectChange = (e: any, id: number) => {
+        const selectedValue = e.target.value;
+
+        if (selectedValue === "approve") {
+            handleApproveModal(e, id);
+        } else if (selectedValue === "revised") {
+            handleRevisedModal(e, id);
+        } else if (selectedValue === "execute") {
+            handleExecuteModal(e, id);
+        }
+    };
 
     // console.log("Data Reimburse", data);
     // console.log(DataRow);
@@ -1328,7 +1355,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPengguna"
                                     value={
-                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                        auth.user.employee?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -1345,7 +1372,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="reimburse_division"
                                     value={
-                                        auth.user.employee.division
+                                        auth.user.employee?.division
                                             ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
@@ -2043,14 +2070,14 @@ export default function Reimburse({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="cashAdvanceNumber"
+                                    htmlFor="reimburseNumber"
                                     value="Reimburse Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="cashAdvanceNumber"
+                                    id="reimburseNumber"
                                     type="text"
-                                    name="cashAdvanceNumber"
+                                    name="reimburseNumber"
                                     value={dataById.REIMBURSE_NUMBER}
                                     className="bg-gray-100"
                                     readOnly
@@ -2058,14 +2085,14 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="tanggalPengajuan"
+                                    htmlFor="requestedDate"
                                     value="Request Date"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="tanggalPengajuan"
+                                    id="requestedDate"
                                     type="text"
-                                    name="tanggalPengajuan"
+                                    name="requestedDate"
                                     value={dateFormat(
                                         dataById.REIMBURSE_REQUETED_DATE,
                                         "dd-mm-yyyy"
@@ -2085,7 +2112,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPengguna"
                                     value={
-                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                        dataById.employee?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2102,7 +2129,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.employee.division
+                                        dataById.division
                                             ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
@@ -2432,6 +2459,160 @@ export default function Reimburse({ auth }: PageProps) {
                                 readOnly
                             />
                         </div>
+
+                        <div className="mt-10">
+                            <p>Status</p>
+                            <ul role="list" className="mt-5">
+                                <li>
+                                    <div className="relative pb-8">
+                                        <span
+                                            aria-hidden="true"
+                                            className="absolute left-4 top-4 -ml-px h-12 w-0.5 bg-red-300"
+                                        />
+                                        <div className="relative flex space-x-5">
+                                            <div>
+                                                <span className="bg-red-600 flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white"></span>
+                                            </div>
+                                            <div className="flex min-w-0 justify-between space-x-8 pt-1.5">
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        Created
+                                                    </p>
+                                                </div>
+                                                <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                                                    <time>
+                                                        {dateFormat(
+                                                            dataById.REIMBURSE_CREATED_AT,
+                                                            "dd-mm-yyyy"
+                                                        )}
+                                                    </time>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                {dataById.REIMBURSE_FIRST_APPROVAL_STATUS ===
+                                    2 && (
+                                    <li>
+                                        <div className="relative pb-8">
+                                            <span
+                                                aria-hidden="true"
+                                                className="absolute left-4 top-4 -ml-px h-12 w-0.5 bg-red-300"
+                                            />
+                                            <div className="relative flex space-x-5">
+                                                <div>
+                                                    <span className="bg-red-600 flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white"></span>
+                                                </div>
+                                                <div className="flex min-w-0 justify-between space-x-6 pt-1.5">
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">
+                                                            Approve 1
+                                                        </p>
+                                                    </div>
+                                                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                                                        <time>
+                                                            {dateFormat(
+                                                                dataById.REIMBURSE_FIRST_APPROVAL_CHANGE_STATUS_DATE,
+                                                                "dd-mm-yyyy"
+                                                            )}
+                                                        </time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                )}
+                                {dataById.REIMBURSE_SECOND_APPROVAL_STATUS !==
+                                    null && (
+                                    <li>
+                                        <div className="relative pb-8">
+                                            <span
+                                                aria-hidden="true"
+                                                className="absolute left-4 top-4 -ml-px h-12 w-0.5 bg-red-300"
+                                            />
+                                            <div className="relative flex space-x-5">
+                                                <div>
+                                                    <span className="bg-red-600 flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white"></span>
+                                                </div>
+                                                <div className="flex min-w-0 justify-between space-x-6 pt-1.5">
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">
+                                                            Approve 2
+                                                        </p>
+                                                    </div>
+                                                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                                                        <time>
+                                                            {dateFormat(
+                                                                dataById.REIMBURSE_SECOND_APPROVAL_CHANGE_STATUS_DATE,
+                                                                "dd-mm-yyyy"
+                                                            )}
+                                                        </time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                )}
+                                {dataById.REIMBURSE_THIRD_APPROVAL_STATUS !==
+                                    null && (
+                                    <li>
+                                        <div className="relative pb-8">
+                                            <span
+                                                aria-hidden="true"
+                                                className="absolute left-4 top-4 -ml-px h-12 w-0.5 bg-red-300"
+                                            />
+                                            <div className="relative flex space-x-5">
+                                                <div>
+                                                    <span className="bg-red-600 flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white"></span>
+                                                </div>
+                                                <div className="flex min-w-0 justify-between space-x-6 pt-1.5">
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">
+                                                            Approve 3
+                                                        </p>
+                                                    </div>
+                                                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                                                        <time>
+                                                            {dateFormat(
+                                                                dataById.REIMBURSE_THIRD_APPROVAL_CHANGE_STATUS_DATE,
+                                                                "dd-mm-yyyy"
+                                                            )}
+                                                        </time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                )}
+                                {dataById.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                    6 && (
+                                    <li>
+                                        <div className="relative pb-8">
+                                            <div className="relative flex space-x-5">
+                                                <div>
+                                                    <span className="bg-red-600 flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white"></span>
+                                                </div>
+                                                <div className="flex min-w-0 justify-between space-x-5 pt-1.5">
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">
+                                                            Complited
+                                                        </p>
+                                                    </div>
+                                                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                                                        <time>
+                                                            {dateFormat(
+                                                                dataById.REIMBURSE_SECOND_APPROVAL_CHANGE_STATUS_DATE,
+                                                                "dd-mm-yyyy"
+                                                            )}
+                                                        </time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
                     </>
                 }
             />
@@ -2544,14 +2725,14 @@ export default function Reimburse({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="cashAdvanceNumber"
+                                    htmlFor="reimburseNumber"
                                     value="Reimburse Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="cashAdvanceNumber"
+                                    id="reimburseNumber"
                                     type="text"
-                                    name="cashAdvanceNumber"
+                                    name="reimburseNumber"
                                     value={dataById.REIMBURSE_NUMBER}
                                     className="bg-gray-100"
                                     readOnly
@@ -2559,14 +2740,14 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="tanggalPengajuan"
+                                    htmlFor="requestedDate"
                                     value="Request Date"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="tanggalPengajuan"
+                                    id="requestedDate"
                                     type="text"
-                                    name="tanggalPengajuan"
+                                    name="requestedDate"
                                     value={dateFormat(
                                         dataById.REIMBURSE_REQUETED_DATE,
                                         "dd-mm-yyyy"
@@ -2586,7 +2767,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPengguna"
                                     value={
-                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                        dataById.employee?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -2603,7 +2784,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.employee.division
+                                        dataById.division
                                             ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
@@ -2932,13 +3113,15 @@ export default function Reimburse({ auth }: PageProps) {
                                                         placeholder={
                                                             "Choose COA"
                                                         }
-                                                        value={
-                                                            rd.REIMBURSE_DETAIL_COST_CLASSIFICATION ||
-                                                            ""
-                                                        }
+                                                        value={{
+                                                            label: getCoaSelect(
+                                                                rd.REIMBURSE_DETAIL_COST_CLASSIFICATION
+                                                            ),
+                                                            value: rd.REIMBURSE_DETAIL_COST_CLASSIFICATION,
+                                                        }}
                                                         onChange={(val: any) =>
                                                             handleChangeApproveReportCustom(
-                                                                val,
+                                                                val.value,
                                                                 "REIMBURSE_DETAIL_COST_CLASSIFICATION",
                                                                 i
                                                             )
@@ -3022,12 +3205,12 @@ export default function Reimburse({ auth }: PageProps) {
                                 <tfoot>
                                     <tr className="text-center text-black text-sm">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border font-bold text-right pr-5 py-2"
                                             colSpan={13}
                                         >
                                             PROPOSE AMOUNT
                                         </TD>
-                                        <TD className="border text-center py-2">
+                                        <TD className="border font-bold text-center py-2">
                                             {formatCurrency.format(
                                                 dataById.REIMBURSE_TOTAL_AMOUNT
                                             )}
@@ -3035,31 +3218,17 @@ export default function Reimburse({ auth }: PageProps) {
                                     </tr>
                                     <tr className="text-center text-black text-sm">
                                         <TD
-                                            className="border text-right pr-5 py-2"
+                                            className="border font-bold text-right pr-5 py-2"
                                             colSpan={13}
                                         >
                                             APPROVE AMOUNT
                                         </TD>
-                                        <TD className="border text-center py-2">
+                                        <TD className="border font-bold text-center py-2">
                                             {formatCurrency.format(
                                                 approveTotalAmount
                                             )}
                                         </TD>
                                     </tr>
-                                    {/* <tr className="text-center text-black text-sm">
-                                        <TD
-                                            className="border text-right pr-5 py-2"
-                                            colSpan={13}
-                                        >
-                                            SURPLUS / DEFICIT
-                                        </TD>
-                                        <TD className="border text-center py-2">
-                                            {formatCurrency.format(
-                                                dataById.REIMBURSE_TOTAL_AMOUNT -
-                                                    reimburse_total_amount_approve
-                                            )}
-                                        </TD>
-                                    </tr> */}
                                 </tfoot>
                             </table>
                         </div>
@@ -3072,7 +3241,6 @@ export default function Reimburse({ auth }: PageProps) {
                                     className="mb-2"
                                 >
                                     Information
-                                    {/* <span className="text-red-600">*</span> */}
                                 </InputLabel>
                                 <select
                                     id="REIMBURSE_TYPE"
@@ -3112,12 +3280,12 @@ export default function Reimburse({ auth }: PageProps) {
                                 name="reimburse_request_note"
                                 className="resize-none border-0 focus:ring-2 focus:ring-inset focus:ring-red-600"
                                 rows={5}
-                                value={dataById.REIMBURSE_REQUEST_NOTE}
+                                value={dataById.REIMBURSE_REQUEST_NOTE || ""}
                                 readOnly
                             />
                         </div>
 
-                        <div className="md:absolute mt-7">
+                        <div className="mt-7">
                             <button
                                 type="submit"
                                 className="mt-3 inline-flex w-full justify-center rounded-md bg-yellow-400 px-3 py-2 text-sm font-semibold text-white hover:bg-yellow-300 sm:ml-3 sm:mt-0 sm:w-auto"
@@ -3334,14 +3502,14 @@ export default function Reimburse({ auth }: PageProps) {
                         <div className="grid md:grid-cols-2 my-10">
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="cashAdvanceNumber"
+                                    htmlFor="reimburseNumber"
                                     value="Reimburse Number"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="cashAdvanceNumber"
+                                    id="reimburseNumber"
                                     type="text"
-                                    name="cashAdvanceNumber"
+                                    name="reimburseNumber"
                                     value={dataById.REIMBURSE_NUMBER}
                                     className="bg-gray-100"
                                     readOnly
@@ -3349,14 +3517,14 @@ export default function Reimburse({ auth }: PageProps) {
                             </div>
                             <div className="w-full p-2">
                                 <InputLabel
-                                    htmlFor="tanggalPengajuan"
+                                    htmlFor="requestedDate"
                                     value="Request Date"
                                     className="mb-2"
                                 />
                                 <TextInput
-                                    id="tanggalPengajuan"
+                                    id="requestedDate"
                                     type="text"
-                                    name="tanggalPengajuan"
+                                    name="requestedDate"
                                     value={dateFormat(
                                         dataById.REIMBURSE_REQUETED_DATE,
                                         "dd-mm-yyyy"
@@ -3376,7 +3544,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="namaPengguna"
                                     value={
-                                        auth.user.employee.EMPLOYEE_FIRST_NAME
+                                        dataById.employee?.EMPLOYEE_FIRST_NAME
                                     }
                                     className="bg-gray-100"
                                     readOnly
@@ -3393,7 +3561,7 @@ export default function Reimburse({ auth }: PageProps) {
                                     type="text"
                                     name="divisi"
                                     value={
-                                        auth.user.employee.division
+                                        dataById.division
                                             ?.COMPANY_DIVISION_ALIAS
                                     }
                                     className="bg-gray-100"
@@ -3864,12 +4032,12 @@ export default function Reimburse({ auth }: PageProps) {
                                             </Button>
                                         </TD>
                                         <TD
-                                            className="text-right pr-5 py-2"
+                                            className="text-right font-bold pr-5 py-2"
                                             colSpan={7}
                                         >
                                             TOTAL AMOUNT
                                         </TD>
-                                        <TD className="py-2">
+                                        <TD className="py-2 font-bold">
                                             {formatCurrency.format(
                                                 revisedTotalAmount
                                             )}
@@ -4076,12 +4244,17 @@ export default function Reimburse({ auth }: PageProps) {
                                             {data.proof_of_document.map(
                                                 (file: any, i: number) => (
                                                     <div
-                                                        className="grid grid-cols-12 my-5"
+                                                        className="grid grid-cols-12 mt-3"
                                                         key={i}
                                                     >
                                                         {file.proof_of_document
                                                             ?.name ? (
                                                             <div className="w-full col-span-11">
+                                                                <InputLabel
+                                                                    htmlFor="files"
+                                                                    value="File"
+                                                                    className="mb-2"
+                                                                />
                                                                 <p>
                                                                     {
                                                                         file
@@ -4092,6 +4265,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                             </div>
                                                         ) : (
                                                             <div className="w-full col-span-11">
+                                                                <InputLabel
+                                                                    htmlFor="files"
+                                                                    value="File"
+                                                                    className="mb-2"
+                                                                />
                                                                 <Input
                                                                     name="proof_of_document"
                                                                     type="file"
@@ -4108,7 +4286,7 @@ export default function Reimburse({ auth }: PageProps) {
                                                             </div>
                                                         )}
                                                         <button
-                                                            className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 py-1 rounded-lg"
+                                                            className="text-center self-center bg-red-600 hover:bg-red-500 text-white mx-2 mt-8 py-1 rounded-lg"
                                                             onClick={(e) =>
                                                                 handleRemoveProofOfDocument(
                                                                     e,
@@ -4123,7 +4301,7 @@ export default function Reimburse({ auth }: PageProps) {
                                             )}
                                             <button
                                                 type="button"
-                                                className="text-sm cursor-pointer hover:underline"
+                                                className="text-sm cursor-pointer hover:underline mt-5"
                                                 onClick={(e) =>
                                                     handleAddRowProofOfDocument(
                                                         e
@@ -4143,706 +4321,997 @@ export default function Reimburse({ auth }: PageProps) {
             {/* Modal Execute End */}
 
             {/* Content Start */}
-            <div className="p-6 text-gray-900">
-                <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-4 mb-5 mt-5">
-                    <div className="flex flex-col">
-                        <div className="rounded-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
-                            <Button
-                                className="text-xs sm:text-sm font-semibold mb-4 px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
-                                onClick={(e) => handleAddModal(e)}
-                            >
-                                {"Add Reimburse"}
-                            </Button>
-                        </div>
-                        <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5">
-                            <fieldset className="py-3 rounded-lg border-slate-100 border-2">
-                                <legend className="ml-8 text-sm">Search</legend>
-                                <div className="mt-3 px-4">
-                                    <InputSearch
-                                        id="reimburse_requested_by"
-                                        name="reimburse_requested_by"
-                                        type="text"
+            <Content
+                buttonOnAction={
+                    <>
+                        <Button
+                            className="text-xs sm:text-sm font-semibold px-6 py-1.5 md:col-span-2 lg:col-auto text-white bg-red-600 hover:bg-red-500"
+                            onClick={handleAddModal}
+                        >
+                            {"Add Reimburse"}
+                        </Button>
+                    </>
+                }
+                search={
+                    <>
+                        <fieldset className="py-3 rounded-lg border-slate-100 border-2">
+                            <legend className="ml-8 text-sm">Search</legend>
+                            <div className="mt-3 px-4">
+                                <InputSearch
+                                    id="REIMBURSE_NUMBER"
+                                    name="REIMBURSE_NUMBER"
+                                    type="text"
+                                    placeholder="Reimburse Number"
+                                    autoComplete="off"
+                                    value={
+                                        searchReimburse.reimburse_search[0]
+                                            .REIMBURSE_NUMBER
+                                    }
+                                    onChange={(val: any) => {
+                                        inputDataSearch(
+                                            "REIMBURSE_NUMBER",
+                                            val.target.value,
+                                            0
+                                        );
+                                        if (
+                                            searchReimburse.reimburse_search[0]
+                                                .REIMBURSE_NUMBER === ""
+                                        ) {
+                                            inputDataSearch("flag", "flag", 0);
+                                        } else {
+                                            inputDataSearch("flag", "", 0);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const reimburseNumber =
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_NUMBER;
+                                            if (reimburseNumber) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
+                                />
+                                <InputSearch
+                                    id="REIMBURSE_REQUESTED_BY"
+                                    name="REIMBURSE_REQUESTED_BY"
+                                    type="text"
+                                    placeholder="Applicant"
+                                    autoComplete="off"
+                                    value={
+                                        searchReimburse.reimburse_search[0]
+                                            .REIMBURSE_REQUESTED_BY
+                                    }
+                                    onChange={(val: any) => {
+                                        inputDataSearch(
+                                            "REIMBURSE_REQUESTED_BY",
+                                            val.target.value,
+                                            0
+                                        );
+                                        if (
+                                            searchReimburse.reimburse_search[0]
+                                                .REIMBURSE_REQUESTED_BY === ""
+                                        ) {
+                                            inputDataSearch("flag", "flag", 0);
+                                        } else {
+                                            inputDataSearch("flag", "", 0);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const reimburseRequestedBy =
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_REQUESTED_BY;
+                                            if (reimburseRequestedBy) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            }
+                                        }
+                                    }}
+                                />
+                                <div className="mb-5">
+                                    <Select
+                                        classNames={{
+                                            menuButton: () =>
+                                                `flex items-center text-xs sm:text-sm text-gray-400 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                            listItem: ({ isSelected }: any) =>
+                                                `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                    isSelected
+                                                        ? `text-white bg-red-600`
+                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                }`,
+                                        }}
+                                        options={selectDivision}
+                                        isSearchable={true}
+                                        placeholder={"Applicant Division"}
                                         value={
-                                            searchReimburse.reimburse_requested_by
+                                            searchReimburse.reimburse_search[0]
+                                                .REIMBURSE_DIVISION
                                         }
-                                        placeholder="Applicant"
-                                        autoComplete="off"
-                                        onChange={(e: any) =>
-                                            setSearchReimburse({
-                                                ...searchReimburse,
-                                                reimburse_requested_by:
-                                                    e.target.value,
-                                            })
-                                        }
+                                        onChange={(val: any) => {
+                                            inputDataSearch(
+                                                "REIMBURSE_DIVISION",
+                                                val,
+                                                0
+                                            );
+                                            if (
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_DIVISION === ""
+                                            ) {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            } else {
+                                                inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        primaryColor={"bg-red-500"}
                                     />
-                                    <div className="mb-5">
-                                        <Select
-                                            classNames={{
-                                                menuButton: () =>
-                                                    `flex items-center text-xs sm:text-sm text-gray-400 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                                listItem: ({
-                                                    isSelected,
-                                                }: any) =>
-                                                    `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                        isSelected
-                                                            ? `text-white bg-red-600`
-                                                            : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                                    }`,
-                                            }}
-                                            options={selectDivision}
-                                            isSearchable={true}
-                                            placeholder={"Applicant Division"}
-                                            value={
-                                                searchReimburse.reimburse_division
+                                </div>
+                                <InputSearch
+                                    id="REIMBURSE_USED_BY"
+                                    name="REIMBURSE_USED_BY"
+                                    type="text"
+                                    placeholder="Used By"
+                                    autoComplete="off"
+                                    value={
+                                        searchReimburse.reimburse_search[0]
+                                            .REIMBURSE_USED_BY
+                                    }
+                                    onChange={(val: any) => {
+                                        inputDataSearch(
+                                            "REIMBURSE_USED_BY",
+                                            val.target.value,
+                                            0
+                                        );
+                                        if (
+                                            searchReimburse.reimburse_search[0]
+                                                .REIMBURSE_USED_BY === ""
+                                        ) {
+                                            inputDataSearch("flag", "flag", 0);
+                                        } else {
+                                            inputDataSearch("flag", "", 0);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const reimburseUsedBy =
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_USED_BY;
+                                            if (reimburseUsedBy) {
+                                                inputDataSearch("flag", "", 0);
+                                                setRefreshSuccess("");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
+                                                });
+                                            } else {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
                                             }
-                                            onChange={(val: any) =>
-                                                setSearchReimburse({
-                                                    ...searchReimburse,
-                                                    reimburse_division: val,
-                                                })
+                                        }
+                                    }}
+                                />
+                                <div className="grid grid-cols-1 mb-5 relative">
+                                    <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
+                                    <DatePicker
+                                        name="REIMBURSE_START_DATE"
+                                        selected={
+                                            searchReimburse.reimburse_search[0]
+                                                .REIMBURSE_START_DATE
+                                        }
+                                        onChange={(val: any) => {
+                                            inputDataSearch(
+                                                "REIMBURSE_START_DATE",
+                                                val.toLocaleDateString("en-CA"),
+                                                0
+                                            );
+                                            if (
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_START_DATE === ""
+                                            ) {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            } else {
+                                                inputDataSearch("flag", "", 0);
                                             }
-                                            primaryColor={"bg-red-500"}
-                                        />
-                                    </div>
-                                    <InputSearch
-                                        id="reimburse_used_by"
-                                        name="reimburse_used_by"
-                                        type="text"
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const reimburseStartDate =
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_START_DATE;
+                                                if (reimburseStartDate) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                    setRefreshSuccess("");
+                                                    setTimeout(() => {
+                                                        setRefreshSuccess(
+                                                            "success"
+                                                        );
+                                                    });
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                }
+                                            }
+                                        }}
+                                        dateFormat={"dd-MM-yyyy"}
+                                        placeholderText="dd-mm-yyyyy (Start Date)"
+                                        className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                        autoComplete="off"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 mb-5 relative">
+                                    <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
+                                    <DatePicker
+                                        name="reimburse_end_date"
+                                        selected={
+                                            searchReimburse.reimburse_search[0]
+                                                .REIMBURSE_END_DATE
+                                        }
+                                        onChange={(val: any) => {
+                                            inputDataSearch(
+                                                "REIMBURSE_END_DATE",
+                                                val.toLocaleDateString("en-CA"),
+                                                0
+                                            );
+                                            if (
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_END_DATE === ""
+                                            ) {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            } else {
+                                                inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const reimburseEndDate =
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_END_DATE;
+                                                if (reimburseEndDate) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                    setRefreshSuccess("");
+                                                    setTimeout(() => {
+                                                        setRefreshSuccess(
+                                                            "success"
+                                                        );
+                                                    });
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                }
+                                            }
+                                        }}
+                                        dateFormat={"dd-MM-yyyy"}
+                                        placeholderText="dd-mm-yyyy (End Date)"
+                                        className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
+                                        autoComplete="off"
+                                    />
+                                </div>
+                                <div className="mb-5">
+                                    <Select
+                                        classNames={{
+                                            menuButton: () =>
+                                                `flex items-center text-xs sm:text-sm text-gray-400 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
+                                            menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                            listItem: ({ isSelected }: any) =>
+                                                `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
+                                                    isSelected
+                                                        ? `text-white bg-red-600`
+                                                        : `text-gray-500 hover:bg-red-100 hover:text-black`
+                                                }`,
+                                        }}
+                                        options={selectDivision}
+                                        isSearchable={true}
+                                        placeholder={"Cost Center"}
                                         value={
-                                            searchReimburse.reimburse_used_by
+                                            searchReimburse.reimburse_search[0]
+                                                .REIMBURSE_COST_CENTER
                                         }
-                                        placeholder="Used By"
-                                        autoComplete="off"
-                                        onChange={(e: any) =>
-                                            setSearchReimburse({
-                                                ...searchReimburse,
-                                                reimburse_used_by:
-                                                    e.target.value,
-                                            })
-                                        }
+                                        onChange={(val: any) => {
+                                            inputDataSearch(
+                                                "REIMBURSE_COST_CENTER",
+                                                val,
+                                                0
+                                            );
+                                            if (
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_COST_CENTER ===
+                                                ""
+                                            ) {
+                                                inputDataSearch(
+                                                    "flag",
+                                                    "flag",
+                                                    0
+                                                );
+                                            } else {
+                                                inputDataSearch("flag", "", 0);
+                                            }
+                                        }}
+                                        primaryColor={"bg-red-500"}
                                     />
-                                    <div className="grid grid-cols-1 mb-5 relative">
-                                        <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
-                                        <DatePicker
-                                            name="reimburse_start_date"
-                                            selected={
-                                                searchReimburse.reimburse_start_date
+                                </div>
+                                <div className="flex flex-col md:flex-row justify-end gap-2">
+                                    <Button
+                                        className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                        onClick={() => {
+                                            if (
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_ID === "" &&
+                                                searchReimburse
+                                                    .reimburse_search[0]
+                                                    .REIMBURSE_NUMBER === ""
+                                            ) {
+                                                inputDataSearch("flag", "", 0);
+                                            } else {
+                                                inputDataSearch("flag", "", 0);
                                             }
-                                            onChange={(date: any) =>
-                                                setSearchReimburse({
-                                                    ...searchReimburse,
-                                                    reimburse_start_date:
-                                                        date.toLocaleDateString(
-                                                            "en-CA"
-                                                        ),
-                                                })
-                                            }
-                                            dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd-mm-yyyyy (Start Date)"
-                                            className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 mb-5 relative">
-                                        <CalendarDaysIcon className="absolute left-2 z-1 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-6" />
-                                        <DatePicker
-                                            name="reimburse_end_date"
-                                            selected={
-                                                searchReimburse.reimburse_end_date
-                                            }
-                                            onChange={(date: any) =>
-                                                setSearchReimburse({
-                                                    ...searchReimburse,
-                                                    reimburse_end_date:
-                                                        date.toLocaleDateString(
-                                                            "en-CA"
-                                                        ),
-                                                })
-                                            }
-                                            dateFormat={"dd-MM-yyyy"}
-                                            placeholderText="dd-mm-yyyy (End Date)"
-                                            className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-xs sm:text-sm focus:ring-red-600 placeholder:text-xs md:placeholder:text-sm pl-10"
-                                        />
-                                    </div>
-                                    <div className="mb-5">
-                                        <Select
-                                            classNames={{
-                                                menuButton: () =>
-                                                    `flex items-center text-xs sm:text-sm text-gray-400 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                                menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                                listItem: ({
-                                                    isSelected,
-                                                }: any) =>
-                                                    `block transition duration-200 text-xs sm:text-sm px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                        isSelected
-                                                            ? `text-white bg-red-600`
-                                                            : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                                    }`,
-                                            }}
-                                            options={selectDivision}
-                                            isSearchable={true}
-                                            placeholder={"Cost Center"}
-                                            value={
-                                                searchReimburse.reimburse_cost_center
-                                            }
-                                            onChange={(val: any) =>
-                                                setSearchReimburse({
-                                                    ...searchReimburse,
-                                                    reimburse_cost_center: val,
-                                                })
-                                            }
-                                            primaryColor={"bg-red-500"}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col md:flex-row justify-end gap-2">
+
+                                            setRefreshSuccess("");
+                                            setTimeout(() => {
+                                                setRefreshSuccess("success");
+                                            }, 1000);
+                                        }}
+                                    >
+                                        Search
+                                    </Button>
+                                    <Button
+                                        className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
+                                        onClick={clearSearchReimburse}
+                                    >
+                                        Clear Search
+                                    </Button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </>
+                }
+                buttonSearch={
+                    <>
+                        <div className="mt-10">
+                            <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
+                                <legend className="ml-8 text-sm">
+                                    Reimburse Status
+                                </legend>
+                                <ArrowPathIcon
+                                    className="w-5 text-gray-600 hover:text-gray-500 cursor-pointer ml-auto mr-3 mb-8"
+                                    onClick={() => handleRefresh()}
+                                ></ArrowPathIcon>
+                                <div className="flex flex-wrap content-between justify-center gap-6 mt-5 text-sm">
+                                    <div className="flex relative">
                                         <Button
-                                            className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                            onClick={() => getReimburse()}
+                                            className="w-36 bg-gray-500 px-2 py-1 hover:bg-gray-400"
+                                            onClick={() => {
+                                                inputDataSearch(
+                                                    "REIMBURSE_APPROVAL_STATUS",
+                                                    "request",
+                                                    0
+                                                );
+                                                if (
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_APPROVAL_STATUS ===
+                                                    ""
+                                                ) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                }
+
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                }, 1000);
+                                            }}
                                         >
-                                            Search
+                                            Request
+                                            <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                {getCountReimburseRequestStatus}
+                                            </span>
                                         </Button>
+                                    </div>
+                                    <div className="flex relative">
                                         <Button
-                                            className="mb-4 w-full md:w-[35%] text-white text-xs sm:text-sm py-1.5 px-2 bg-red-600 hover:bg-red-500"
-                                            onClick={() =>
-                                                clearSearchReimburse()
-                                            }
+                                            className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
+                                            onClick={() => {
+                                                inputDataSearch(
+                                                    "REIMBURSE_APPROVAL_STATUS",
+                                                    "approve1",
+                                                    0
+                                                );
+                                                if (
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_APPROVAL_STATUS ===
+                                                    ""
+                                                ) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                }
+
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                }, 1000);
+                                            }}
                                         >
-                                            Clear Search
+                                            Approve 1
+                                            <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                {
+                                                    getCountReimburseApprove1Status
+                                                }
+                                            </span>
+                                        </Button>
+                                    </div>
+                                    <div className="flex relative">
+                                        <Button
+                                            className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
+                                            onClick={() => {
+                                                inputDataSearch(
+                                                    "REIMBURSE_APPROVAL_STATUS",
+                                                    "approve2",
+                                                    0
+                                                );
+                                                if (
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_APPROVAL_STATUS ===
+                                                    ""
+                                                ) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                }
+
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                }, 1000);
+                                            }}
+                                        >
+                                            Approve 2
+                                            <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                {
+                                                    getCountReimburseApprove2Status
+                                                }
+                                            </span>
+                                        </Button>
+                                    </div>
+                                    <div className="flex relative">
+                                        <Button
+                                            className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
+                                            onClick={() => {
+                                                inputDataSearch(
+                                                    "REIMBURSE_APPROVAL_STATUS",
+                                                    "approve3",
+                                                    0
+                                                );
+                                                if (
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_APPROVAL_STATUS ===
+                                                    ""
+                                                ) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                }
+
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                }, 1000);
+                                            }}
+                                        >
+                                            Approve 3
+                                            <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                {
+                                                    getCountReimburseApprove3Status
+                                                }
+                                            </span>
+                                        </Button>
+                                    </div>
+                                    <div className="flex relative">
+                                        <Button
+                                            className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
+                                            onClick={() => {
+                                                inputDataSearch(
+                                                    "REIMBURSE_APPROVAL_STATUS",
+                                                    "revision",
+                                                    0
+                                                );
+                                                if (
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_APPROVAL_STATUS ===
+                                                    ""
+                                                ) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                }
+
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                }, 1000);
+                                            }}
+                                        >
+                                            Need Revision
+                                            <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                {
+                                                    getCountReimburseNeedRevisionStatus
+                                                }
+                                            </span>
+                                        </Button>
+                                    </div>
+                                    <div className="flex relative">
+                                        <Button
+                                            className="w-36 bg-red-600 px-2 py-1 hover:bg-red-500"
+                                            onClick={() => {
+                                                inputDataSearch(
+                                                    "REIMBURSE_APPROVAL_STATUS",
+                                                    "reject",
+                                                    0
+                                                );
+                                                if (
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_APPROVAL_STATUS ===
+                                                    ""
+                                                ) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                }
+
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                }, 1000);
+                                            }}
+                                        >
+                                            Reject
+                                            <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
+                                                {getCountReimburseRejectStatus}
+                                            </span>
+                                        </Button>
+                                    </div>
+                                    <div className="flex relative">
+                                        <Button
+                                            className="w-36 bg-green-500 px-2 py-1 hover:bg-green-400"
+                                            onClick={() => {
+                                                inputDataSearch(
+                                                    "REIMBURSE_APPROVAL_STATUS",
+                                                    "complited",
+                                                    0
+                                                );
+                                                if (
+                                                    searchReimburse
+                                                        .reimburse_search[0]
+                                                        .REIMBURSE_APPROVAL_STATUS ===
+                                                    ""
+                                                ) {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "flag",
+                                                        0
+                                                    );
+                                                } else {
+                                                    inputDataSearch(
+                                                        "flag",
+                                                        "",
+                                                        0
+                                                    );
+                                                }
+
+                                                setRefreshSuccess("success");
+                                                setTimeout(() => {
+                                                    setRefreshSuccess("");
+                                                }, 1000);
+                                            }}
+                                        >
+                                            Complited
                                         </Button>
                                     </div>
                                 </div>
                             </fieldset>
-                            <div className="mt-10">
-                                <fieldset className="pb-10 pt-5 rounded-lg border-slate-100 border-2">
-                                    <legend className="ml-8 text-sm">
-                                        Reimburse Status
-                                    </legend>
-                                    <ArrowPathIcon
-                                        className="w-5 text-gray-600 hover:text-gray-500 cursor-pointer ml-auto mr-3 mb-8"
-                                        onClick={() => handleRefresh()}
-                                    ></ArrowPathIcon>
-                                    <div className="flex flex-wrap content-between justify-center gap-6 mt-5 text-sm">
-                                        <div className="flex relative">
-                                            <Button
-                                                className="w-36 bg-gray-500 px-2 py-1 hover:bg-gray-400"
-                                                onClick={() =>
-                                                    getReimburse(
-                                                        "",
-                                                        "1",
-                                                        "Approve1"
-                                                    )
-                                                }
-                                            >
-                                                Request
-                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
-                                                    {
-                                                        getCountReimburseRequestStatus
-                                                    }
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button
-                                                className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
-                                                onClick={() =>
-                                                    getReimburse(
-                                                        "",
-                                                        "2",
-                                                        "Approve1"
-                                                    )
-                                                }
-                                            >
-                                                Approve 1
-                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
-                                                    {
-                                                        getCountReimburseApprove1Status
-                                                    }
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button
-                                                className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
-                                                onClick={() =>
-                                                    getReimburse(
-                                                        "",
-                                                        "2",
-                                                        "Approve2"
-                                                    )
-                                                }
-                                            >
-                                                Approve 2
-                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
-                                                    {
-                                                        getCountReimburseApprove2Status
-                                                    }
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button
-                                                className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
-                                                onClick={() =>
-                                                    getReimburse(
-                                                        "",
-                                                        "2",
-                                                        "Approve3"
-                                                    )
-                                                }
-                                            >
-                                                Approve 3
-                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
-                                                    {
-                                                        getCountReimburseApprove3Status
-                                                    }
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button
-                                                className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
-                                                onClick={() =>
-                                                    getReimburse(
-                                                        "",
-                                                        "3",
-                                                        "Need Revision"
-                                                    )
-                                                }
-                                            >
-                                                Need Revision
-                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
-                                                    {
-                                                        getCountReimburseNeedRevisionStatus
-                                                    }
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button
-                                                className="w-36 bg-red-600 px-2 py-1 hover:bg-red-500"
-                                                onClick={() =>
-                                                    getReimburse(
-                                                        "",
-                                                        "4",
-                                                        "Reject"
-                                                    )
-                                                }
-                                            >
-                                                Reject
-                                                <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
-                                                    {
-                                                        getCountReimburseRejectStatus
-                                                    }
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        <div className="flex relative">
-                                            <Button
-                                                className="w-36 bg-green-500 px-2 py-1 hover:bg-green-400"
-                                                onClick={() =>
-                                                    getReimburse(
-                                                        "",
-                                                        "6",
-                                                        "Complited"
-                                                    )
-                                                }
-                                            >
-                                                Complited
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
                         </div>
-                    </div>
-                    <div className="bg-white rounded-md col-span-2 p-10">
-                        <div
-                            className={`max-w-full overflow-x-auto ${
-                                reimburse.data ? "h-[70%]" : "h-auto"
-                            } ring-1 ring-stone-200 shadow-xl rounded-lg custom-table overflow-visible`}
-                        >
-                            <table className="min-w-full divide-y divide-gray-300">
-                                <thead className="bg-gray-100">
-                                    <tr className="bg-gray-2 dark:bg-meta-4 text-center">
-                                        <TableTH
-                                            className="border whitespace-nowrap"
-                                            label={"No"}
-                                            colSpan=""
-                                            rowSpan="2"
-                                        />
-                                        <TableTH
-                                            className="border whitespace-nowrap"
-                                            label={"Reimburse Number"}
-                                            colSpan=""
-                                            rowSpan="2"
-                                        />
-                                        <TableTH
-                                            className="border whitespace-nowrap"
-                                            label={"Request Date"}
-                                            colSpan=""
-                                            rowSpan="2"
-                                        />
-                                        <TableTH
-                                            className="border whitespace-nowrap"
-                                            label={"Amount"}
-                                            colSpan=""
-                                            rowSpan="2"
-                                        />
-                                        <TableTH
-                                            className="border whitespace-nowrap"
-                                            label={"Approve"}
-                                            colSpan="3"
-                                            rowSpan=""
-                                        />
-                                        <TableTH
-                                            className={
-                                                "border whitespace-nowrap"
-                                            }
-                                            label={"Action"}
-                                            colSpan=""
-                                            rowSpan="2"
-                                        />
-                                    </tr>
-                                    <tr>
-                                        <TableTH
-                                            className="border whitespace-nowrap"
-                                            label={"Approve 1"}
-                                            colSpan=""
-                                            rowSpan=""
-                                        />
-                                        <TableTH
-                                            className="border whitespace-nowrap"
-                                            label={"Approve 2"}
-                                            colSpan=""
-                                            rowSpan=""
-                                        />
-                                        <TableTH
-                                            className="border whitespace-nowrap"
-                                            label={"Approve 3"}
-                                            colSpan=""
-                                            rowSpan=""
-                                        />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {reimburse.data === undefined && (
-                                        <tr className="text-center">
-                                            <TD
-                                                className="leading-10 font-medium text-gray-500"
-                                                colSpan="12"
-                                            >
-                                                Please Search Reimburse
-                                            </TD>
-                                        </tr>
-                                    )}
-                                    {reimburse.data?.length === 0 ? (
-                                        <tr className="text-center">
-                                            <TD
-                                                className="leading-10 font-medium text-gray-500"
-                                                colSpan="12"
-                                            >
-                                                Data not available
-                                            </TD>
-                                        </tr>
-                                    ) : (
-                                        reimburse.data?.map(
-                                            (dataReimburse: any, i: number) => (
-                                                <tr
-                                                    key={i}
-                                                    className={
-                                                        i % 2 === 0
-                                                            ? "text-center hover:bg-gray-100"
-                                                            : "bg-gray-100 text-center"
-                                                    }
-                                                >
-                                                    <TableTD
-                                                        value={i + 1}
-                                                        className="w-px"
-                                                    />
-                                                    <TableTD
-                                                        value={
-                                                            dataReimburse.REIMBURSE_NUMBER
-                                                        }
-                                                        className=""
-                                                    />
-                                                    <TableTD
-                                                        value={dateFormat(
-                                                            dataReimburse.REIMBURSE_REQUESTED_DATE,
-                                                            "dd-mm-yyyy"
-                                                        )}
-                                                        className=""
-                                                    />
-                                                    <TableTD
-                                                        value={formatCurrency.format(
-                                                            dataReimburse.REIMBURSE_TOTAL_AMOUNT
-                                                        )}
-                                                        className=""
-                                                    />
-                                                    <TableTD
-                                                        value={
-                                                            <>
-                                                                {dataReimburse.REIMBURSE_FIRST_APPROVAL_STATUS ===
-                                                                    1 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-gray-200 text-gray-700"
-                                                                        title="Request"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_FIRST_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_FIRST_APPROVAL_STATUS ===
-                                                                    2 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-green-100 text-green-700"
-                                                                        title="Approve"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_FIRST_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_FIRST_APPROVAL_STATUS ===
-                                                                    3 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-yellow-300 text-white"
-                                                                        title="Need Revision"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_FIRST_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_FIRST_APPROVAL_STATUS ===
-                                                                    4 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-red-100 text-red-700"
-                                                                        title="Reject"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_FIRST_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                            </>
-                                                        }
-                                                        className=""
-                                                    />
-                                                    <TableTD
-                                                        value={
-                                                            <>
-                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                                    "" ||
-                                                                    (dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                                        null && (
-                                                                        <span>
-                                                                            -
-                                                                        </span>
-                                                                    ))}
-                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                                    1 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-gray-200 text-gray-700"
-                                                                        title="Request"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                                    2 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-green-100 text-green-700"
-                                                                        title="Approve"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                                    3 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-yellow-300 text-white"
-                                                                        title="Need Revision"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                                    4 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-red-100 text-red-700"
-                                                                        title="Reject"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                                    5 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-green-100 text-green-700"
-                                                                        title="Execute"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_SECOND_APPROVAL_STATUS ===
-                                                                    6 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-green-100 text-green-700"
-                                                                        title="Complited"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_SECOND_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                            </>
-                                                        }
-                                                        className=""
-                                                    />
-                                                    <TableTD
-                                                        value={
-                                                            <>
-                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
-                                                                    "" ||
-                                                                    (dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
-                                                                        null && (
-                                                                        <span>
-                                                                            -
-                                                                        </span>
-                                                                    ))}
-                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
-                                                                    1 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-gray-200 text-gray-700"
-                                                                        title="Request"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_THIRD_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
-                                                                    2 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-green-100 text-green-700"
-                                                                        title="Approve"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_THIRD_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
-                                                                    3 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-yellow-300 text-white"
-                                                                        title="Need Revision"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_THIRD_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                                {dataReimburse.REIMBURSE_THIRD_APPROVAL_STATUS ===
-                                                                    4 && (
-                                                                    <BadgeFlat
-                                                                        className=" bg-red-100 text-red-700"
-                                                                        title="Reject"
-                                                                        body={
-                                                                            dataReimburse.REIMBURSE_THIRD_APPROVAL_USER
-                                                                        }
-                                                                    />
-                                                                )}
-                                                            </>
-                                                        }
-                                                        className=""
-                                                    />
-                                                    <TableTD
-                                                        className="text-center"
-                                                        value={
-                                                            <Dropdown
-                                                                title="Actions"
-                                                                className=""
-                                                                children={
-                                                                    <>
-                                                                        <a
-                                                                            href=""
-                                                                            className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                            onClick={(
-                                                                                e
-                                                                            ) =>
-                                                                                handleShowModal(
-                                                                                    e,
-                                                                                    dataReimburse.REIMBURSE_ID
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            Detail
-                                                                        </a>
-                                                                        <a
-                                                                            href=""
-                                                                            className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                            onClick={(
-                                                                                e
-                                                                            ) =>
-                                                                                handleApproveModal(
-                                                                                    e,
-                                                                                    dataReimburse.REIMBURSE_ID
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            Approve
-                                                                        </a>
-                                                                        <a
-                                                                            href=""
-                                                                            className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                            onClick={(
-                                                                                e
-                                                                            ) =>
-                                                                                handleRevisedModal(
-                                                                                    e,
-                                                                                    dataReimburse.REIMBURSE_ID
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            Revised
-                                                                        </a>
-                                                                        <a
-                                                                            href=""
-                                                                            className="block px-4 py-2 text-sm hover:bg-gray-100"
-                                                                            onClick={(
-                                                                                e
-                                                                            ) =>
-                                                                                handleExecuteModal(
-                                                                                    e,
-                                                                                    dataReimburse.REIMBURSE_ID
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            Execute
-                                                                        </a>
-                                                                    </>
+                    </>
+                }
+                dataList={
+                    <>
+                        <AGGrid
+                            addButtonLabel={undefined}
+                            addButtonModalState={undefined}
+                            withParam={""}
+                            searchParam={searchReimburse.reimburse_search}
+                            url={"getReimburse"}
+                            doubleClickEvent={handleShowModal}
+                            triggeringRefreshData={refreshSuccess}
+                            rowHeight={130}
+                            noRowsOverlayComponent={true}
+                            colDefs={[
+                                {
+                                    headerName: "No.",
+                                    valueGetter: "node.rowIndex + 1",
+                                    flex: 1,
+                                    cellStyle: { textAlign: "center" },
+                                },
+                                {
+                                    headerName: "Reimburse Number",
+                                    field: "REIMBURSE_NUMBER",
+                                    flex: 3,
+                                    cellStyle: { textAlign: "center" },
+                                },
+                                {
+                                    headerName: "Request Date",
+                                    field: "REIMBURSE_REQUESTED_DATE",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    valueFormatter: (params: any) => {
+                                        return dateFormat(
+                                            params.value,
+                                            "dd-mm-yyyy"
+                                        );
+                                    },
+                                },
+                                {
+                                    headerName: "Amount",
+                                    field: "REIMBURSE_TOTAL_AMOUNT",
+                                    flex: 2,
+                                    cellStyle: { textAlign: "center" },
+                                    valueFormatter: (params: any) => {
+                                        return formatCurrency.format(
+                                            params.value
+                                        );
+                                    },
+                                },
+                                {
+                                    headerName: "Approval",
+                                    children: [
+                                        {
+                                            headerName: "Approve",
+                                            field: "REIMBURSE_FIRST_APPROVAL_USER",
+                                            flex: 2,
+                                            cellHeader: "header-center",
+                                            cellRenderer: (params: any) => {
+                                                const first_approval_status =
+                                                    params.data
+                                                        .REIMBURSE_FIRST_APPROVAL_STATUS;
+
+                                                let badgeClass =
+                                                    "bg-gray-200 text-gray-700";
+                                                let title = "Request";
+
+                                                if (
+                                                    first_approval_status === 1
+                                                ) {
+                                                    badgeClass =
+                                                        "bg-gray-200 text-gray-700";
+                                                    title = "Request";
+                                                } else if (
+                                                    first_approval_status === 2
+                                                ) {
+                                                    badgeClass =
+                                                        "bg-green-100 text-green-700";
+                                                    title = "Approve";
+                                                } else if (
+                                                    first_approval_status === 3
+                                                ) {
+                                                    badgeClass =
+                                                        "bg-yellow-300 text-white";
+                                                    title = "Need Revision";
+                                                } else if (
+                                                    first_approval_status === 4
+                                                ) {
+                                                    badgeClass =
+                                                        "bg-red-100 text-red-700";
+                                                    title = "Reject";
+                                                }
+
+                                                const second_approval_status =
+                                                    params.data
+                                                        .REIMBURSE_SECOND_APPROVAL_STATUS;
+                                                const second_approval_user =
+                                                    params.data
+                                                        .REIMBURSE_SECOND_APPROVAL_USER;
+
+                                                let badgeClassSecond = "";
+                                                let titleSecond = "";
+
+                                                if (
+                                                    second_approval_status === 2
+                                                ) {
+                                                    badgeClassSecond =
+                                                        "bg-green-100 text-green-700";
+                                                    titleSecond = "Approve";
+                                                } else if (
+                                                    second_approval_status === 3
+                                                ) {
+                                                    badgeClassSecond =
+                                                        "bg-yellow-300 text-white";
+                                                    titleSecond =
+                                                        "Need Revision";
+                                                } else if (
+                                                    second_approval_status === 4
+                                                ) {
+                                                    badgeClassSecond =
+                                                        "bg-red-100 text-red-700";
+                                                    titleSecond = "Reject";
+                                                } else if (
+                                                    second_approval_status === 5
+                                                ) {
+                                                    badgeClassSecond =
+                                                        "bg-green-100 text-green-700";
+                                                    titleSecond = "Execute";
+                                                } else if (
+                                                    second_approval_status === 6
+                                                ) {
+                                                    badgeClassSecond =
+                                                        "bg-green-100 text-green-700";
+                                                    titleSecond = "Complited";
+                                                }
+
+                                                const third_approval_status =
+                                                    params.data
+                                                        .REIMBURSE_THIRD_APPROVAL_STATUS;
+                                                const third_approval_user =
+                                                    params.data
+                                                        .REIMBURSE_THIRD_APPROVAL_USER;
+
+                                                let badgeClassThird = "";
+                                                let titleThird = "";
+
+                                                if (
+                                                    third_approval_status === 2
+                                                ) {
+                                                    badgeClassThird =
+                                                        "bg-green-100 text-green-700";
+                                                    titleThird = "Approve";
+                                                } else if (
+                                                    third_approval_status === 3
+                                                ) {
+                                                    badgeClassThird =
+                                                        "bg-yellow-300 text-white";
+                                                    titleThird =
+                                                        "Need Revision";
+                                                } else if (
+                                                    third_approval_status === 4
+                                                ) {
+                                                    badgeClassThird =
+                                                        "bg-red-100 text-red-700";
+                                                    titleThird = "Reject";
+                                                }
+
+                                                return (
+                                                    <div className="flex flex-col">
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClass
+                                                                }
+                                                                title={title}
+                                                                body={
+                                                                    params.value
                                                                 }
                                                             />
-                                                        }
-                                                    />
-                                                </tr>
-                                            )
-                                        )
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                        <Pagination
-                            links={reimburse.links}
-                            fromData={reimburse.from}
-                            toData={reimburse.to}
-                            totalData={reimburse.totalAmount}
-                            clickHref={(url: string) =>
-                                getReimburse(url.split("?").pop())
-                            }
+                                                        </div>
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClassSecond
+                                                                }
+                                                                title={
+                                                                    titleSecond
+                                                                }
+                                                                body={
+                                                                    second_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <BadgeFlat
+                                                                className={
+                                                                    badgeClassThird
+                                                                }
+                                                                title={
+                                                                    titleThird
+                                                                }
+                                                                body={
+                                                                    third_approval_user
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            },
+                                        },
+                                        {
+                                            headerName: "Status",
+                                            flex: 2,
+                                            filter: "agSetColumnFilter",
+                                            filterParams: {
+                                                values: ["Execute", "Pending"],
+                                            },
+                                            cellRenderer: (params: any) => {
+                                                const paramsData = params.data;
+                                                const status =
+                                                    paramsData?.REIMBURSE_SECOND_APPROVAL_STATUS ===
+                                                    6
+                                                        ? "Execute"
+                                                        : "Pending";
+
+                                                return (
+                                                    <>
+                                                        <BadgeFlat
+                                                            className={
+                                                                status ===
+                                                                "Execute"
+                                                                    ? "bg-green-100 text-green-700"
+                                                                    : "bg-yellow-300 text-white"
+                                                            }
+                                                            title={status}
+                                                            body={status}
+                                                        />
+                                                    </>
+                                                );
+                                            },
+                                        },
+                                    ],
+                                },
+                                {
+                                    headerName: "Action",
+                                    field: "",
+                                    flex: 2,
+                                    autoHeight: true,
+                                    cellRenderer: (params: any) => {
+                                        return (
+                                            <>
+                                                <select
+                                                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 cursor-pointer"
+                                                    onChange={(e) =>
+                                                        handleSelectChange(
+                                                            e,
+                                                            params.data
+                                                                .REIMBURSE_ID
+                                                        )
+                                                    }
+                                                >
+                                                    <option value="">
+                                                        Actions
+                                                    </option>
+                                                    <option value="approve">
+                                                        Approve
+                                                    </option>
+                                                    <option value="revised">
+                                                        Revised
+                                                    </option>
+                                                    <option value="execute">
+                                                        Execute
+                                                    </option>
+                                                </select>
+                                            </>
+                                        );
+                                    },
+                                },
+                            ]}
                         />
-                    </div>
-                </div>
-            </div>
+                    </>
+                }
+            />
             {/* Content End */}
         </AuthenticatedLayout>
     );

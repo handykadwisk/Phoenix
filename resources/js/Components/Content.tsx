@@ -1,29 +1,23 @@
 export default function Content(props: any) {
-    const { buttonOnAction, search, th, td, pagination } = props;
+    const { buttonOnAction, search, buttonSearch, dataList } = props;
     return (
         <>
-            <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-4 mb-5 mt-5">
+            <div className="grid grid-cols-4 gap-4 px-4 py-2 xs:grid xs:grid-cols-1 xs:gap-0 lg:grid lg:grid-cols-4 lg:gap-4">
                 <div className="flex flex-col">
-                    <div className="rounded-md bg-white pt-5 pb-1 px-10 shadow-default dark:border-strokedark dark:bg-boxdark">
+                    <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         {buttonOnAction}
                     </div>
-                    <div className="bg-white rounded-md mb-5 lg:mb-0 p-10 mt-5">
-                        <fieldset className="py-3 rounded-lg border-slate-100 border-2">
-                            <legend className="ml-8 text-sm">Search</legend>
-                            <div className="mt-3 px-4">{search}</div>
-                        </fieldset>
+                    <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
+                        {search}
+                        {/* <div className="flex flex-col md:flex-row justify-end gap-2"> */}
+                        {buttonSearch}
+                        {/* </div> */}
                     </div>
                 </div>
-                <div className="bg-white rounded-md col-span-2 p-10">
-                    <div
-                        className={`max-w-full overflow-x-auto ring-1 ring-stone-200 shadow-xl rounded-lg custom-table overflow-visible`}
-                    >
-                        <table className="min-w-full divide-y divide-gray-300">
-                            <thead className="bg-gray-100">{th}</thead>
-                            <tbody>{td}</tbody>
-                        </table>
+                <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
+                    <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
+                        {dataList}
                     </div>
-                    {pagination}
                 </div>
             </div>
         </>

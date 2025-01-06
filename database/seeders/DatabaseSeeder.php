@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
             RCashAdvanceStatusSeeder::class,
             RCurrencySeeder::class,
             RJournalTypeSeeder::class,
+            RPaymentTypeSeeder::class,
             RReimburseNotesSeeder::class
         ]);
 
@@ -645,11 +646,12 @@ class DatabaseSeeder extends Seeder
             file_get_contents($file_path19)
         );
 
-        $file_path20 = resource_path('../database/LogDB/2024_07_31_m_role_access_menu.sql');
+        // $file_path20 = resource_path('../database/LogDB/2024_07_31_m_role_access_menu.sql');
 
-        DB::unprepared(
-            file_get_contents($file_path20)
-        );
+        // DB::unprepared(
+        //     file_get_contents($file_path20)
+        // );
+
         // create 2024_16_05_r_salutation
         $r_salutation = resource_path('../database/LogDB/2024_16_05_r_salutation.sql');
 

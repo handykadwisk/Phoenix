@@ -25,6 +25,9 @@ class CashAdvanceReport extends Model
         'cash_advance_detail_report',
         'cash_advance_difference',
         'cash_advance_method',
+        'division',
+        'cost_center',
+        'office',
         'employee',
         'employee_used_by',
         'employee_approval',
@@ -57,6 +60,21 @@ class CashAdvanceReport extends Model
     public function cash_advance_method(): BelongsTo
     {
         return $this->belongsTo(RCashAdvanceMethod::class, 'REPORT_CASH_ADVANCE_METHOD');
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(TCompanyDivision::class, 'REPORT_CASH_ADVANCE_DIVISION');
+    }
+
+    public function cost_center(): BelongsTo
+    {
+        return $this->belongsTo(TCompanyDivision::class, 'REPORT_CASH_ADVANCE_COST_CENTER');
+    }
+
+    public function office(): BelongsTo
+    {
+        return $this->belongsTo(TCompanyOffice::class, 'REPORT_CASH_ADVANCE_BRANCH');
     }
 
     public function employee(): BelongsTo
