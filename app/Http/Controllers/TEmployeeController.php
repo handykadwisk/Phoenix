@@ -14,6 +14,7 @@ use App\Models\TEmployeeCertificate;
 use App\Models\TEmployeeContact;
 use App\Models\TEmployeeEducation;
 use App\Models\TEmployeeEmergencyContact;
+use App\Models\TEmployeeFamilyMember;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -106,7 +107,8 @@ class TEmployeeController extends Controller
         return response()->json($data);
     }
 
-    public function getAllEmployeeJson(){
+    public function getAllEmployeeJson()
+    {
         $data = TEmployee::all();
         return response()->json($data);
     }
@@ -180,6 +182,18 @@ class TEmployeeController extends Controller
             }
         }
 
+        // created emergency contact
+        if (is_countable($request->family_member)) {
+            // Created Mapping Relation AKA
+            for ($i = 0; $i < sizeof($request->family_member); $i++) {
+                TEmployeeFamilyMember::create([
+                    "EMPLOYEE_ID" => $employee->EMPLOYEE_ID,
+                    "EMPLOYEE_FAMILY_MEMBER_NAME" => $request->family_member[$i]["NAME_FAMILY_MEMBER"],
+                    "EMPLOYEE_RELATIONSHIP_ID" => $request->family_member[$i]["FAMILY_MEMBER"]
+                ]);
+            }
+        }
+
         // Created Log
         UserLog::create([
             "created_by" => Auth::user()->id,
@@ -201,7 +215,7 @@ class TEmployeeController extends Controller
 
     public function get_employeeById(Request $request)
     {
-        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->with('office')->with('structure')->with('divisionCompany')->where('EMPLOYEE_ID', $request->idEmployee)->first();
+        $data = TEmployee::with('Company')->with('MEmploymentContact')->with('TEmploymentEmergency')->with('TEmploymentFamilyMember')->with('mAddressEmployee')->with('TEmployeeBank')->with('Document')->with('office')->with('structure')->with('divisionCompany')->where('EMPLOYEE_ID', $request->idEmployee)->first();
         return response()->json($data);
     }
 
@@ -283,6 +297,25 @@ class TEmployeeController extends Controller
                 ]);
             }
         }
+
+        // for family member
+        $contactEmergency = TEmployeeFamilyMember::where('EMPLOYEE_ID', $request->EMPLOYEE_ID)->get();
+        if ($contactEmergency->count() > 0) { //jika ada delete data sebelumnya
+            TEmployeeFamilyMember::where('EMPLOYEE_ID', $request->EMPLOYEE_ID)->delete();
+        }
+
+        // created emergency contact
+        if (is_countable($request->t_employment_family_member)) {
+            // Created Mapping Relation AKA
+            for ($i = 0; $i < sizeof($request->t_employment_family_member); $i++) {
+                TEmployeeFamilyMember::create([
+                    "EMPLOYEE_ID" => $request->EMPLOYEE_ID,
+                    "EMPLOYEE_FAMILY_MEMBER_NAME" => $request->t_employment_family_member[$i]["EMPLOYEE_FAMILY_MEMBER_NAME"],
+                    "EMPLOYEE_RELATIONSHIP_ID" => $request->t_employment_family_member[$i]["EMPLOYEE_RELATIONSHIP_ID"]
+                ]);
+            }
+        }
+        // end for family member
 
         // Created Log
         UserLog::create([
