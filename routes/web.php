@@ -38,6 +38,7 @@ use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RelationController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleAccesMenuController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\RUserTypeController;
@@ -707,6 +708,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/getReminderStart', [TReminderController::class, 'get_reminder_start'])->name('getReminderStart.get_reminder_start');
     Route::post('/getReminderEnd', [TReminderController::class, 'get_reminder_end'])->name('getReminderEnd.get_reminder_end');
     Route::post('/getCekDetailReminder', [TReminderController::class, 'get_detail_reminder_new'])->name('getCekDetailReminder.get_detail_reminder_new');
+
+
+    // Report
+    Route::get('/reportRelation', [ReportController::class, 'index'])->name('reportRelation');
+    Route::post('/exportReportRelation', [ReportController::class, 'excelReportRelation'])->name('exportReportRelation.excelReportRelation');
 });
 
 require __DIR__ . '/auth.php';

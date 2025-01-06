@@ -112,6 +112,12 @@ export default function DetailEmployee({
                 EMPLOYEE_RELATIONSHIP_ID: "",
             },
         ],
+        t_employment_family_member: [
+            {
+                EMPLOYEE_FAMILY_MEMBER_NAME: "",
+                EMPLOYEE_RELATIONSHIP_ID: "",
+            },
+        ],
     });
 
     // const [structure, setStructure] = useState<any>([]);
@@ -145,6 +151,20 @@ export default function DetailEmployee({
                 {
                     EMPLOYEE_EMERGENCY_CONTACT_NAME: "",
                     EMPLOYEE_EMERGENCY_CONTACT_NUMBER: "",
+                    EMPLOYEE_RELATIONSHIP_ID: "",
+                },
+            ],
+        });
+    };
+
+    const addRowFamilyMember = (e: FormEvent) => {
+        e.preventDefault();
+        setDataEditEmployment({
+            ...dataEditEmployment,
+            t_employment_family_member: [
+                ...dataEditEmployment.t_employment_family_member,
+                {
+                    EMPLOYEE_FAMILY_MEMBER_NAME: "",
                     EMPLOYEE_RELATIONSHIP_ID: "",
                 },
             ],
@@ -190,6 +210,21 @@ export default function DetailEmployee({
         setDataEditEmployment({
             ...dataEditEmployment,
             t_employment_emergency: changeVal,
+        });
+    };
+
+    const inputFamilyMember = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [
+            ...dataEditEmployment.t_employment_family_member,
+        ];
+        changeVal[i][name] = value;
+        setDataEditEmployment({
+            ...dataEditEmployment,
+            t_employment_family_member: changeVal,
         });
     };
 
@@ -406,6 +441,7 @@ export default function DetailEmployee({
         document: false,
         search: false,
     });
+
     const handleBankAccount = async (e: FormEvent) => {
         e.preventDefault();
 
@@ -430,6 +466,10 @@ export default function DetailEmployee({
                 search: false,
             });
         }
+    };
+
+    const handleFamilyMember = async (e: FormEvent) => {
+        e.preventDefault();
     };
 
     const handleSuccess = (message: string) => {
@@ -1056,6 +1096,164 @@ export default function DetailEmployee({
                                     <thead className="border-slate-300 bg-slate-300">
                                         <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
                                             <th
+                                                className="py-2 px-2 text-black"
+                                                colSpan={4}
+                                            >
+                                                Family Member
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {dataEditEmployment
+                                            .t_employment_family_member
+                                            ?.length !== 0 ? (
+                                            <>
+                                                {dataEditEmployment.t_employment_family_member?.map(
+                                                    (cm: any, i: number) => {
+                                                        return (
+                                                            <tr key={i}>
+                                                                <td className="py-3 px-2">
+                                                                    <span className="text-sm">
+                                                                        Family
+                                                                        Member{" "}
+                                                                        {/* {i + 1} */}
+                                                                    </span>
+                                                                    <TextInput
+                                                                        type="text"
+                                                                        value={
+                                                                            cm.EMPLOYEE_FAMILY_MEMBER_NAME
+                                                                        }
+                                                                        className="mt-1"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputFamilyMember(
+                                                                                "EMPLOYEE_FAMILY_MEMBER_NAME",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                        required
+                                                                        placeholder="Name *"
+                                                                    />
+                                                                </td>
+                                                                <td className="py-3 px-2">
+                                                                    <select
+                                                                        className="mt-7 rounded-md border-0 py-1.5 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 w-full"
+                                                                        value={
+                                                                            cm.EMPLOYEE_RELATIONSHIP_ID
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputFamilyMember(
+                                                                                "EMPLOYEE_RELATIONSHIP_ID",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                        required
+                                                                    >
+                                                                        <option
+                                                                            value={
+                                                                                ""
+                                                                            }
+                                                                        >
+                                                                            --
+                                                                            Employee
+                                                                            Relationship
+                                                                            --
+                                                                        </option>
+                                                                        {dataRelationship
+                                                                            ?.filter(
+                                                                                (
+                                                                                    m: any
+                                                                                ) =>
+                                                                                    m.PERSON_RELATIONSHIP_ID ===
+                                                                                        12 ||
+                                                                                    m.PERSON_RELATIONSHIP_ID ===
+                                                                                        13 ||
+                                                                                    m.PERSON_RELATIONSHIP_ID ===
+                                                                                        16
+                                                                            )
+                                                                            .map(
+                                                                                (
+                                                                                    getPersonRelation: any,
+                                                                                    i: number
+                                                                                ) => {
+                                                                                    return (
+                                                                                        <option
+                                                                                            key={
+                                                                                                i
+                                                                                            }
+                                                                                            value={
+                                                                                                getPersonRelation.PERSON_RELATIONSHIP_ID
+                                                                                            }
+                                                                                        >
+                                                                                            {
+                                                                                                getPersonRelation.PERSON_RELATIONSHIP_NAME
+                                                                                            }
+                                                                                        </option>
+                                                                                    );
+                                                                                }
+                                                                            )}
+                                                                    </select>
+                                                                </td>
+                                                                <td className="w-1">
+                                                                    <XMarkIcon
+                                                                        className="w-7 mt-7 text-red-600 hover:cursor-pointer"
+                                                                        onClick={() => {
+                                                                            const updatedData =
+                                                                                dataEditEmployment.t_employment_family_member.filter(
+                                                                                    (
+                                                                                        data: any,
+                                                                                        a: number
+                                                                                    ) =>
+                                                                                        a !==
+                                                                                        i
+                                                                                );
+                                                                            setDataEditEmployment(
+                                                                                {
+                                                                                    ...dataEditEmployment,
+                                                                                    t_employment_family_member:
+                                                                                        updatedData,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    }
+                                                )}
+                                            </>
+                                        ) : null}
+                                        <tr>
+                                            <td>
+                                                <a
+                                                    className="px-2 py-2 text-xs cursor-pointer text-black"
+                                                    onClick={(e) =>
+                                                        addRowFamilyMember(e)
+                                                    }
+                                                >
+                                                    <span className="hover:underline hover:decoration-from-font">
+                                                        + Add Family Number
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="mt-2">
+                                <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
+                                    <thead className="border-slate-300 bg-slate-300">
+                                        <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                            <th
                                                 className="py-2 px-2 text-slate-900-700"
                                                 colSpan={3}
                                             >
@@ -1194,7 +1392,7 @@ export default function DetailEmployee({
                                                                             e
                                                                         ) =>
                                                                             inputContactEmergency(
-                                                                                "NAME_CONTACT_EMERGENCY",
+                                                                                "EMPLOYEE_EMERGENCY_CONTACT_NAME",
                                                                                 e
                                                                                     .target
                                                                                     .value,
@@ -1216,7 +1414,7 @@ export default function DetailEmployee({
                                                                             e
                                                                         ) =>
                                                                             inputContactEmergency(
-                                                                                "PHONE_CONTACT_EMERGENCY",
+                                                                                "EMPLOYEE_EMERGENCY_CONTACT_NUMBER",
                                                                                 e
                                                                                     .target
                                                                                     .value,
@@ -1237,7 +1435,7 @@ export default function DetailEmployee({
                                                                             e
                                                                         ) =>
                                                                             inputContactEmergency(
-                                                                                "PERSON_RELATIONSHIP",
+                                                                                "EMPLOYEE_RELATIONSHIP_ID",
                                                                                 e
                                                                                     .target
                                                                                     .value,
@@ -1729,8 +1927,64 @@ export default function DetailEmployee({
                     </div>
                     <hr className="mt-5" />
                     <div>
-                        <div className="grid grid-cols-3 gap-4 mt-1">
-                            <div className="p-2 grid grid-cols-3 gap-2 relative">
+                        <div className="font-semibold text-red-600">
+                            <span>Family Member</span>
+                        </div>
+                        {dataDetailEmployee.t_employment_family_member
+                            ?.length === 0 ? (
+                            "-"
+                        ) : (
+                            <>
+                                <div className="grid grid-cols-4 gap-2 divide-x">
+                                    {dataDetailEmployee.t_employment_family_member?.map(
+                                        (cm: any, i: number) => {
+                                            return (
+                                                <div key={i} className="px-2">
+                                                    <div className="flex justify-between mt-2">
+                                                        <div className="relative text-sm text-gray-500">
+                                                            <span>
+                                                                <UserIcon className="w-4 absolute" />
+                                                            </span>
+                                                            <span className="ml-7">
+                                                                {
+                                                                    cm.EMPLOYEE_FAMILY_MEMBER_NAME
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-between mt-3">
+                                                        <div className="relative text-sm text-gray-500">
+                                                            <span>
+                                                                <UsersIcon className="w-4 absolute" />
+                                                            </span>
+                                                            <span className="ml-7">
+                                                                {
+                                                                    cm
+                                                                        .employment_relationship
+                                                                        ?.PERSON_RELATIONSHIP_NAME
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {/* {i !==
+                                                    dataDetailEmployee
+                                                        .t_employment_family_member
+                                                        ?.length -
+                                                        1 ? (
+                                                        <hr className="mt-2" />
+                                                    ) : null} */}
+                                                </div>
+                                            );
+                                        }
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                    <hr className="mt-5" />
+                    <div>
+                        <div className="grid grid-cols-3 gap-1 mt-1">
+                            <div className="p-2 grid grid-cols-3 gap-1 relative">
                                 <div className="flex justify-center">
                                     <UserGroupIcon className="w-12 text-red-600" />
                                 </div>
@@ -1738,7 +1992,7 @@ export default function DetailEmployee({
                                     <div className="absolute">
                                         <span>Structure</span>
                                     </div>
-                                    <div className="mt-7 text-[13px] text-gray-500">
+                                    <div className="mt-7 text-[12px] text-gray-500">
                                         <span className="">
                                             {dataDetailEmployee.STRUCTURE_ID ===
                                             null
@@ -1749,7 +2003,7 @@ export default function DetailEmployee({
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-2 grid grid-cols-3 gap-2 relative">
+                            <div className="p-2 grid grid-cols-3 gap-1 relative">
                                 <div className="flex justify-center">
                                     <IdentificationIcon className="w-12 text-red-600" />
                                 </div>
@@ -1757,7 +2011,7 @@ export default function DetailEmployee({
                                     <div className="absolute">
                                         <span>Division</span>
                                     </div>
-                                    <div className="mt-8 text-[13px] text-gray-500">
+                                    <div className="mt-8 text-[12px] text-gray-500">
                                         <span className="">
                                             {dataDetailEmployee.DIVISION_ID ===
                                             null
@@ -1769,7 +2023,7 @@ export default function DetailEmployee({
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-2 grid grid-cols-3 gap-2 relative">
+                            <div className="p-2 grid grid-cols-3 gap-1 relative">
                                 <div className="flex justify-center">
                                     <MapIcon className="w-12 text-red-600" />
                                 </div>
@@ -1777,7 +2031,7 @@ export default function DetailEmployee({
                                     <div className="absolute">
                                         <span>Address & Location</span>
                                     </div>
-                                    <div className="mt-8 text-[13px] text-gray-500">
+                                    <div className="mt-8 text-[12px] text-gray-500">
                                         <span className="">
                                             {dataDetailEmployee.OFFICE_ID ===
                                             null
@@ -1814,6 +2068,14 @@ export default function DetailEmployee({
                         >
                             <div className="flex justify-center items-center">
                                 <span>Bank Account</span>
+                            </div>
+                        </div>
+                        <div
+                            className="bg-red-600 text-white p-2 rounded-md shadow-md cursor-pointer hover:bg-red-500 hidden"
+                            onClick={(e) => handleFamilyMember(e)}
+                        >
+                            <div className="flex justify-center items-center">
+                                <span>Family Member</span>
                             </div>
                         </div>
                     </div>

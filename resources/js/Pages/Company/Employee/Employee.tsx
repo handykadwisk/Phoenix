@@ -97,6 +97,7 @@ export default function Employee({
         COMPANY_ID: idCompany,
         employee_contact: [],
         emergency_contact: [],
+        family_member: [],
     });
 
     const structureSelect = structure?.map((query: any) => {
@@ -122,11 +123,15 @@ export default function Employee({
 
     // state for relationship
     const [dataRelationship, setDataRelationship] = useState<any>([]);
+    const [dataRelationshipFamily, setDataRelationshipFamily] = useState<any>(
+        []
+    );
     const getPersonRelationship = async () => {
         await axios
             .get(`/getPersonRelationship`)
             .then((res) => {
                 setDataRelationship(res.data);
+                setDataRelationshipFamily(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -156,6 +161,17 @@ export default function Employee({
         ]);
     };
 
+    const addRowFamilyMember = (e: FormEvent) => {
+        e.preventDefault();
+        setData("family_member", [
+            ...data.family_member,
+            {
+                NAME_FAMILY_MEMBER: "",
+                FAMILY_MEMBER: "",
+            },
+        ]);
+    };
+
     const inputDataEmployeeContact = (
         name: string,
         value: string | undefined,
@@ -174,6 +190,16 @@ export default function Employee({
         const changeVal: any = [...data.emergency_contact];
         changeVal[i][name] = value;
         setData({ ...data, emergency_contact: changeVal });
+    };
+
+    const inputFamilyMember = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...data.family_member];
+        changeVal[i][name] = value;
+        setData({ ...data, family_member: changeVal });
     };
 
     const handleSuccessAddEmployee = (message: string) => {
@@ -242,8 +268,7 @@ export default function Employee({
     ) => {
         const changeVal: any = [...searchEmployee.company_employee];
         changeVal[i][name] = value;
-        console.log("changeVal", changeVal);
-        
+
         setSearchEmployee({ ...searchEmployee, company_employee: changeVal });
     };
 
@@ -613,6 +638,162 @@ export default function Employee({
                                                 className="py-2 px-2 text-slate-900-700"
                                                 colSpan={3}
                                             >
+                                                <span>Family Member</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.family_member?.length !== 0 ? (
+                                            <>
+                                                {data.family_member?.map(
+                                                    (cm: any, i: number) => {
+                                                        return (
+                                                            <tr key={i}>
+                                                                <td className="py-3 px-2">
+                                                                    <span className="text-sm">
+                                                                        Family
+                                                                        Member{" "}
+                                                                        {/* {i + 1} */}
+                                                                    </span>
+                                                                    <TextInput
+                                                                        type="text"
+                                                                        value={
+                                                                            cm.NAME_FAMILY_MEMBER
+                                                                        }
+                                                                        className="mt-1"
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputFamilyMember(
+                                                                                "NAME_FAMILY_MEMBER",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                        required
+                                                                        placeholder="Name *"
+                                                                    />
+                                                                </td>
+                                                                <td className="py-3 px-2">
+                                                                    <select
+                                                                        className="mt-7 rounded-md border-0 py-1.5 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6 w-full"
+                                                                        value={
+                                                                            cm.FAMILY_MEMBER
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            inputFamilyMember(
+                                                                                "FAMILY_MEMBER",
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                i
+                                                                            )
+                                                                        }
+                                                                        // required
+                                                                    >
+                                                                        <option
+                                                                            value={
+                                                                                ""
+                                                                            }
+                                                                        >
+                                                                            --
+                                                                            Family
+                                                                            Member
+                                                                            --
+                                                                        </option>
+                                                                        {dataRelationshipFamily
+                                                                            ?.filter(
+                                                                                (
+                                                                                    m: any
+                                                                                ) =>
+                                                                                    m.PERSON_RELATIONSHIP_ID ===
+                                                                                        12 ||
+                                                                                    m.PERSON_RELATIONSHIP_ID ===
+                                                                                        13 ||
+                                                                                    m.PERSON_RELATIONSHIP_ID ===
+                                                                                        16
+                                                                            )
+                                                                            .map(
+                                                                                (
+                                                                                    getPersonRelation: any,
+                                                                                    i: number
+                                                                                ) => {
+                                                                                    return (
+                                                                                        <option
+                                                                                            key={
+                                                                                                i
+                                                                                            }
+                                                                                            value={
+                                                                                                getPersonRelation.PERSON_RELATIONSHIP_ID
+                                                                                            }
+                                                                                        >
+                                                                                            {
+                                                                                                getPersonRelation.PERSON_RELATIONSHIP_NAME
+                                                                                            }
+                                                                                        </option>
+                                                                                    );
+                                                                                }
+                                                                            )}
+                                                                    </select>
+                                                                </td>
+                                                                <td className="w-1">
+                                                                    <XMarkIcon
+                                                                        className="w-7 mt-7 text-red-600 hover:cursor-pointer"
+                                                                        onClick={() => {
+                                                                            const updatedData =
+                                                                                data.family_member.filter(
+                                                                                    (
+                                                                                        data: any,
+                                                                                        a: number
+                                                                                    ) =>
+                                                                                        a !==
+                                                                                        i
+                                                                                );
+                                                                            setData(
+                                                                                {
+                                                                                    ...data,
+                                                                                    family_member:
+                                                                                        updatedData,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    />
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    }
+                                                )}
+                                            </>
+                                        ) : null}
+                                        <tr>
+                                            <td>
+                                                <a
+                                                    className="px-2 py-2 text-xs cursor-pointer"
+                                                    onClick={(e) =>
+                                                        addRowFamilyMember(e)
+                                                    }
+                                                >
+                                                    <span className="hover:underline hover:decoration-from-font">
+                                                        + Add Family Member
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="mt-4">
+                                <table className="w-full table-auto border border-slate-300 overflow-x-auto rounded-xl">
+                                    <thead className="border-slate-300 bg-slate-300">
+                                        <tr className="bg-gray-2 dark:bg-meta-4 text-sm">
+                                            <th
+                                                className="py-2 px-2 text-slate-900-700"
+                                                colSpan={3}
+                                            >
                                                 <span>Employee Contact</span>
                                             </th>
                                         </tr>
@@ -951,14 +1132,22 @@ export default function Employee({
                                 } else {
                                     inputDataSearch("flag", "", 0);
                                 }
-
-                                // setSearchRelation([
-                                //     ...searchRelation,
-                                //     {
-                                //         RELATION_ORGANIZATION_NAME:
-                                //             e.target.value,
-                                //     },
-                                // ])
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    if (
+                                        searchEmployee.company_employee[0]
+                                            .EMPLOYEE_FIRST_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
+                                }
                             }}
                             placeholder="Search Employee Name"
                         />

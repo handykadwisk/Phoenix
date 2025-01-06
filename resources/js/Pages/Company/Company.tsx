@@ -4,7 +4,7 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import Button from "@/Components/Button/Button";
 import TextInput from "@/Components/TextInput";
 import AGGrid from "@/Components/AgGrid";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import ModalToAdd from "@/Components/Modal/ModalToAdd";
 import InputLabel from "@/Components/InputLabel";
 import TextArea from "@/Components/TextArea";
@@ -70,6 +70,10 @@ export default function Company({ auth }: PageProps) {
             setTimeout(() => {
                 setIsSuccess("");
             }, 5000);
+            setRefreshGrid("success");
+            setTimeout(() => {
+                setRefreshGrid("");
+            }, 1000);
         }
     };
 
@@ -88,6 +92,41 @@ export default function Company({ auth }: PageProps) {
             add: false,
             view: !modalCompany.view,
         });
+    };
+
+    const [refreshGrid, setRefreshGrid] = useState<any>("");
+
+    // search company
+    const [searchCompany, setSearchCompany] = useState<any>({
+        company_search: [
+            {
+                COMPANY_NAME: "",
+                flag: "",
+            },
+        ],
+    });
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchCompany.company_search];
+        changeVal[i][name] = value;
+        setSearchCompany({
+            ...searchCompany,
+            company_search: changeVal,
+        });
+    };
+
+    const clearSearchCompany = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("COMPANY_NAME", "", 0);
+        inputDataSearch("flag", "", 0);
+        setRefreshGrid("success");
+        setTimeout(() => {
+            setRefreshGrid("");
+        }, 1000);
     };
 
     return (
@@ -398,18 +437,75 @@ export default function Company({ auth }: PageProps) {
                             type="text"
                             className="mt-2 ring-1 ring-red-600"
                             placeholder="Search Company Name"
+                            value={
+                                searchCompany.company_search[0].COMPANY_NAME ===
+                                ""
+                                    ? ""
+                                    : searchCompany.company_search[0]
+                                          .COMPANY_NAME
+                            }
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "COMPANY_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchCompany.company_search[0]
+                                        .COMPANY_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
+                                }
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    if (
+                                        searchCompany.company_search[0]
+                                            .COMPANY_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
+                                }
+                            }}
                         />
                         <div className="mt-4 flex justify-end gap-2">
-                            <div className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer">
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchCompany.company_search[0]
+                                            .COMPANY_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setRefreshGrid("success");
+                                    setTimeout(() => {
+                                        setRefreshGrid("");
+                                    }, 1000);
+                                }}
+                            >
                                 Search
                             </div>
-                            <div className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer">
+                            <div
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={(e) => clearSearchCompany(e)}
+                            >
                                 Clear Search
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                         {/* <KendoGrid dataResult={Company} /> */}
@@ -417,10 +513,10 @@ export default function Company({ auth }: PageProps) {
                             addButtonLabel={undefined}
                             addButtonModalState={undefined}
                             withParam={""}
-                            searchParam={null}
+                            searchParam={searchCompany.company_search}
                             url={"getCompany"}
                             doubleClickEvent={handleDetailCompany}
-                            triggeringRefreshData={isSuccess}
+                            triggeringRefreshData={refreshGrid}
                             colDefs={[
                                 {
                                     headerName: "No.",
