@@ -1244,72 +1244,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     readOnly
                                 />
                             </div>
-                            {/* <div className="w-full mb-1">
-                                <InputLabel
-                                    htmlFor="expenses_cost_center"
-                                    className="mb-2"
-                                >
-                                    Cost Center
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <Select
-                                    classNames={{
-                                        menuButton: () =>
-                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                        listItem: ({ isSelected }: any) =>
-                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                isSelected
-                                                    ? `text-white bg-red-600`
-                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                            }`,
-                                    }}
-                                    options={selectDivision}
-                                    isSearchable={true}
-                                    placeholder={"Choose Cost Center"}
-                                    value={data.expenses_cost_center}
-                                    onChange={(val: any) =>
-                                        setData({
-                                            ...data,
-                                            expenses_cost_center: val,
-                                        })
-                                    }
-                                    primaryColor={"bg-red-500"}
-                                />
-                            </div>
-                            <div className="w-full mb-1">
-                                <InputLabel
-                                    htmlFor="expenses_used_by"
-                                    className="mb-2"
-                                >
-                                    Used By
-                                    <span className="text-red-600">*</span>
-                                </InputLabel>
-                                <Select
-                                    classNames={{
-                                        menuButton: () =>
-                                            `flex text-sm text-gray-500 mt-4 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400 ring-1 ring-gray-300`,
-                                        menu: "absolute text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
-                                        listItem: ({ isSelected }: any) =>
-                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${
-                                                isSelected
-                                                    ? `text-white bg-red-600`
-                                                    : `text-gray-500 hover:bg-red-100 hover:text-black`
-                                            }`,
-                                    }}
-                                    options={selectEmployee}
-                                    isSearchable={true}
-                                    placeholder={"Choose Used By"}
-                                    value={data.expenses_used_by}
-                                    onChange={(val: any) =>
-                                        setData({
-                                            ...data,
-                                            expenses_used_by: val,
-                                        })
-                                    }
-                                    primaryColor={"bg-red-500"}
-                                />
-                            </div> */}
                             <div className="w-full mb-1">
                                 <InputLabel
                                     htmlFor="expenses_branch"
@@ -1487,15 +1421,18 @@ export default function CashAdvance({ auth }: PageProps) {
                                                             }
                                                             onChange={(
                                                                 date: any
-                                                            ) =>
+                                                            ) => {
                                                                 handleChangeRow(
                                                                     date.toLocaleDateString(
                                                                         "en-CA"
                                                                     ),
                                                                     "expenses_detail_due_date",
                                                                     i
-                                                                )
-                                                            }
+                                                                );
+                                                                console.log(
+                                                                    "aaa"
+                                                                );
+                                                            }}
                                                             dateFormat={
                                                                 "dd-MM-yyyy"
                                                             }
