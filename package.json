@@ -13,6 +13,7 @@
         "@types/dateformat": "^5.0.2",
         "@types/jquery": "^3.5.30",
         "@types/node": "^18.13.0",
+        "@types/qs": "^6.9.17",
         "@types/react": "^18.0.28",
         "@types/react-beautiful-dnd": "^13.1.8",
         "@types/react-dom": "^18.0.10",
