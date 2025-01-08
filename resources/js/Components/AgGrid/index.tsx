@@ -8,6 +8,7 @@ import "ag-grid-enterprise";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import axios from "axios";
+import { router } from "@inertiajs/react";
 // import "../../../css/style.css";
 
 export default function AGGrid({
@@ -45,9 +46,6 @@ export default function AGGrid({
     suppressCsvExport?: boolean;
     noRowsOverlayComponent?: boolean;
 }>) {
-    // console.log("searchParamAGGRid", searchParam);
-
-
     const gridRef = useRef<AgGridReact>(null);
     const getServerSideDatasource = (): IServerSideDatasource => {
         return {
@@ -78,11 +76,11 @@ export default function AGGrid({
                     }
                 }
 
-                let urlNew: string = "";
+                let urlNew: any = "";
 
                 if (withParam !== "") {
                     urlNew = `${url}?id=${withParam}`;
-                } else {
+                } else if (withParam === "") {
                     urlNew = `${url}?`;
                 }
 
@@ -91,7 +89,7 @@ export default function AGGrid({
 
                 axios
                     .get(
-                        `/${urlNew}&page=${page}&perPage=${
+                        `/${urlNew}page=${page}&perPage=${
                             endRow - startRow
                         }&sort=${sortParams}&filter=${JSON.stringify(
                             filterParams
@@ -108,12 +106,20 @@ export default function AGGrid({
                             params.api.hideOverlay();
                         }
                     })
-                    .catch((err) => console.log(err));
-
+                    .catch((err) => {
+                        if (
+                            err.status === 401 ||
+                            err.status === 403 ||
+                            err.status === 419
+                        ) {
+                            router.visit("/logout", { method: "post" });
+                        } else {
+                            console.log(err);
+                        }
+                    });
             },
         };
     };
-
 
     const onGridReady = (params: GridReadyEvent<any, any>) => {
         var dataSource = getServerSideDatasource();
@@ -157,44 +163,60 @@ export default function AGGrid({
         }
     }, [triggeringRefreshData]);
 
-    console.log("Trigger Refresh Data", triggeringRefreshData);
+    // console.log("Trigger Refresh Data", triggeringRefreshData);
 
     return (
         // <div className="rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
-        <div className="flex flex-row items-center h-[100%]">
-            {addButtonLabel && (
-                <div className="w-96">
-                    <Button
-                        className="text-sm w-full lg:w-1/2 font-semibold px-3 py-1.5 mb-4 md:col-span-2 text-white"
-                        onClick={() => addButtonModalState()}
-                    >
-                        {addButtonLabel}
-                    </Button>
-                </div>
+        <>
+            {buttonExcelExport && (
+                <button
+                    onClick={handleButtonExcelExport}
+                    className="border border-gray-200 hover:bg-gray-200 font-bold text-sm px-3 py-2 mb-5 rounded-md"
+                >
+                    Export to Excel
+                </button>
             )}
-            <div className="w-full h-[100%] overflow-x-auto ag-grid-table custom-scrollbar overflow-visible ag-theme-quartz">
-                <AgGridReact
-                    ref={gridRef}
-                    columnDefs={colDefs}
-                    getRowStyle={(params: any) => {
-                        if (params.node.rowIndex % 2 !== 0) {
-                            return {
-                                background: "#fafafb",
-                            };
-                        }
-                    }}
-                    suppressServerSideFullWidthLoadingRow={true}
-                    pagination={true}
-                    paginationPageSize={10}
-                    paginationAutoPageSize={true}
-                    cacheBlockSize={10}
-                    paginationPageSizeSelector={[1, 10, 25, 50, 100]}
-                    onGridReady={onGridReady}
-                    rowModelType="serverSide"
-                    onRowDoubleClicked={doubleClicked}
-                />
+            <div className="flex flex-row items-center h-[100%]">
+                {addButtonLabel && (
+                    <div className="w-96">
+                        <Button
+                            className="text-sm w-full lg:w-1/2 font-semibold px-3 py-1.5 mb-4 md:col-span-2 text-white"
+                            onClick={() => addButtonModalState()}
+                        >
+                            {addButtonLabel}
+                        </Button>
+                    </div>
+                )}
+                <div className="w-full h-[100%] overflow-x-auto ag-grid-table custom-scrollbar overflow-visible ag-theme-quartz">
+                    <AgGridReact
+                        ref={gridRef}
+                        columnDefs={colDefs}
+                        getRowStyle={(params: any) => {
+                            if (params.node.rowIndex % 2 !== 0) {
+                                return {
+                                    background: "#fafafb",
+                                };
+                            }
+                        }}
+                        suppressServerSideFullWidthLoadingRow={true}
+                        pagination={true}
+                        paginationPageSize={10}
+                        // paginationAutoPageSize={true}
+                        cacheBlockSize={10}
+                        paginationPageSizeSelector={[1, 10, 25, 50, 100]}
+                        onGridReady={onGridReady}
+                        rowModelType="serverSide"
+                        onRowDoubleClicked={doubleClicked}
+                        rowHeight={rowHeight}
+                        rowSelection={rowSelection}
+                        onSelectionChanged={handleRowSelectedChange}
+                        suppressRowClickSelection={suppressRowClickSelection}
+                        suppressCsvExport={suppressCsvExport}
+                        noRowsOverlayComponent={customNoRowsOverlayComponent}
+                    />
+                </div>
             </div>
-        </div>
+        </>
         // </div>
     );
 }

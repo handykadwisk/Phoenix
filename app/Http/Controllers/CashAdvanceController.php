@@ -389,41 +389,6 @@ class CashAdvanceController extends Controller
         return response()->json($data);
     }
 
-    public function RemoveSpecialChar($str)
-    {
-        $replace = Str::of($str)->replace(
-            [
-                '`',
-                '~',
-                ' ',
-                '!',
-                '@',
-                '#',
-                '$',
-                '%',
-                '^',
-                '&',
-                '*',
-                '(',
-                ')',
-                '+',
-                '=',
-                '<',
-                '>',
-                '{',
-                '}',
-                '[',
-                ']',
-                '?',
-                '/',
-                ':',
-                ';'
-            ],
-            '-'
-        );
-        return $replace;
-    }
-
     public function generateCashAdvanceNumber()
     {
         // Format kode
@@ -434,7 +399,7 @@ class CashAdvanceController extends Controller
         $currentMonth = date('n');
 
         // Cari kode terakhir dari tabel
-        $lastCode = CashAdvance::orderBy('CASH_ADVANCE_CREATED_AT', 'desc')->first();
+        $lastCode = CashAdvance::orderBy('CASH_ADVANCE_CREATED_DATE', 'desc')->first();
 
         // Inisialisasi nomor urut
         $nextNumber = 1;
@@ -540,7 +505,7 @@ class CashAdvanceController extends Controller
             $cash_advance_delivery_method_cash = $request->cash_advance_delivery_method_cash;
             $cash_advance_cash_amount = $request->cash_advance_cash_amount;
             $cash_advance_total_amount = $total_amount;
-            $cash_advance_created_at = now();
+            $cash_advance_created_date = now();
             $cash_advance_created_by = $user_id;
     
             // Insert CA
@@ -562,7 +527,7 @@ class CashAdvanceController extends Controller
                 'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
                 'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount,
                 'CASH_ADVANCE_TOTAL_AMOUNT' => $cash_advance_total_amount,
-                'CASH_ADVANCE_CREATED_AT' => $cash_advance_created_at,
+                'CASH_ADVANCE_CREATED_DATE' => $cash_advance_created_date,
                 'CASH_ADVANCE_CREATED_BY' => $cash_advance_created_by
             ])->CASH_ADVANCE_ID;
     
@@ -640,7 +605,7 @@ class CashAdvanceController extends Controller
                                 MCashAdvanceDocument::create([
                                     'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_ID' => $cash_advance_detail_id,
                                     'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_DOCUMENT_ID' => $document,
-                                    'CASH_ADVANCE_DOCUMENT_CREATED_AT' => now(),
+                                    'CASH_ADVANCE_DOCUMENT_CREATED_DATE' => now(),
                                     'CASH_ADVANCE_DOCUMENT_CREATED_BY' => $userId,
                                 ]);
                             }
@@ -817,7 +782,7 @@ class CashAdvanceController extends Controller
             $cash_advance_transfer_amount = $request->CASH_ADVANCE_TRANSFER_AMOUNT;
             $cash_advance_delivery_method_cash = $request->CASH_ADVANCE_DELIVERY_METHOD_CASH;
             $cash_advance_cash_amount = $request->CASH_ADVANCE_CASH_AMOUNT;
-            $cash_advance_updated_at = now();
+            $cash_advance_updated_date = now();
             $cash_advance_updated_by = $user_id;
     
             // Update data from table cash advance
@@ -830,7 +795,7 @@ class CashAdvanceController extends Controller
                 'CASH_ADVANCE_DELIVERY_METHOD_CASH' => $cash_advance_delivery_method_cash,
                 'CASH_ADVANCE_CASH_AMOUNT' => $cash_advance_cash_amount,
                 'CASH_ADVANCE_TOTAL_AMOUNT' => $cash_advance_total_amount,
-                'CASH_ADVANCE_UPDATED_AT' => $cash_advance_updated_at,
+                'CASH_ADVANCE_UPDATED_DATE' => $cash_advance_updated_date,
                 'CASH_ADVANCE_UPDATED_BY' => $cash_advance_updated_by
             ]);
     
@@ -916,7 +881,7 @@ class CashAdvanceController extends Controller
                                 MCashAdvanceDocument::create([
                                     'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_ID' => $cashAdvanceDetailId,
                                     'CASH_ADVANCE_DOCUMENT_CASH_ADVANCE_DETAIL_DOCUMENT_ID' => $document,
-                                    'CASH_ADVANCE_DOCUMENT_CREATED_AT' => now(),
+                                    'CASH_ADVANCE_DOCUMENT_CREATED_DATE' => now(),
                                     'CASH_ADVANCE_DOCUMENT_CREATED_BY' => $userId,
                                 ]);
                             }

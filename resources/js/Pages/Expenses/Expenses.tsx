@@ -59,9 +59,9 @@ export default function CashAdvance({ auth }: PageProps) {
         getExpensesNeedRevisionStatus();
         getExpensesRejectStatus();
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
 
@@ -184,9 +184,9 @@ export default function CashAdvance({ auth }: PageProps) {
             setIsSuccess("");
         }, 5000);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Handle Success End
@@ -1862,13 +1862,13 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                     .EXPENSES_DETAIL_ID
                                                             }/${
                                                                 file?.document
-                                                                    .DOCUMENT_ID
+                                                                    ?.DOCUMENT_ID
                                                             }`}
                                                             target="_blank"
                                                         >
                                                             {
                                                                 file?.document
-                                                                    .DOCUMENT_ORIGINAL_NAME
+                                                                    ?.DOCUMENT_ORIGINAL_NAME
                                                             }
                                                         </a>
                                                     </div>
@@ -1884,7 +1884,7 @@ export default function CashAdvance({ auth }: PageProps) {
                                                                 ]
                                                                     .EXPENSES_DETAIL_ID,
                                                                 file?.document
-                                                                    .DOCUMENT_ID
+                                                                    ?.DOCUMENT_ID
                                                             )
                                                         }
                                                     >
@@ -3371,7 +3371,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                         <TH className="border px-3 py-2">
                                             Document
                                         </TH>
-                                        {data.expensesDetail.length > 1 && (
+                                        {dataById.expenses_detail?.length >
+                                            1 && (
                                             <TH
                                                 label="Action"
                                                 className="border p-2"
@@ -4406,9 +4407,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4446,9 +4449,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4486,9 +4491,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4498,46 +4505,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                             </span>
                                         </Button>
                                     </div>
-                                    {/* <div className="flex relative">
-                                        <Button
-                                            className="w-36 bg-green-600 px-2 py-1 hover:bg-green-500"
-                                            onClick={() => {
-                                                inputDataSearch(
-                                                    "EXPENSES_APPROVAL_STATUS",
-                                                    "approve3",
-                                                    0
-                                                );
-                                                if (
-                                                    searchExpenses
-                                                        .expenses_search[0]
-                                                        .EXPENSES_APPROVAL_STATUS ===
-                                                    ""
-                                                ) {
-                                                    inputDataSearch(
-                                                        "flag",
-                                                        "flag",
-                                                        0
-                                                    );
-                                                } else {
-                                                    inputDataSearch(
-                                                        "flag",
-                                                        "",
-                                                        0
-                                                    );
-                                                }
-
-                                                setRefreshSuccess("success");
-                                                setTimeout(() => {
-                                                    setRefreshSuccess("");
-                                                }, 1000);
-                                            }}
-                                        >
-                                            Approve 3
-                                            <span className="flex absolute bg-red-600 -top-2 -right-3 px-2 rounded-full">
-                                                {getCountExpensesApprove3Status}
-                                            </span>
-                                        </Button>
-                                    </div> */}
                                     <div className="flex relative">
                                         <Button
                                             className="w-36 bg-yellow-400 px-2 py-1 hover:bg-yellow-300"
@@ -4566,9 +4533,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4608,9 +4577,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4648,9 +4619,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4672,7 +4645,7 @@ export default function CashAdvance({ auth }: PageProps) {
                             url={"getExpenses"}
                             doubleClickEvent={handleShowModal}
                             triggeringRefreshData={refreshSuccess}
-                            rowHeight={130}
+                            rowHeight={90}
                             noRowsOverlayComponent={true}
                             colDefs={[
                                 {
@@ -4919,7 +4892,6 @@ export default function CashAdvance({ auth }: PageProps) {
                                     headerName: "Action",
                                     field: "",
                                     flex: 2,
-                                    autoHeight: true,
                                     cellRenderer: (params: any) => {
                                         return (
                                             <>

@@ -115,9 +115,9 @@ export default function Receipt({ auth }: PageProps) {
                 setIsSuccess("");
             }, 5000);
 
-            setRefreshSuccess("success");
+            setRefreshSuccess("");
             setTimeout(() => {
-                setRefreshSuccess("");
+                setRefreshSuccess("success");
             }, 1000);
         }
     };
@@ -185,9 +185,9 @@ export default function Receipt({ auth }: PageProps) {
                             setIsSuccess("");
                         }, 5000);
 
-                        setRefreshSuccess("success");
+                        setRefreshSuccess("");
                         setTimeout(() => {
-                            setRefreshSuccess("");
+                            setRefreshSuccess("success");
                         }, 1000);
                     })
                     .catch((err) => console.log(err));

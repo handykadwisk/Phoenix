@@ -120,7 +120,7 @@ class CashAdvanceReportController extends Controller
         $currentMonth = date('n');
 
         // Cari kode terakhir dari tabel
-        $lastCode = CashAdvanceReport::orderBy('REPORT_CASH_ADVANCE_CREATED_AT', 'desc')->first();
+        $lastCode = CashAdvanceReport::orderBy('REPORT_CASH_ADVANCE_CREATED_DATE', 'desc')->first();
 
         // Inisialisasi nomor urut
         $nextNumber = 1;
@@ -256,7 +256,7 @@ class CashAdvanceReportController extends Controller
             $report_cash_advance_type = $type;
             $report_cash_advance_total_amount = $total_amount_report;
             $report_cash_advance_total_amount_request = $request->cash_advance_total_amount_request;
-            $report_cash_advance_created_at = now();
+            $report_cash_advance_created_date = now();
             $report_cash_advance_created_by = $user_id;
     
             // Insert Report CA
@@ -277,7 +277,7 @@ class CashAdvanceReportController extends Controller
                 'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount,
                 'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_REQUEST' => $report_cash_advance_total_amount_request,
                 'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT' => $report_cash_advance_total_amount_different,
-                'REPORT_CASH_ADVANCE_CREATED_AT' => $report_cash_advance_created_at,
+                'REPORT_CASH_ADVANCE_CREATED_DATE' => $report_cash_advance_created_date,
                 'REPORT_CASH_ADVANCE_CREATED_BY' => $report_cash_advance_created_by
             ])->REPORT_CASH_ADVANCE_ID;
     
@@ -361,7 +361,7 @@ class CashAdvanceReportController extends Controller
                                 MCashAdvanceReportDocument::create([
                                     'CASH_ADVANCE_DOCUMENT_REPORT_CASH_ADVANCE_DETAIL_ID' => $report_cash_advance_detail_id,
                                     'CASH_ADVANCE_DOCUMENT_REPORT_CASH_ADVANCE_DETAIL_DOCUMENT_ID' => $document,
-                                    'CASH_ADVANCE_DOCUMENT_CREATED_AT' => now(),
+                                    'CASH_ADVANCE_DOCUMENT_CREATED_DATE' => now(),
                                     'CASH_ADVANCE_DOCUMENT_CREATED_BY' => $userId,
                                 ]);
                             }
@@ -562,7 +562,7 @@ class CashAdvanceReportController extends Controller
             $report_cash_advance_total_amount = $total_amount_report;
             $report_cash_advance_first_approval_status = 1;
             $report_cash_advance_request_note = $request->REPORT_CASH_ADVANCE_REQUEST_NOTE;
-            $report_cash_advance_updated_at = now();
+            $report_cash_advance_updated_date = now();
             $report_cash_advance_updated_by = $user_id;
     
             CashAdvanceReport::where('REPORT_CASH_ADVANCE_ID', $report_cash_advance_id)->update([
@@ -571,7 +571,7 @@ class CashAdvanceReportController extends Controller
                 'REPORT_CASH_ADVANCE_TYPE' => $type,
                 'REPORT_CASH_ADVANCE_TOTAL_AMOUNT' => $report_cash_advance_total_amount,
                 'REPORT_CASH_ADVANCE_TOTAL_AMOUNT_DIFFERENT' => $report_cash_advance_total_amount_different,
-                'REPORT_CASH_ADVANCE_UPDATED_AT' => $report_cash_advance_updated_at,
+                'REPORT_CASH_ADVANCE_UPDATED_DATE' => $report_cash_advance_updated_date,
                 'REPORT_CASH_ADVANCE_UPDATED_BY' => $report_cash_advance_updated_by
             ]);
     
@@ -654,7 +654,7 @@ class CashAdvanceReportController extends Controller
                                 MCashAdvanceReportDocument::create([
                                     'CASH_ADVANCE_DOCUMENT_REPORT_CASH_ADVANCE_DETAIL_ID' => $cashAdvanceDetailReportId,
                                     'CASH_ADVANCE_DOCUMENT_REPORT_CASH_ADVANCE_DETAIL_DOCUMENT_ID' => $document,
-                                    'CASH_ADVANCE_DOCUMENT_CREATED_AT' => now(),
+                                    'CASH_ADVANCE_DOCUMENT_CREATED_DATE' => now(),
                                     'CASH_ADVANCE_DOCUMENT_CREATED_BY' => $userId,
                                 ]);
                             }
@@ -774,7 +774,7 @@ class CashAdvanceReportController extends Controller
                         MCashAdvanceProofOfDocument::create([
                             'CASH_ADVANCE_PROOF_OF_DOCUMENT_REPORT_CASH_ADVANCE_ID' => $report_cash_advance_id,
                             'CASH_ADVANCE_PROOF_OF_DOCUMENT_REPORT_CASH_ADVANCE_DOCUMENT_ID' => $document,
-                            'CASH_ADVANCE_PROOF_OF_DOCUMENT_CREATED_AT' => now(),
+                            'CASH_ADVANCE_PROOF_OF_DOCUMENT_CREATED_DATE' => now(),
                             'CASH_ADVANCE_PROOF_OF_DOCUMENT_CREATED_BY' => $userId,
                         ]);
                     }

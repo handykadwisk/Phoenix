@@ -75,9 +75,9 @@ export default function CashAdvance({ auth }: PageProps) {
         getCAApproval();
         getCAMethod();
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
 
@@ -298,9 +298,9 @@ export default function CashAdvance({ auth }: PageProps) {
             setIsSuccess("");
         }, 5000);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Handle Success End
@@ -2301,25 +2301,28 @@ export default function CashAdvance({ auth }: PageProps) {
         return count > 0 ? count - 1 : 0;
     };
 
-    const calculateDate = (requestedDate: any) => {
+    const calculateDate = (
+        requestedDate: any,
+        textAlign: string = "center"
+    ) => {
         if (!requestedDate) {
             // console.error("Requested date is missing in params.data");
-            return { textAlign: "center" };
+            return { textAlign: textAlign };
         }
 
         const days = calculateBusinessDays(requestedDate, new Date());
         if (days > 3) {
             return {
                 backgroundColor: "#fcd9d9",
-                textAlign: "center",
+                textAlign: textAlign,
             };
         } else if (days > 1) {
             return {
                 backgroundColor: "yellow",
-                textAlign: "center",
+                textAlign: textAlign,
             };
         } else {
-            return { textAlign: "center" };
+            return { textAlign: textAlign };
         }
     };
 
@@ -10167,9 +10170,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10207,9 +10212,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10247,9 +10254,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10287,9 +10296,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10327,9 +10338,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10367,9 +10380,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10407,9 +10422,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10460,9 +10477,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10500,9 +10519,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10540,9 +10561,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10580,9 +10603,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10620,9 +10645,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10662,9 +10689,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10702,9 +10731,11 @@ export default function CashAdvance({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -10819,7 +10850,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 return calculateDate(
                                                     params.data
                                                         ?.cash_advance_detail[0]
-                                                        ?.CASH_ADVANCE_DETAIL_END_DATE
+                                                        ?.CASH_ADVANCE_DETAIL_END_DATE,
+                                                    "left"
                                                 );
                                             },
                                             cellRenderer: (params: any) => {
@@ -11030,7 +11062,8 @@ export default function CashAdvance({ auth }: PageProps) {
                                                 return calculateDate(
                                                     params.data
                                                         ?.cash_advance_detail[0]
-                                                        ?.CASH_ADVANCE_DETAIL_END_DATE
+                                                        ?.CASH_ADVANCE_DETAIL_END_DATE,
+                                                    "left"
                                                 );
                                             },
                                             cellRenderer: (params: any) => {

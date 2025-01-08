@@ -10,7 +10,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 export default function ModalToAction({
     show = false,
     closeable = true,
-    onClose = () => { },
+    onClose = () => {},
     title,
     body,
     url,
@@ -59,11 +59,11 @@ export default function ModalToAction({
     };
 
     const callAxios = axios.create({
-        headers
-    })
+        headers,
+    });
 
     const action = async (e: any) => {
-        e.preventDefault()
+        e.preventDefault();
 
         setIsProcessing(true);
         onSuccess("");
@@ -162,9 +162,9 @@ export default function ModalToAction({
                                             {isError && (
                                                 <Alert body={isError} />
                                             )}
-                                            <div className="max-h-full">
+                                            <div className="h-[100%]">
                                                 <div
-                                                    className="max-h-[25rem] overflow-y-auto custom-scrollbar px-2"
+                                                    className="overflow-y-auto custom-scrollbar px-2"
                                                     ref={modalRef}
                                                 >
                                                     {body}

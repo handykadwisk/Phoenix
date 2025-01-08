@@ -116,9 +116,9 @@ export default function BankTransaction({ auth }: PageProps) {
             setIsSuccess("");
         }, 5000);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Handle Success End
@@ -325,9 +325,9 @@ export default function BankTransaction({ auth }: PageProps) {
                             setIsSuccess("");
                         }, 5000);
 
-                        setRefreshSuccess("success");
+                        setRefreshSuccess("");
                         setTimeout(() => {
-                            setRefreshSuccess("");
+                            setRefreshSuccess("success");
                         }, 1000);
                     })
                     .catch(function (error) {

@@ -251,7 +251,7 @@ class ReimburseController extends Controller
         $currentMonth = date('n');
 
         // Cari kode terakhir dari tabel
-        $lastCode = Reimburse::orderBy('REIMBURSE_CREATED_AT', 'desc')->first();
+        $lastCode = Reimburse::orderBy('REIMBURSE_CREATED_DATE', 'desc')->first();
 
         // Inisialisasi nomor urut
         $nextNumber = 1;
@@ -382,7 +382,7 @@ class ReimburseController extends Controller
             $reimburse_first_approval_status = 1;
             $reimburse_request_note = $request->reimburse_request_note;
             $reimburse_total_amount = $request->reimburse_total_amount;
-            $reimburse_created_at = now();
+            $reimburse_created_date = now();
             $reimburse_created_by = $user_id;
 
             // Insert Reimburse
@@ -399,7 +399,7 @@ class ReimburseController extends Controller
                 'REIMBURSE_FIRST_APPROVAL_STATUS' => $reimburse_first_approval_status,
                 'REIMBURSE_REQUEST_NOTE' => $reimburse_request_note,
                 'REIMBURSE_TOTAL_AMOUNT' => $reimburse_total_amount,
-                'REIMBURSE_CREATED_AT' => $reimburse_created_at,
+                'REIMBURSE_CREATED_DATE' => $reimburse_created_date,
                 'REIMBURSE_CREATED_BY' => $reimburse_created_by
             ])->REIMBURSE_ID;
 
@@ -479,7 +479,7 @@ class ReimburseController extends Controller
                                 MReimburseDocument::create([
                                     'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_ID' => $reimburse_detail_id,
                                     'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_DOCUMENT_ID' => $document,
-                                    'REIMBURSE_DOCUMENT_CREATED_AT' => now(),
+                                    'REIMBURSE_DOCUMENT_CREATED_DATE' => now(),
                                     'REIMBURSE_DOCUMENT_CREATED_BY' => $userId,
                                 ]);
                             }
@@ -654,14 +654,14 @@ class ReimburseController extends Controller
             $reimburse_total_amount = $request->REIMBURSE_TOTAL_AMOUNT;
             $reimburse_first_approval_status = 1;
             $reimburse_request_note = $request->REIMBURSE_REQUEST_NOTE;
-            $reimburse_updated_at = now();
+            $reimburse_updated_date = now();
             $reimburse_updated_by = $user_id;
     
             Reimburse::where('REIMBURSE_ID', $reimburse_id)->update([
                 'REIMBURSE_FIRST_APPROVAL_STATUS' => $reimburse_first_approval_status,
                 'REIMBURSE_REQUEST_NOTE' => $reimburse_request_note,
                 'REIMBURSE_TOTAL_AMOUNT' => $reimburse_total_amount,
-                'REIMBURSE_UPDATED_AT' => $reimburse_updated_at,
+                'REIMBURSE_UPDATED_DATE' => $reimburse_updated_date,
                 'REIMBURSE_UPDATED_BY' => $reimburse_updated_by
             ]);
     
@@ -745,7 +745,7 @@ class ReimburseController extends Controller
                                 MReimburseDocument::create([
                                     'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_ID' => $reimburseDetailId,
                                     'REIMBURSE_DOCUMENT_REIMBURSE_DETAIL_DOCUMENT_ID' => $document,
-                                    'REIMBURSE_DOCUMENT_CREATED_AT' => now(),
+                                    'REIMBURSE_DOCUMENT_CREATED_DATE' => now(),
                                     'REIMBURSE_DOCUMENT_CREATED_BY' => $userId,
                                 ]);
                             }
@@ -865,7 +865,7 @@ class ReimburseController extends Controller
                         MReimburseProofOfDocument::create([
                             'REIMBURSE_PROOF_OF_DOCUMENT_REIMBURSE_ID' => $reimburse_id,
                             'REIMBURSE_PROOF_OF_DOCUMENT_REIMBURSE_DOCUMENT_ID' => $document,
-                            'REIMBURSE_PROOF_OF_DOCUMENT_CREATED_AT' => now(),
+                            'REIMBURSE_PROOF_OF_DOCUMENT_CREATED_DATE' => now(),
                             'REIMBURSE_PROOF_OF_DOCUMENT_CREATED_BY' => $userId,
                         ]);
                     }

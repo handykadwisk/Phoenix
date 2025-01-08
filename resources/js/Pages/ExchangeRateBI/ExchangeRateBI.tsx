@@ -285,9 +285,9 @@ export default function ExchangeRateController({ auth }: PageProps) {
             setIsSuccess("");
         }, 5000);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Handle Success End

@@ -55,9 +55,9 @@ export default function Reimburse({ auth }: PageProps) {
         getReimburseNotes();
         getReimburseMethod();
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
 
@@ -184,9 +184,9 @@ export default function Reimburse({ auth }: PageProps) {
             setIsSuccess("");
         }, 5000);
 
-        setRefreshSuccess("success");
+        setRefreshSuccess("");
         setTimeout(() => {
-            setRefreshSuccess("");
+            setRefreshSuccess("success");
         }, 1000);
     };
     // Handle Success End
@@ -4769,9 +4769,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4809,9 +4811,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4851,9 +4855,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4893,9 +4899,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4935,9 +4943,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -4977,9 +4987,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
@@ -5017,9 +5029,11 @@ export default function Reimburse({ auth }: PageProps) {
                                                     );
                                                 }
 
-                                                setRefreshSuccess("success");
+                                                setRefreshSuccess("");
                                                 setTimeout(() => {
-                                                    setRefreshSuccess("");
+                                                    setRefreshSuccess(
+                                                        "success"
+                                                    );
                                                 }, 1000);
                                             }}
                                         >
