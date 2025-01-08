@@ -216,6 +216,10 @@ export default function Address({
     };
 
     const clearSearchAddress = async (pageNumber = "page=1") => {
+        setSearchOffice({
+            ...searchOffice,
+            RELATION_OFFICE_ALIAS: "",
+        });
         await axios
             .post(`/getOffice?${pageNumber}`, {
                 idRelation,
@@ -610,8 +614,19 @@ export default function Address({
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchAddress()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={(e) => {
+                                    if (
+                                        searchOffice.RELATION_OFFICE_ALIAS !==
+                                        ""
+                                    ) {
+                                        getRelationOffice();
+                                        // setSearchOffice({
+                                        //     ...searchOffice,
+                                        //     RELATION_OFFICE_ALIAS: "",
+                                        // });
+                                    }
+                                }}
                             >
                                 Search
                             </div>

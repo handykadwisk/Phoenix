@@ -2458,6 +2458,19 @@ export default function DetailRelation({
                                     </div>
                                 )}
                             </div>
+                            <div className="col-span-2 ">
+                                <div className="font-semibold">
+                                    <span>Description</span>
+                                </div>
+                                <div className="text-sm text-gray-400">
+                                    <span className="font-normal">
+                                        {dataRelationNew.RELATION_ORGANIZATION_DESCRIPTION ===
+                                        null
+                                            ? "-"
+                                            : dataRelationNew.RELATION_ORGANIZATION_DESCRIPTION}
+                                    </span>
+                                </div>
+                            </div>
                             <div className="col-span-2 hidden">
                                 <div className="font-semibold">
                                     <span>Address & Location</span>

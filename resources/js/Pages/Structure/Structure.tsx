@@ -415,8 +415,19 @@ export default function Structure({
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                // onClick={() => clearSearchStructurer()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchStructure.RELATION_STRUCTURE_ALIAS !==
+                                        ""
+                                    ) {
+                                        getStructure();
+                                        setSearchStructure({
+                                            ...searchStructure,
+                                            RELATION_STRUCTURE_ALIAS: "",
+                                        });
+                                    }
+                                }}
                             >
                                 Search
                             </div>

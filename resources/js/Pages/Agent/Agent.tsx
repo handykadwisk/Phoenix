@@ -37,8 +37,16 @@ export default function Agent({ auth }: PageProps) {
     const [dataAgent, setDataAgent] = useState<any>([]);
     const [isSuccess, setIsSuccess] = useState<string>("");
     // for search agent
+    // const [searchAgent, setSearchAgent] = useState<any>({
+    //     RELATION_ORGANIZATION_NAME: "",
+    // });
     const [searchAgent, setSearchAgent] = useState<any>({
-        RELATION_ORGANIZATION_NAME: "",
+        relationAgent_search: [
+            {
+                RELATION_ORGANIZATION_NAME: "",
+                flag: "flag",
+            },
+        ],
     });
 
     // get data agent
@@ -57,21 +65,15 @@ export default function Agent({ auth }: PageProps) {
     };
 
     // for clear search
-    const clearSearchAgent = async (pageNumber = "page=1") => {
-        await axios
-            .post(`/getRelationAgent?${pageNumber}`, {
-                // idRelation,
-            })
-            .then((res) => {
-                setDataAgent([]);
-                setSearchAgent({
-                    ...searchAgent,
-                    RELATION_ORGANIZATION_NAME: "",
-                });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    const clearSearchAgent = async (e: FormEvent) => {
+        e.preventDefault();
+        inputDataSearch("RELATION_ORGANIZATION_NAME", "", 0);
+        inputDataSearch("RELATION_TYPE_ID", "", 0);
+        inputDataSearch("flag", "flag", 0);
+        setIsSuccess("success");
+        setTimeout(() => {
+            setIsSuccess("");
+        }, 1000);
     };
 
     // for modal
@@ -145,6 +147,16 @@ export default function Agent({ auth }: PageProps) {
             edit: false,
             view: true,
         });
+    };
+
+    const inputDataSearch = (
+        name: string,
+        value: string | undefined,
+        i: number
+    ) => {
+        const changeVal: any = [...searchAgent.relationAgent_search];
+        changeVal[i][name] = value;
+        setSearchAgent({ ...searchAgent, relationAgent_search: changeVal });
     };
 
     return (
@@ -268,36 +280,70 @@ export default function Agent({ auth }: PageProps) {
                     <div className="bg-white rounded-md shadow-md p-4 h-[100%] relative">
                         <TextInput
                             type="text"
-                            value={searchAgent.RELATION_ORGANIZATION_NAME}
-                            className="mt-2 ring-1 ring-red-600"
-                            onChange={(e) =>
-                                setSearchAgent({
-                                    ...searchAgent,
-                                    RELATION_ORGANIZATION_NAME: e.target.value,
-                                })
+                            value={
+                                searchAgent.relationAgent_search[0]
+                                    .RELATION_ORGANIZATION_NAME === ""
+                                    ? ""
+                                    : searchAgent.relationAgent_search[0]
+                                          .RELATION_ORGANIZATION_NAME
                             }
+                            className="mt-2 ring-1 ring-red-600"
+                            onChange={(e) => {
+                                inputDataSearch(
+                                    "RELATION_ORGANIZATION_NAME",
+                                    e.target.value,
+                                    0
+                                );
+                                if (
+                                    searchAgent.relationAgent_search[0]
+                                        .RELATION_ORGANIZATION_NAME === ""
+                                ) {
+                                    inputDataSearch("flag", "flag", 0);
+                                } else {
+                                    inputDataSearch("flag", "", 0);
+                                }
+                            }}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     if (
-                                        searchAgent.RELATION_ORGANIZATION_NAME !==
-                                        ""
+                                        searchAgent.relationAgent_search[0]
+                                            .RELATION_ORGANIZATION_NAME === ""
                                     ) {
-                                        getAgent();
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
                                     }
+                                    setIsSuccess("success");
+                                    setTimeout(() => {
+                                        setIsSuccess("");
+                                    }, 1000);
                                 }
                             }}
                             placeholder="Search Agent Name"
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchAgent()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchAgent.relationAgent_search[0]
+                                            .RELATION_ORGANIZATION_NAME === ""
+                                    ) {
+                                        inputDataSearch("flag", "", 0);
+                                    } else {
+                                        inputDataSearch("flag", "", 0);
+                                    }
+                                    setIsSuccess("success");
+                                    setTimeout(() => {
+                                        setIsSuccess("");
+                                    }, 1000);
+                                }}
                             >
                                 Search
                             </div>
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
-                                onClick={() => clearSearchAgent()}
+                                onClick={(e: any) => clearSearchAgent(e)}
                             >
                                 Clear Search
                             </div>
@@ -307,7 +353,7 @@ export default function Agent({ auth }: PageProps) {
                 <div className="col-span-3 bg-white shadow-md rounded-md p-5 xs:mt-4 lg:mt-0">
                     <div className="ag-grid-layouts rounded-md shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-2.5">
                         <AGGrid
-                            searchParam={""}
+                            searchParam={searchAgent.relationAgent_search}
                             addButtonLabel={null}
                             addButtonModalState={undefined}
                             withParam={null}

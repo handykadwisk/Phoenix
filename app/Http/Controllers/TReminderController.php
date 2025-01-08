@@ -6,11 +6,15 @@ use App\Models\MReminderMethodNotification;
 use App\Models\MReminderParticipant;
 use App\Models\RMethodNotification;
 use App\Models\RReminderTier;
+use App\Models\TDetailReminder;
 use App\Models\TReminder;
+use App\Models\TReminderData;
 use App\Models\UserLog;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class TReminderController extends Controller
 {
@@ -30,6 +34,40 @@ class TReminderController extends Controller
     // proses add reminder
     public function store(Request $request)
     {
+        // get data r setting untuk ambil waktu reminder start dan reminder endnya
+        $reminderStart = DB::table('r_setting')->where('SETTING_VARIABLE', "reminder_start")->first();
+        $reminderEnd = DB::table('r_setting')->where('SETTING_VARIABLE', "reminder_end")->first();
+        // Waktu mulai
+        $startTime = Carbon::createFromFormat('H:i', $reminderStart->SETTING_VALUE);
+
+        // Waktu selesai
+        $endTime = Carbon::createFromFormat('H:i', $reminderEnd->SETTING_VALUE);
+
+        // Hitung selisih waktu dalam jam
+        $diffInHours = $startTime->diffInHours($endTime);
+
+        // get tanggal dari beberapa hari
+        $dates = collect();
+        $dateFromData = $request->REMINDER_START_DATE;
+        for ($i = 0; $i <= $request->REMINDER_DAYS; $i++) {
+            $dates->push(Carbon::parse($dateFromData)->addDays($i)->toDateString());
+        }
+        $dates->pop();
+
+        // Tentukan waktu mulai dan durasi
+        $start = Carbon::parse($reminderStart->SETTING_VALUE); // jam mulai dari r setting variable = reminder_start
+        $totalHours = $diffInHours; // hasil dari perhitungan reminderStar dan reminderEnd
+        $intervalCount = $request->REMINDER_TIMES;
+        $intervalDuration = $totalHours / $intervalCount; // 4 jam per interval
+
+        // Collection untuk menyimpan hasil interval
+        $intervals = collect();
+
+        // Loop untuk menambahkan waktu mulai tiap interval
+        for ($i = 0; $i < $intervalCount; $i++) {
+            $intervals->push($start->copy()->addHours($i * $intervalDuration)->format('H:i'));
+        }
+
 
         // Create Reminder To Database t_reminder
         $createReminder = TReminder::create([
@@ -82,6 +120,30 @@ class TReminderController extends Controller
             }
         }
 
+
+        // created reminder data
+        // 1. Get Data Participant By Reminder ID
+        $dataReminderParticipant = MReminderParticipant::where('REMINDER_ID', $createReminder->REMINDER_ID)->get();
+        for ($i = 0; $i < sizeof($dataReminderParticipant); $i++) {
+            for ($a = 0; $a < sizeof($dates); $a++) {
+                for ($c = 0; $c < sizeof($intervals); $c++) {
+                    $reminderData = TReminderData::create([
+                        "REMINDER_DATA_DATE"            => $dates[$a],
+                        "REMINDER_ID"                   => $dataReminderParticipant[$i]['REMINDER_ID'],
+                        "USER_ID"                       => $dataReminderParticipant[$i]['USER_ID'],
+                        "REMINDER_TIER_ID"              => $dataReminderParticipant[$i]['REMINDER_TIER_ID'],
+                        "REMINDER_DATA_STATUS"          => 1
+                    ]);
+
+                    // update TReminderData
+                    TReminderData::where('REMINDER_DATA_ID', $reminderData['REMINDER_DATA_ID'])->update([
+                        "REMINDER_DATA_HOUR"        => $intervals[$c]
+                    ]);
+                }
+            }
+        }
+
+
         // Created Log
         UserLog::create([
             'created_by' => Auth::user()->id,
@@ -95,6 +157,7 @@ class TReminderController extends Controller
 
         return new JsonResponse([
             "Reminder Success Created",
+            Auth::user()->id
         ], 201, [
             'X-Inertia' => true
         ]);
@@ -183,5 +246,28 @@ class TReminderController extends Controller
         ], 201, [
             'X-Inertia' => true
         ]);
+    }
+
+    public function get_reminder_start(Request $request)
+    {
+        $data = DB::table('r_setting')->where('SETTING_VARIABLE', "reminder_start")->first();
+
+
+        return response()->json($data);
+    }
+
+    public function get_reminder_end(Request $request)
+    {
+        $data = DB::table('r_setting')->where('SETTING_VARIABLE', "reminder_end")->first();
+
+
+        return response()->json($data);
+    }
+
+    public function get_detail_reminder_new(Request $request)
+    {
+        $data = TDetailReminder::where('REMINDER_DETAIL_USER_TO', $request->userIdLogin)->where('REMINDER_DETAIL_USER_STATUS_READ', 0)->get();
+
+        return response()->json($data);
     }
 }

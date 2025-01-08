@@ -16,12 +16,12 @@ class MRelationFBIPKSController extends Controller
     public function index()
     {
 
-        return Inertia::render('FBIBYPKS/Index', [
-        ]);
+        return Inertia::render('FBIBYPKS/Index', []);
     }
 
     // for FBI
-    public function getRelationFBI(Request $request){
+    public function getRelationFBI(Request $request)
+    {
         // $data = MRelationAgent::with('relation')->where('RELATION_AGENT_ID', $request->id)->get();
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
@@ -33,17 +33,17 @@ class MRelationFBIPKSController extends Controller
         $query->leftJoin('m_relation_type', 't_relation.RELATION_ORGANIZATION_ID', '=', 'm_relation_type.RELATION_ORGANIZATION_ID')->where('RELATION_TYPE_ID', "13");
 
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
 
         if ($request->newFilter !== "") {
             if ($newSearch[0]["flag"] !== "") {
                 $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-            }else{
+            } else {
                 // dd("masuk sini");
                 foreach ($newSearch[0] as $keyId => $searchValue) {
                     if ($keyId === 'RELATION_ORGANIZATION_NAME') {
@@ -58,7 +58,8 @@ class MRelationFBIPKSController extends Controller
         return response()->json($data);
     }
 
-    public function getMRelationFBI(Request $request){
+    public function getMRelationFBI(Request $request)
+    {
         // $data = MRelationAgent::with('relation')->where('RELATION_AGENT_ID', $request->id)->get();
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
@@ -69,10 +70,10 @@ class MRelationFBIPKSController extends Controller
         $query->leftJoin('t_relation', 'm_relation_fbi.RELATION_ORGANIZATION_ID', '=', 't_relation.RELATION_ORGANIZATION_ID')->where('RELATION_FBI_ID', $request->id);
 
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
 
@@ -80,7 +81,7 @@ class MRelationFBIPKSController extends Controller
             foreach ($filterModel as $colId => $filterValue) {
                 if ($colId === 'RELATION_ORGANIZATION_ALIAS') {
                     $query->where('RELATION_ORGANIZATION_ALIAS', 'LIKE', '%' . $filterValue . '%');
-                } 
+                }
                 // elseif ($colId === 'policy_inception_date') {
                 //     $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
                 //           ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
@@ -93,12 +94,13 @@ class MRelationFBIPKSController extends Controller
         return response()->json($data);
     }
 
-    
-    public function relationFbi(Request $request){
+
+    public function relationFbi(Request $request)
+    {
         $clientId = 1;
-        $data = Relation::whereHas('mRelationType', function($q) use($clientId) {
+        $data = Relation::where('is_deleted', '<>', 1)->whereHas('mRelationType', function ($q) use ($clientId) {
             // Query the name field in status table
-            $q->where('RELATION_TYPE_ID', 'like', '%'.$clientId.'%');
+            $q->where('RELATION_TYPE_ID', 'like', '%' . $clientId . '%');
         })->whereDoesntHave('MRelationFbi', function (Builder $query) {
             $query->whereNotNull('RELATION_ORGANIZATION_ID');
         })->get();
@@ -106,8 +108,9 @@ class MRelationFBIPKSController extends Controller
         return response()->json($data);
     }
 
-    public function addMRelationFBI(Request $request){
-        for ($i=0; $i < sizeof($request->name_relation); $i++) { 
+    public function addMRelationFBI(Request $request)
+    {
+        for ($i = 0; $i < sizeof($request->name_relation); $i++) {
             $nameRelation = trim($request->name_relation[$i]);
             $idFBI = $request->idFBI;
 
@@ -139,7 +142,8 @@ class MRelationFBIPKSController extends Controller
         ]);
     }
 
-    public function deleteFBI(Request $request){
+    public function deleteFBI(Request $request)
+    {
         MRelationFBIPKS::where('M_RELATION_FBI_ID', $request->id)->delete();
 
         return new JsonResponse([

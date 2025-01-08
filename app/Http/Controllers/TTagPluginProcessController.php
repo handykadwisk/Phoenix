@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Events\GotMessage;
 use App\Models\RPluginProcess;
 use App\Models\TChatDetail;
 use App\Models\TTagPluginProcess;
 use App\Models\TChat;
+use App\Models\TChatDetailUser;
 use App\Models\TChatParticipant;
 use App\Models\TCompanyDivision;
 use App\Models\TParticipantChat;
@@ -18,7 +21,7 @@ class TTagPluginProcessController extends Controller
 {
     public function getPlugin(Request $request)
     {
-        $data = RPluginProcess::get();
+        $data = RPluginProcess::where('PLUGIN_PROCESS_SHOW_CONTEXT_MENU', 1)->get();
         return response()->json($data);
     }
 
@@ -60,12 +63,36 @@ class TTagPluginProcessController extends Controller
             "CREATED_CHAT_BY"      => Auth::user()->id,
         ]);
 
+
         // create message chat
         if ($createTypeChat) {
+            $chatDetail = TChatDetail::create([
+                "CHAT_ID"                      => $createTypeChat->CHAT_ID,
+                "CHAT_DETAIL_TEXT"             => $request->INITIATE_YOUR_CHAT,
+                "CHAT_DETAIL_DOCUMENT_ID"      => null,
+                "CREATED_CHAT_DETAIL_DATE"     => now(),
+                "CREATED_CHAT_DETAIL_BY"       => Auth::user()->id,
+            ]);
 
+            // realtime laravel reverb
+            $modulChat = "Chat";
+            // SendMessage::dispatch($createMessage, $modulChat);
+            event(new GotMessage($chatDetail, $modulChat));
+
+            // untuk diri sendirinya
+            TChatParticipant::create([
+                'CHAT_ID'                       => $createTypeChat->CHAT_ID,
+                'CHAT_PARTICIPANT_NAME'         => Auth::user()->name,
+                'USER_ID'                       => Auth::user()->id,
+                'DIVISION_ID'                   => null,
+                'IS_DIVISION'                   => 0,
+                'CHAT_PARTICIPANT_CREATED_BY'   => Auth::user()->id,
+                'CHAT_PARTICIPANT_CREATED_DATE' => now()
+            ]);
             // add Participant
             $arrayParticipant = is_countable($request->PARTICIPANT);
             if ($arrayParticipant) {
+
                 for ($i = 0; $i < sizeof($request->PARTICIPANT); $i++) {
                     $valueParticipant = trim($request->PARTICIPANT[$i]['value']);
                     $nameParticipant = trim($request->PARTICIPANT[$i]['label']);
@@ -92,23 +119,39 @@ class TTagPluginProcessController extends Controller
                         'USER_ID'                       => $userId,
                         'DIVISION_ID'                   => $idDivision,
                         'IS_DIVISION'                   => $is_division,
-                        'CREATED_CHAT_PARTICIPANT_BY'   => Auth::user()->id,
-                        'CREATED_CHAT_PARTICIPANT_DATE' => now()
+                        'CHAT_PARTICIPANT_CREATED_BY'   => Auth::user()->id,
+                        'CHAT_PARTICIPANT_CREATED_DATE' => now()
                     ]);
+                }
+                // get data participant for message detail user
+                $dataParticipant  = TChatParticipant::where('CHAT_ID', $createTypeChat->CHAT_ID)->get();
+                for ($i = 0; $i < sizeof($dataParticipant); $i++) {
+                    if ($dataParticipant[$i]['USER_ID'] != null) {
+                        TChatDetailUser::create([
+                            "CHAT_ID"                                   => $createTypeChat->CHAT_ID,
+                            "CHAT_DETAIL_ID"                            => $chatDetail->CHAT_DETAIL_ID,
+                            "CHAT_DETAIL_USER_TO"                       => $dataParticipant[$i]['USER_ID'],
+                            "CHAT_DETAIL_USER_FROM"                     => Auth::user()->id,
+                            "CHAT_DETAIL_USER_STATUS_READ"              => 0,
+                            "CHAT_DETAIL_USER_STATUS_MENTION"           => 0,
+                            "CHAT_DETAIL_USER_REPLY_DATE"               => null,
+                            "CHAT_DETAIL_USER_RELATE_CHAT_DETAIL_ID"    => null,
+                            "CHAT_DETAIL_USER_CREATED_DATE"             => now(),
+                            "CHAT_DETAIL_USER_CREATED_ID"               => Auth::user()->id,
+                        ]);
+                    }
                 }
             }
             // end add Perticipant
-
-
-
-            TChatDetail::create([
-                "CHAT_ID"                  => $createTypeChat->CHAT_ID,
-                "CHAT_DETAIL_TEXT"             => $request->INITIATE_YOUR_CHAT,
-                "CHAT_DETAIL_DOCUMENT_ID"      => null,
-                "CREATED_CHAT_DETAIL_DATE"     => now(),
-                "CREATED_CHAT_DETAIL_BY"       => Auth::user()->id,
-            ]);
         }
+
+        // Edit T chat detail user yang kirim chat auto read ketika dia ngirim pesan
+        // update read
+        TChatDetailUser::where('CHAT_ID', $createTypeChat->CHAT_ID)
+            ->where('CHAT_DETAIL_ID', $chatDetail->CHAT_DETAIL_ID)
+            ->where('CHAT_DETAIL_USER_TO', Auth::user()->id)->update([
+                "CHAT_DETAIL_USER_STATUS_READ"    => 1
+            ]);
 
 
         return new JsonResponse([
@@ -117,7 +160,8 @@ class TTagPluginProcessController extends Controller
             "Add Plugin Success",
             (string)$createTypeChat->CHAT_ID,
             $request->TAG_ID,
-            "Add Chat Success"
+            "Add Chat Success",
+            Auth::user()->id
         ], 201, [
             'X-Inertia' => true
         ]);

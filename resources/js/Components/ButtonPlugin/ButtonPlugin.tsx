@@ -23,6 +23,9 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
     useEffect(() => {
         getDataPluginChat();
         connectWebSocket();
+        connectWebSocketReminder();
+        cekDetailChatRead(auth.user.id);
+        cekDetailReminder(auth.user.id);
 
         return () => {
             window.Echo.leave(webSocketChannel);
@@ -39,6 +42,31 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
         } else {
             setShow(false);
         }
+    };
+    const [cekMessage, setCekMessage] = useState<any>([]);
+    const cekDetailChatRead = async (userIdLogin?: any) => {
+        await axios
+            .post(`/getCekDetailChatRead`, { userIdLogin })
+            .then((res) => {
+                setCekMessage(res.data);
+                // setShow(false);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [cekReminder, setCekReminder] = useState<any>([]);
+    const cekDetailReminder = async (userIdLogin?: any) => {
+        await axios
+            .post(`/getCekDetailReminder`, { userIdLogin })
+            .then((res) => {
+                setCekReminder(res.data);
+                // setShow(false);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     // for load data chat plugin
@@ -86,13 +114,34 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
         setShow(false);
     };
 
+    const [detailTypeChat, setDetailTypeChat] = useState<any>([]);
+    const getObjectChat = async (userIdLogin?: any) => {
+        await axios
+            .post(`/getObjectChat`, { userIdLogin })
+            .then((res) => {
+                setDetailTypeChat(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     const [notification, setNotification] = useState<boolean>(false);
     const webSocketChannel = `channel-name`;
     const connectWebSocket = () => {
-        window.Echo.private(webSocketChannel).listen("GotMessage", (e: any) => {
-            // e.message
+        window.Echo.channel(webSocketChannel).listen("GotMessage", (e: any) => {
+            cekDetailChatRead(auth.user.id);
             setNotification(true);
         });
+    };
+    const connectWebSocketReminder = () => {
+        window.Echo.channel(webSocketChannel).listen(
+            "ReminderMessage",
+            (e: any) => {
+                cekDetailReminder(auth.user.id);
+                setNotification(true);
+            }
+        );
     };
 
     return (
@@ -108,6 +157,7 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                 setFlagObject={setFlagObject}
                 flagObject={flagObject}
                 tagIdChat={1}
+                cekDetailChatRead={cekDetailChatRead}
                 // onClose={() =>
                 //     setShowChatMessage({
                 //         chatModal: false,
@@ -129,7 +179,7 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                     leaveTo="opacity-0"
                 >
                     <div className="fixed z-99 bottom-0 right-0 mr-3 mb-[70px] cursor-pointer text-white">
-                        <div
+                        {/* <div
                             className="bg-red-600 flex flex-col-reverse mb-2 rounded-full w-12 h-12 justify-center items-center z-999999"
                             onClick={(e: any) => handleClickReminder(e)}
                             title="Reminder"
@@ -137,23 +187,48 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                             <span>
                                 <BellAlertIcon className="w-5" />
                             </span>
-                        </div>
+                        </div> */}
                         {dataPluginProcess?.map((items: any, index: number) => {
                             return (
                                 <div
                                     key={index}
                                     className="bg-red-600 flex flex-col-reverse mb-2 rounded-full w-12 h-12 justify-center items-center z-999999"
-                                    onClick={(e: any) =>
-                                        handleClickModalChatMessage(e)
-                                    }
+                                    onClick={(e: any) => {
+                                        items.PLUGIN_PROCESS_NAME === "Chat"
+                                            ? handleClickModalChatMessage(e)
+                                            : items.PLUGIN_PROCESS_NAME ===
+                                              "Reminder"
+                                            ? handleClickReminder(e)
+                                            : null;
+                                    }}
                                     title={items.PLUGIN_PROCESS_NAME}
                                 >
+                                    {items.PLUGIN_PROCESS_NAME === "Chat" ? (
+                                        <>
+                                            {cekMessage.length !== 0 && (
+                                                <div className="absolute top-0 right-0 bg-yellow-300 w-15 h-15 p-2 rounded-lg">
+                                                    {/* <span>a</span> */}
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : null}
+                                    {items.PLUGIN_PROCESS_NAME ===
+                                    "Reminder" ? (
+                                        <>
+                                            {cekReminder.length !== 0 && (
+                                                <div className="absolute top-28 right-0 bg-yellow-300 w-15 h-15 p-2 rounded-lg"></div>
+                                            )}
+                                        </>
+                                    ) : null}
                                     <span>
                                         {items.PLUGIN_PROCESS_NAME ===
                                         "Chat" ? (
                                             <ChatBubbleLeftRightIcon className="w-5" />
-                                        ) : (
+                                        ) : items.PLUGIN_PROCESS_NAME ===
+                                          "Task" ? (
                                             <ClockIcon className="w-5" />
+                                        ) : (
+                                            <BellAlertIcon className="w-5" />
                                         )}
                                     </span>
                                 </div>
@@ -169,11 +244,11 @@ export default function ButtonPlugin({}: PropsWithChildren<{}>) {
                 className="fixed z-50 bg-red-600 bottom-0 right-0 rounded-full w-12 h-12 mr-3 mb-5 flex justify-center items-center cursor-pointer text-white"
                 onClick={(e) => handleClickShow(e)}
             >
-                {notification && (
+                {cekMessage.length !== 0 || cekReminder.length !== 0 ? (
                     <div className="absolute top-0 right-0 bg-yellow-300 w-15 h-15 p-2 rounded-lg">
                         {/* <span>a</span> */}
                     </div>
-                )}
+                ) : null}
 
                 <span>
                     <img src={iconGrid} className="w-5" />

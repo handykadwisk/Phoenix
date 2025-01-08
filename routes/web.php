@@ -42,6 +42,7 @@ use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RelationController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleAccesMenuController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\RUserTypeController;
@@ -110,6 +111,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/getDocumentPKSAgent', [RelationController::class, 'getPKSAgentJson'])->name('getDocumentPKSAgent.getPKSAgentJson');
     Route::get('/getDocumentPKSFbi', [RelationController::class, 'getPKSFbiJson'])->name('getDocumentPKSFbi.getPKSFbiJson');
     Route::post('/editDocumentPks', [RelationController::class, 'edit_document_pks'])->name('editDocumentPks.edit_document_pks');
+    Route::post('/getRelationClient', [RelationController::class, 'get_relation_client'])->name('getRelationClient.get_relation_client');
 
 
 
@@ -198,6 +200,7 @@ Route::middleware('auth')->group(function () {
     // Person
     Route::post('/getPersons', [TPersonController::class, 'getPersonJson'])->name('getPersons.getPersonJson');
     Route::get('getPersonRelationship', [TPersonController::class, 'getDataPersonRelationship'])->name('getPersonRelationship.getDataPersonRelationship');
+    Route::get('getPersonRelationshipFamily', [TPersonController::class, 'getPersonRelationshipFamily'])->name('getPersonRelationshipFamily.getPersonRelationshipFamily');
     Route::post('/person', [TPersonController::class, 'store'])->name('person.store');
     Route::post('/editPersonRelation', [TPersonController::class, 'edit_person_relation'])->name('editPersonRelation.edit_person_relation');
     Route::post('/editPersons', [TPersonController::class, 'edit'])->name('editPersons.edit');
@@ -696,20 +699,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/getAttendanceByEmployeeIdAndDate', [AttendanceController::class, 'getAttendanceByEmployeeIdAndDate'])->name('attendance.getAttendanceByEmployeeIdAndDate');
     Route::post('/getMEmployeeAttendanceByEmployeeId', [AttendanceController::class, 'getMEmployeeAttendanceByEmployeeId'])->name('attendance.getMEmployeeAttendanceByEmployeeId');
     Route::post('/getAttendanceSettingById', [AttendanceController::class, 'getAttendanceSettingById'])->name('attendance.getAttendanceSettingById');
-    Route::post('/pinMessage', [TDetailChatController::class, 'pin_message'])->name('pinMessage.pin_message');
-    Route::post('/pinMessageObject', [TDetailChatController::class, 'pinMessageObject'])->name('pinMessageObject.pinMessageObject');
-    Route::post('/getChatPin', [TDetailChatController::class, 'getChatPin'])->name('getChatPin.getChatPin');
-    Route::post('/getDataParticipant', [TDetailChatController::class, 'get_participant'])->name('getDataParticipant.get_participant');
-    Route::post('/unPinMessageObject', [TDetailChatController::class, 'unPinMessageObject'])->name('unPinMessageObject.unPinMessageObject');
-    Route::post('/getDataParticipantById', [TDetailChatController::class, 'getDataParticipantById'])->name('getDataParticipantById.getDataParticipantById');
-    Route::post('/addParticipant', [TDetailChatController::class, 'add_participant'])->name('addParticipant.add_participant');
-    Route::post('/removeParticipant', [TDetailChatController::class, 'remove_participant'])->name('removeParticipant.remove_participant');
-    Route::post('/getDataChatDetailUser', [TDetailChatController::class, 'getDataChatDetailUser'])->name('getDataChatDetailUser.getDataChatDetailUser');
-    Route::post('/actionUpdateReadMention', [TDetailChatController::class, 'actionUpdateReadMention'])->name('actionUpdateReadMention.actionUpdateReadMention');
-    Route::post('/getDataPluginChat', [TDetailChatController::class, 'get_plugin_chat'])->name('getDataPluginChat.get_plugin_chat');
-    Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
-    Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
-    Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
 
     // Message Chat
     Route::post('/getMessageChatByTypeId', [TDetailChatController::class, 'getMessage'])->name('getMessageChatByTypeId.getMessage');
@@ -729,6 +718,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/getObjectChat', [TDetailChatController::class, 'get_object_chat'])->name('getObjectChat.get_object_chat');
     Route::post('/getDataChatDetailMention', [TDetailChatController::class, 'getDataChatDetailMention'])->name('getDataChatDetailMention.getDataChatDetailMention');
     Route::post('/getParticipantAll', [TDetailChatController::class, 'getParticipantAll'])->name('getParticipantAll.getParticipantAll');
+    Route::post('/getSumMessageUnread', [TDetailChatController::class, 'get_message_unread'])->name('getSumMessageUnread.get_message_unread');
+    Route::post('/getCekDetailChatRead', [TDetailChatController::class, 'get_message_cek_detail'])->name('getCekDetailChatRead.get_message_cek_detail');
+
 
 
     // Time Off
@@ -746,8 +738,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/getMethodNotification', [TReminderController::class, 'getMethodNotification'])->name('getMethodNotification.getMethodNotification');
     Route::post('/addReminder', [TReminderController::class, 'store'])->name('addReminder.addReminder');
     Route::post('/getTReminder', [TReminderController::class, 'get_reminder'])->name('getTReminder.getTReminder');
-    Route::post('/getDetailReminder', [TReminderController::class, 'get_detail_reminder'])->name('getDetailReminder.getDetailReminder');
+    Route::post('/getDetailReminder', [TReminderController::class, 'get_detail_reminder'])->name('getDetailReminder.get_detail_reminder');
     Route::patch('/editReminder/{id}', [TReminderController::class, 'edit'])->name('editReminder.edit');
+    Route::post('/getReminderStart', [TReminderController::class, 'get_reminder_start'])->name('getReminderStart.get_reminder_start');
+    Route::post('/getReminderEnd', [TReminderController::class, 'get_reminder_end'])->name('getReminderEnd.get_reminder_end');
+    Route::post('/getCekDetailReminder', [TReminderController::class, 'get_detail_reminder_new'])->name('getCekDetailReminder.get_detail_reminder_new');
+
+
+    // Report
+    Route::get('/reportRelation', [ReportController::class, 'index'])->name('reportRelation');
+    Route::post('/exportReportRelation', [ReportController::class, 'excelReportRelation'])->name('exportReportRelation.excelReportRelation');
 });
 
 require __DIR__ . '/auth.php';

@@ -336,8 +336,19 @@ export default function JobDesk({
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchJobDesc()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchJobDesc.RELATION_JOBDESC_ALIAS !==
+                                        ""
+                                    ) {
+                                        getJobDesc();
+                                        setSearchJobDesc({
+                                            ...searchJobDesc,
+                                            RELATION_JOBDESC_ALIAS: "",
+                                        });
+                                    }
+                                }}
                             >
                                 Search
                             </div>

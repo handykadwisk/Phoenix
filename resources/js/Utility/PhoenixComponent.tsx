@@ -136,24 +136,6 @@ export default function PhoenixComponent({
     };
     // end handle for plugin process
 
-    useEffect(() => {
-        getTPluginProcess();
-    }, []);
-    // state for data plugin process
-    const [dataTPlugin, setDataTPlugin] = useState<any>([]);
-    // getData Plugin Process
-    const getTPluginProcess = async () => {
-        await axios
-            .post(`/getTPluginProcess`)
-            .then((res) => {
-                // getPlugin(res.data);
-                setDataTPlugin(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
     // state for modal show chat message
     const [showChatMessage, setShowChatMessage] = useState({
         chatModal: false,
@@ -264,13 +246,14 @@ export default function PhoenixComponent({
                         element.nextSibling
                     );
                 } else {
-                    console.log("true");
                 }
             }
+        });
 
-            return () => {
-                console.log("berhenti");
-                // getMark.forEach((element: any) => {
+        // getTPluginProcess();
+        return () => {
+            // getMark.forEach((element: any) => {
+            getMarks.forEach((element) => {
                 if (element) {
                     element?.removeEventListener(
                         "contextmenu",
@@ -278,11 +261,30 @@ export default function PhoenixComponent({
                     );
                     element?.removeEventListener("click", handleClick);
                 }
-                // });
-            };
-        });
+            });
+
+            // });
+        };
         // END RENDER ELEMENT YANG PUNYA CLASS "cls_can_attach_process"
-    }, []);
+    }, [getMark]);
+
+    useEffect(() => {
+        getTPluginProcess();
+    }, [getMark]);
+    // state for data plugin process
+    const [dataTPlugin, setDataTPlugin] = useState<any>([]);
+    // getData Plugin Process
+    const getTPluginProcess = async () => {
+        await axios
+            .post(`/getTPluginProcess`)
+            .then((res) => {
+                // getPlugin(res.data);
+                setDataTPlugin(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     useEffect(() => {
         const handleModalClick = async (

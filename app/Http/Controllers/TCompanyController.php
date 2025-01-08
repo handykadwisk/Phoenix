@@ -37,28 +37,17 @@ class TCompanyController extends Controller
             }
         }
 
-        // if ($request->newFilter !== "") {
-        //     if ($newSearch[0]["flag"] !== "") {
-        //         $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
-        //     }else{
-        //         foreach ($newSearch[0] as $keyId => $searchValue) {
-        //             if ($keyId === 'RELATION_ORGANIZATION_NAME') {
-        //                 $query->where('RELATION_ORGANIZATION_NAME', 'LIKE', '%' . $searchValue . '%');
-        //             }elseif ($keyId === 'RELATION_TYPE_ID'){
-        //                 if (!isset($searchValue['value'])) {
-        //                     $valueTypeId = $searchValue;
-        //                 }else{
-        //                     $valueTypeId = $searchValue['value'];
-        //                 }
-        //                 // dd($searchValue);
-        //                 $query->whereHas('mRelationType', function($q) use($valueTypeId) {
-        //                     // Query the name field in status table
-        //                     $q->where('RELATION_TYPE_ID', 'like', '%'.$valueTypeId.'%');
-        //                 });
-        //             }
-        //         }
-        //     }
-        // }
+        if ($request->newFilter !== "") {
+            if ($newSearch[0]["flag"] !== "") {
+                $query->where('COMPANY_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            } else {
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'COMPANY_NAME') {
+                        $query->where('COMPANY_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
 
         // if ($filterModel) {
         //     foreach ($filterModel as $colId => $filterValue) {

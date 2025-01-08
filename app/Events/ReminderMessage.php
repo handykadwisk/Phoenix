@@ -11,21 +11,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class GotMessage implements ShouldBroadcastNow
+class ReminderMessage implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public $message;
-    public $modul;
+    public $messageReminder;
 
-    public function __construct($message, $modul)
+    public function __construct($messageReminder)
     {
         //
-        $this->message = $message;
-        $this->modul = $modul;
+        $this->messageReminder = $messageReminder;
     }
 
     /**
@@ -43,8 +41,7 @@ class GotMessage implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return [
-            'message' => $this->message,
-            'modul' => $this->modul
+            'messageReminder' => $this->messageReminder,
         ];
     }
 }

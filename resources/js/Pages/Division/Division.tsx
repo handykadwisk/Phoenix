@@ -367,8 +367,19 @@ export default function Division({
                         />
                         <div className="mt-4 flex justify-end gap-2">
                             <div
-                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer lg:hidden"
-                                onClick={() => clearSearchDivision()}
+                                className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
+                                onClick={() => {
+                                    if (
+                                        searchDivision.RELATION_DIVISION_ALIAS !==
+                                        ""
+                                    ) {
+                                        getDivision();
+                                        setSearchDivision({
+                                            ...searchDivision,
+                                            RELATION_DIVISION_ALIAS: "",
+                                        });
+                                    }
+                                }}
                             >
                                 Search
                             </div>

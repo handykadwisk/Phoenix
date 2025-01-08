@@ -40,7 +40,7 @@ export default function AddRelation({
     show,
     modal,
     handleSuccess,
-    relation,
+    // relation,
     data,
     setData,
     switchPage,
@@ -53,7 +53,7 @@ export default function AddRelation({
     relationType: any;
     profession: any;
     relationLOB: any;
-    relation: any;
+    // relation: any;
     show: any;
     modal: any;
     handleSuccess: any;
@@ -65,28 +65,37 @@ export default function AddRelation({
 }>) {
     const [salutations, setSalutations] = useState<any>([]);
     const [postSalutations, setPostSalutation] = useState<any>([]);
-    // const [switchPage, setSwitchPage] = useState(false);
-    // const [switchPageTBK, setSwitchPageTBK] = useState(false);
     const [mappingParent, setMappingParent] = useState<any>({
         mapping_parent: [],
     });
-    // const { data, setData, errors, reset } = useForm<any>({
-    //     group_id: "",
-    //     name_relation: "",
-    //     parent_id: "",
-    //     abbreviation: "",
-    //     relation_aka: [],
-    //     relation_email: "",
-    //     relation_description: "",
-    //     relation_lob_id: "",
-    //     salutation_id: "",
-    //     relation_status_id: "",
-    //     tagging_name: [],
-    //     is_managed: "",
-    //     mark_tbk_relation: "",
-    //     profession_id: "",
-    //     relation_type_id: [],
-    // });
+
+    useEffect(() => {
+        getRelationClient();
+        getAllRelations();
+    }, [show === true]);
+
+    const [relation, setRelation] = useState<any>([]);
+    const getRelationClient = async () => {
+        await axios
+            .post(`/getRelationClient`, {})
+            .then((res) => {
+                setRelation(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    const [relationSuggestion, setRelationSuggestion] = useState<any>([]);
+    const getAllRelations = async () => {
+        try {
+            const result = await axios.get("/getAllRelations");
+            setRelationSuggestion(result.data);
+        } catch (error) {
+            // console.error('Fetch error:', error);
+            throw error;
+        }
+    };
 
     const getPostSalutationById = async (id: string, column: string) => {
         if (id) {
@@ -380,7 +389,7 @@ export default function AddRelation({
 
     const [showRelation, setShowRelation] = useState<boolean>(false);
     const inputRefRelation = useRef<HTMLInputElement>(null);
-    const filteredRelation = relation.filter((item: any) =>
+    const filteredRelation = relationSuggestion.filter((item: any) =>
         item.RELATION_ORGANIZATION_NAME?.toLocaleLowerCase()?.includes(
             data.name_relation.toLocaleLowerCase()?.trim()
         )

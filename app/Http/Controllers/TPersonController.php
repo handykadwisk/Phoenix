@@ -43,12 +43,12 @@ class TPersonController extends Controller
     public function getPersonData($dataPerPage = 5, $searchQuery = null)
     {
 
-        // dd($searchQuery);
         $data = TPic::leftJoin('t_person', 't_person.PERSON_ID', '=', 't_pic.PERSON_ID')->where('t_pic.RELATION_ORGANIZATION_ID', $searchQuery->idRelation)
             ->where('t_pic.PIC_IS_DELETED', 0)
             ->orderBy('t_pic.PIC_ID', 'desc');
+
         if ($searchQuery) {
-            if ($searchQuery->input('t_person.PERSON_FIRST_NAME')) {
+            if ($searchQuery->input('PERSON_FIRST_NAME')) {
                 $data->where('t_person.PERSON_FIRST_NAME', 'like', '%' . $searchQuery->PERSON_FIRST_NAME . '%');
             }
         }
@@ -69,6 +69,13 @@ class TPersonController extends Controller
     public function getDataPersonRelationship()
     {
         $pRelationship = RPersonRelationship::get();
+
+        return response()->json($pRelationship);
+    }
+
+    public function getPersonRelationshipFamily()
+    {
+        $pRelationship = RPersonRelationship::where('PERSON_RELATIONSHIP_IS_FAMILY_MEMBER', 1)->get();
 
         return response()->json($pRelationship);
     }
@@ -1638,7 +1645,7 @@ class TPersonController extends Controller
 
     public function get_individu_relation(Request $request)
     {
-        $data = Relation::where('relation_status_id', 2)->get();
+        $data = Relation::where('relation_status_id', 2)->where('is_deleted', '<>', 1)->get();
 
         return response()->json($data);
     }
@@ -1657,35 +1664,57 @@ class TPersonController extends Controller
             // ]);
             // get person id from by relation individual
             $idPersonByIndividual = TPerson::where('INDIVIDU_RELATION_ID', $individuId)->first();
-            // cek person
-            $dataPerson = TPic::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->where('PERSON_ID', $idPersonByIndividual->PERSON_ID)->first();
-            // dd($dataPerson);
-            if ($dataPerson != null) { //jika ada aktifkan lagi data sebelumnya
-                $idPerson = $dataPerson->RELATION_ORGANIZATION_ID;
-                TPic::where('RELATION_ORGANIZATION_ID', $idPerson)->where('PERSON_ID', $idPersonByIndividual->PERSON_ID)->update([
-                    "PIC_IS_DELETED"         => "0"
+            if ($idPersonByIndividual == null) { // jika tidak ada person maka dibuatkan terlebih dahulu
+                // create relation individu for person
+                $personCreate = TPerson::create([
+                    "PERSON_FIRST_NAME"         => $personName,
+                    "INDIVIDU_RELATION_ID"      => $individuId,
+                    "PERSON_IS_DELETED"         => "0",
+                    "PERSON_CREATED_BY"         => Auth::user()->id,
+                    "PERSON_CREATED_DATE"       => now()
                 ]);
 
-                // $idLog = $idPerson;
-            } else {
-                // simpan mapping ke t person
-                TPic::create([
-                    "PERSON_ID"                 => $idPersonByIndividual->PERSON_ID,
-                    "RELATION_ORGANIZATION_ID"  => $request->RELATION_ORGANIZATION_ID,
-                    "PIC_IS_DELETED"            => "0"
+                $createPIC = TPic::create([
+                    "PERSON_ID"                     => $personCreate->PERSON_ID,
+                    "RELATION_ORGANIZATION_ID"      => $request->RELATION_ORGANIZATION_ID,
+                    "PIC_CREATED_BY"                => Auth::user()->id,
+                    "PIC_CREATED_DATE"              => now()
                 ]);
-                // $idLog = $person;
+            } else {
+                // cek person
+                $dataPerson = TPic::where('RELATION_ORGANIZATION_ID', $request->RELATION_ORGANIZATION_ID)->where('PERSON_ID', $idPersonByIndividual->PERSON_ID)->first();
+                // dd($dataPerson);
+                if ($dataPerson != null) { //jika ada aktifkan lagi data sebelumnya
+                    $idPerson = $dataPerson->RELATION_ORGANIZATION_ID;
+                    TPic::where('RELATION_ORGANIZATION_ID', $idPerson)->where('PERSON_ID', $idPersonByIndividual->PERSON_ID)->update([
+                        "PIC_IS_DELETED"         => "0"
+                    ]);
+
+                    // $idLog = $idPerson;
+                } else {
+                    // simpan mapping ke t person
+                    TPic::create([
+                        "PERSON_ID"                 => $idPersonByIndividual->PERSON_ID,
+                        "RELATION_ORGANIZATION_ID"  => $request->RELATION_ORGANIZATION_ID,
+                        "PIC_IS_DELETED"            => "0",
+                        "PIC_CREATED_BY"            => Auth::user()->id,
+                        "PIC_CREATED_DATE"          => now()
+                    ]);
+                    // $idLog = $person;
+                }
+                // Created Log
+                UserLog::create([
+                    'created_by' => Auth::user()->id,
+                    'action'     => json_encode([
+                        "description" => "Created PIC (PIC).",
+                        "module"      => "Person PIC",
+                        "id"          => $idLog
+                    ]),
+                    'action_by'  => Auth::user()->user_login
+                ]);
             }
-            // Created Log
-            UserLog::create([
-                'created_by' => Auth::user()->id,
-                'action'     => json_encode([
-                    "description" => "Created PIC (PIC).",
-                    "module"      => "Person PIC",
-                    "id"          => $idLog
-                ]),
-                'action_by'  => Auth::user()->user_login
-            ]);
+            // dd($idPersonByIndividual);
+
         }
         return new JsonResponse([
             $idLog,

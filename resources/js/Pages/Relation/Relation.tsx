@@ -447,7 +447,7 @@ export default function Relation({ auth }: PageProps) {
                 relationType={relationType}
                 profession={profession}
                 relationLOB={relationLOB}
-                relation={relation}
+                // relation={relation}
                 data={data}
                 setData={setData}
                 switchPage={switchPage}
@@ -511,7 +511,7 @@ export default function Relation({ auth }: PageProps) {
                     <div className="bg-white mb-4 rounded-md shadow-md p-4">
                         <Button
                             className="p-2"
-                            onClick={() => {
+                            onClick={async () => {
                                 getRBank();
                                 setSwitchPage(false);
                                 setModal({
@@ -656,7 +656,7 @@ export default function Relation({ auth }: PageProps) {
                                 },
                                 {
                                     headerName: "Relation Name",
-                                    field: "RELATION_ORGANIZATION_ALIAS",
+                                    field: "RELATION_ORGANIZATION_NAME",
                                     flex: 7,
                                 },
                             ]}

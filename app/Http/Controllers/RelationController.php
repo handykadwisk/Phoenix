@@ -36,7 +36,8 @@ class RelationController extends Controller
 {
     public function getAllRelations()
     {
-        $data = Relation::get();
+        // $data = Relation::with('relationStatus')->where('is_deleted', '<>', 1)->get();
+        $data = Relation::with('relationStatus')->get();
         return response()->json($data);
     }
     public function RemoveSpecialChar($str)
@@ -72,6 +73,14 @@ class RelationController extends Controller
             '-'
         );
         return $replace;
+    }
+
+    public function get_relation_client(Request $request)
+    {
+        $data = Relation::where('relation_status_id', 1)->with('relationStatus')->where('is_deleted', '<>', 1)->get();
+
+
+        return response()->json($data);
     }
 
     public function getOldRelation($id)
