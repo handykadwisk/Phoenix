@@ -652,8 +652,7 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
             <ModalToAction
                 headers={''}
                 show={modal.detail}
-                onClose={() =>
-                {
+                onClose={() => {
                     setModal({
                         add: false,
                         edit: false,

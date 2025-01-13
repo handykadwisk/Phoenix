@@ -828,11 +828,11 @@ export default function UserManagement({ auth, type }: any) {
                                     < div className="mb-2">
                                         <div className="relative">
                                             <InputLabel
-                                                className="absolute"
+                                                className=""
                                                 htmlFor="company"
                                                 value={'Company'}
                                             />
-                                            <div className="ml-[4.6rem] text-red-600">*</div>
+                                            {/* <div className="ml-[4.6rem] text-red-600">*</div> */}
                                         </div>
                                         <Select
                                             classNames={{
@@ -860,11 +860,11 @@ export default function UserManagement({ auth, type }: any) {
                                     {/* role  */}
                                     <div className="relative">
                                         <InputLabel
-                                            className="absolute"
+                                            className=""
                                             htmlFor="type"
                                             value={'Role'}
                                         />
-                                        <div className="ml-[2.3rem] text-red-600">*</div>
+                                        {/* <div className="ml-[2.3rem] text-red-600">*</div> */}
                                         <div className="mb-2">
                                             <Select
                                                 classNames={{
