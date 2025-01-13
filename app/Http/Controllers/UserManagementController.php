@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MRoleUser;
 use App\Models\Role;
+use App\Models\TCompany;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -25,31 +26,24 @@ extends Controller
         ]);
     }
 
-    public function getUserData($request)
-    {
+    public function getUserData(Request $request)
+    {   
         // dd($request);
-
-        $page = $request->input('page',1);
-        // $page = $request->page;
-        $perPage = $request->input('perPage', 25);
-        // $perPage = $request->perPage;
-        // dd($page, $perPage);
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
 
         $query = User::with('roles', 'type');
-        // $query = User::query()->with('company');
 
         $sortModel = $request->input('sort');
         $filterModel = json_decode($request->input('filter'), true);
         $newFilter = $request->input('newFilter', '');
-        $newSearch = json_decode($request->newFilter, true);
+        $newSearch = json_decode($newFilter, true);
 
-        // dd($sortModel);
         if ($sortModel) {
-            $sortModel = explode(';', $sortModel); 
+            $sortModel = explode(';', $sortModel);
             foreach ($sortModel as $sortItem) {
-                // dd($sortItem);
                 list($colId, $sortDirection) = explode(',', $sortItem);
-                $query->orderBy($colId, $sortDirection); 
+                $query->orderBy($colId, $sortDirection);
             }
         }
 
@@ -57,30 +51,29 @@ extends Controller
             foreach ($filterModel as $colId => $filterValue) {
                 if ($colId === 'name') {
                     $query->where('first_name', 'LIKE', '%' . $filterValue . '%')
-                    ->orWhere('last_name', 'LIKE', '%' . $filterValue . '%');
+                        ->orWhere('last_name', 'LIKE', '%' . $filterValue . '%');
                 } else {
                     $query->where($colId, 'LIKE', '%' . $filterValue . '%');
                 }
             }
         }
-         // Jika ada filter 'newFilter' dan tidak kosong
-         if ($newFilter !== "") {
+
+        if ($newFilter !== "") {
             foreach ($newSearch as $search) {
-            foreach ($search as $keyId => $searchValue) {
-                // Pencarian berdasarkan nama menu
-                if ($keyId === 'name') {
-                $query->where('name', 'LIKE', '%' . $searchValue . '%');
+                foreach ($search as $keyId => $searchValue) {
+                    if ($keyId === 'name') {
+                        $query->where('name', 'LIKE', '%' . $searchValue . '%');
+                    }
                 }
             }
-            }
         }
-        
+
         if (!$sortModel && !$filterModel) {
             $query->orderBy('id', 'desc');
         }
-        // dd($query);
+        // dd($page);
         $data = $query->paginate($perPage, ['*'], 'page', $page);
-        
+        Log::info('SQL Query: ' . $query->toSql());
         return $data;
     }
 
@@ -89,7 +82,6 @@ extends Controller
         // dd($request->id);
         $data = $this->getUserData($request);
         return response()->json($data);
-        
     }
 
     public function store(Request $request)
@@ -111,21 +103,21 @@ extends Controller
                 'X-Inertia' => true
             ]);
         }
-        
+
         $name = $request->name;
-        if($name === null || $name === ''){
+        if ($name === null || $name === '') {
             $name = $request->user_login;
         }
-        $User = User::create([  
+        $User = User::create([
             "role_id" => 0,
             "name" => $name,  // Tambahkan name di sini
             'employee_id' => $request->employee_id == 0 ? null : $request->employee_id,
             'company_division_id' => $request->company_division_id == 0 ? null : $request->company_division_id,
-            'individual_relation_id'=>$request->individual_relations_id == 0 ? null : $request->individual_relations_id,
+            'individual_relation_id' => $request->individual_relations_id == 0 ? null : $request->individual_relations_id,
             "user_login" => $request->user_login,
             "user_type_id" => $request->type,
-            'jobpost_id'=>$request->jobpost == 0 ? null : $request->jobpost,
-            'company_id'=>$request->company_id == 0 ? null : $request->company_id,
+            'jobpost_id' => $request->jobpost == 0 ? null : $request->jobpost,
+            'company_id' => $request->company_id == 0 ? null : $request->company_id,
             "password" => bcrypt($request->password),
             "USER_CREATED_BY" => Auth::user()->id,
             "USER_CREATED_DATE" => now()
@@ -168,7 +160,7 @@ extends Controller
     }
     public function getUserDataById($id)
     {
-        $users = User::with('roles', 'type','jobpost')->where('id', $id)->first();
+        $users = User::with('roles', 'type', 'jobpost')->where('id', $id)->first();
         return response()->json($users);
     }
 
@@ -184,29 +176,29 @@ extends Controller
     {
         $User = User::find($id);
         $typeInput = collect($request->input('type'))->first();
-
+        // dd($typeInput);
         $User->update([
-            'individual_relation_id'=>$request->individual_relation_id == 0 ? null : $request->individual_relation_id,
+            'individual_relation_id' => $request->individual_relation_id == 0 ? null : $request->individual_relation_id,
             "user_status" => $request->user_status,
-            'company_division_id'=>$request->company_division_id == 0 ? null : $request->company_division_id,
+            'company_division_id' => $request->company_division_id == 0 ? null : $request->company_division_id,
             "name" => $request->name,
             "email" => $request->email,
             "user_login" => $request->user_login,
             "employee_id" => $request->employee_id == 0 ? null : $request->employee_id,
             "user_type_id" => $typeInput,
-            'jobpost_id'=>$request->jobpost == 0 ? null : $request->jobpost,
-            'company_id'=>$request->company_id == 0 ? null : $request->company_id,
+            'jobpost_id' => $request->jobpost == 0 ? null : $request->jobpost,
+            'company_id' => $request->company_id == 0 ? null : $request->company_id,
             "USER_UPDATED_BY" => Auth::user()->id,
             "USER_UPDATED_DATE" => null
         ]);
 
         // Hapus entri di m_role_users jika tipe bukan 2
-        if ($typeInput !== 2) {
+        if ($typeInput !== 4 && $typeInput !== 4) {
             DB::table('m_role_users')->where('user_id', $id)->delete();
         }
 
         // Insert Roles
-        if ($typeInput === 2 && $request->has('role')) {
+        if (($typeInput === 4 && $typeInput === 4) && $request->has('role')) {
             $roles = $request->input('newRole');
             DB::table('m_role_users')->where('user_id', $id)->delete(); // Menghapus entri lama
             foreach ($roles as $roleId) {
@@ -244,5 +236,11 @@ extends Controller
     {
         $users = User::all();
         return response()->json($users);
+    }
+
+    public function getAllCompanyJson()
+    {
+        $data = TCompany::get();
+        return response()->json($data);
     }
 }

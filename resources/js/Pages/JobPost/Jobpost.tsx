@@ -309,7 +309,7 @@ export default function Jobpost({ auth }: PageProps) {
     );
   };
   // show jobpost
-  
+
 
   return (
     <AuthenticatedLayout user={auth.user} header={"Job Post"}>
@@ -543,27 +543,27 @@ export default function Jobpost({ auth }: PageProps) {
           <>
             <div className="mb-3">
               <ul>
-              {devJobpost.length > 0 ? (
-                Array.from(
-                new Set(
-                  devJobpost
-                  .filter((jobpost: any) => jobpost.COMPANY_DIVISION_NAME)
-                  .map((jobpost: any) => jobpost.COMPANY_DIVISION_NAME)
-                )
-                ).map((divisionName: any, index: number) => (
-                // Ganti <li> dengan <div> untuk menghindari nested <li>
-                <div key={divisionName + index} className="mb-2 border-l-4 border-red-500 pl-2">
-                  <TreeDivision
-                  divisionName={divisionName}
-                  jobposts={devJobpost.filter(
-                    (jobpost: any) => jobpost.COMPANY_DIVISION_NAME === divisionName
-                  )}
-                  />
-                </div>
-                ))
-              ) : (
-                <div className="text-center"></div>
-              )}
+                {devJobpost.length > 0 ? (
+                  Array.from(
+                    new Set(
+                      devJobpost
+                        .filter((jobpost: any) => jobpost.COMPANY_DIVISION_NAME)
+                        .map((jobpost: any) => jobpost.COMPANY_DIVISION_NAME)
+                    )
+                  ).map((divisionName: any, index: number) => (
+                    // Ganti <li> dengan <div> untuk menghindari nested <li>
+                    <div key={divisionName + index} className="mb-2 border-l-4 border-red-500 pl-2">
+                      <TreeDivision
+                        divisionName={divisionName}
+                        jobposts={devJobpost.filter(
+                          (jobpost: any) => jobpost.COMPANY_DIVISION_NAME === divisionName
+                        )}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center"></div>
+                )}
               </ul>
             </div>
           </>
@@ -650,7 +650,7 @@ export default function Jobpost({ auth }: PageProps) {
               withParam={null}
               searchParam={null}
               // loading={isLoading.get_policy}
-              url={"getCompany"}
+              url={"getJobpostByCompany"}
               doubleClickEvent={handleDetailJobpost}
               triggeringRefreshData={''}
               colDefs={[

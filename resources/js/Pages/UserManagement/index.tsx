@@ -43,7 +43,7 @@ import { Label } from "flowbite-react";
 import { data } from "jquery";
 import ModalToActions from "@/Components/Modal/ModalToActions";
 import { ShowHideButton } from "@/Components/ShowHideButton";
-
+// import {} from 're'
 export default function UserManagement({ auth, type }: any) {
 
     //type DataInput
@@ -98,6 +98,7 @@ export default function UserManagement({ auth, type }: any) {
     const [resetPassword, setResetPassword] = useState<any>({
         password: 'Phoenix123',
     })
+    const [isLoading, setIsLoading] = useState(false);
 
     const inputDataSearch = (
         name: string,
@@ -153,46 +154,27 @@ export default function UserManagement({ auth, type }: any) {
 
     //handle change email
     const handleUserLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const user_login = e.target.value;
 
-        let name;
-        if (user_login.includes('@')) {
-            // Jika mengandung '@', ambil bagian sebelum '@'
-            name = user_login.split("@")[0];
-        } else {
-            // Jika tidak mengandung '@', gunakan full user_login sebagai name
-            name = user_login;
-        }
         // Update state
+        if (dataInput.name === '' && dataInputEdit.name === '') {
+            const user_login = e.target.value;
 
-        setDataInput({ ...dataInput, name: name });
-        setDataInputEdit({ ...dataInputEdit, user_login, name });
-    };
+            let name;
+            if (user_login.includes('@')) {
+                // Jika mengandung '@', ambil bagian sebelum '@'
+                name = user_login.split("@")[0];
+            } else {
+                // Jika tidak mengandung '@', gunakan full user_login sebagai name
+                name = user_login;
+            }
+            setDataInput({ ...dataInput, name: name });
+            setDataInputEdit({ ...dataInputEdit, user_login, name });
 
-    //get user by id
-    const getUserById = async (userId: number) => {
-        try {
-            const result = await axios.post(`/settings/getUserId/${userId}`);
-            setDataUserId(result.data);
-            // set
-            setDataInputEdit({
-                name: result.data.name,
-                email: result.data.email,
-                user_login: result.data.user_login,
-                employee_id: result.data.employee_id,
-                individual_relations_id: result.data.individual_relation_id,
-                type: result.data.type,
-                user_status: result.data.user_status,
-                role: result.data.roles,
-                company_id: result.data.company_id,
-                jobpost: result.data.jobpost_id,
-                company_division_id: result.data.company_division_id
-            });
-        } catch (error) {
-            // console.log(error);
-            throw error;
+        } else {
+            setDataInput({ ...dataInput, user_login: e.target.value });
+            setDataInputEdit({ ...dataInputEdit, user_login: e.target.value });
         }
-    }
+    };
 
 
     //get role
@@ -223,8 +205,6 @@ export default function UserManagement({ auth, type }: any) {
             throw error;
         }
     }
-
-
 
     //modal add
     const addRolePopup = async (e: FormEvent) => {
@@ -307,7 +287,29 @@ export default function UserManagement({ auth, type }: any) {
 
 
     const handleDetailUser = async (e: any) => {
-        getUserById(e.id);
+        try {
+            const result = await axios.post(`/settings/getUserId/${e.id}`);
+            // console.log('result.data', result.data);
+
+            setDataUserId(result.data);
+
+            // set
+            setDataInputEdit({
+                name: result.data.name,
+                email: result.data.email,
+                user_login: result.data.user_login,
+                employee_id: result.data.employee_id,
+                individual_relations_id: result.data.individual_relation_id,
+                type: result.data.type,
+                user_status: result.data.user_status,
+                role: result.data.roles,
+                company_id: result.data.company_id,
+                jobpost: result.data.jobpost_id,
+                company_division_id: result.data.company_division_id
+            });
+        } catch (error) {
+            console.log(error);
+        }
         getTypeTest()
         getRole()
         getEmployee()
@@ -476,16 +478,20 @@ export default function UserManagement({ auth, type }: any) {
             [field]: event ? (event.target ? event.target.value : event.value) : ''
         });
     };
+
     const handleInputChangeEdit = (field: string) => (event: any) => {
         setDataInputEdit({
             ...dataInputEdit,
-            [field]: event.target ? event.target.value : event.value
+            // [field]: event.target ? event.target.value : event.value
+            [field]: event ? (event.target ? event.target.value : event.value) : ''
+
         });
     };
 
     const [showPassword, setShowPassword] = useState(false);
     const toggleShowPassword = () => setShowPassword(!showPassword);
 
+    // console.clear();
 
     return (
         <AuthenticatedLayout user={auth.user} header="User Management">
@@ -789,7 +795,110 @@ export default function UserManagement({ auth, type }: any) {
                             </>
                         )}
                         {/* end company */}
+                        {
+                            dataInput.type === 4 && (
+                                <>
+                                    {/* name */}
+                                    <div className="mb-2">
+                                        <div className="relative">
+                                            <InputLabel
+                                                className="absolute"
+                                                value={'Name'}
+                                            />
+                                            <div className="ml-[2.8rem] text-red-600">*</div>
+                                        </div>
+                                        <TextInput
+                                            id="name"
+                                            type="text"
+                                            name="name"
+                                            value={dataInput.name}
+                                            className="mt-2"
+                                            onChange={
+                                                (e) => setDataInput({
+                                                    ...dataInput, name: e.target.value,
+                                                })}
+                                            required
+                                            autoComplete="off"
+                                            placeholder="Name"
+                                        />
+                                    </div>
+                                    {/* end name  */}
 
+                                    {/* Company */}
+                                    < div className="mb-2">
+                                        <div className="relative">
+                                            <InputLabel
+                                                className="absolute"
+                                                htmlFor="company"
+                                                value={'Company'}
+                                            />
+                                            <div className="ml-[4.6rem] text-red-600">*</div>
+                                        </div>
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({ isSelected }: any) =>
+                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                        ? `text-white bg-red-500`
+                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                    }`,
+                                            }}
+                                            options={companySelect}
+                                            isSearchable={true}
+                                            isMultiple={false}
+                                            placeholder={"Select Company"}
+                                            isClearable={true}
+                                            value={companySelect.find((emp: { value: any }) => emp.value === dataInput.company_id) || ""}
+                                            onChange={handleInputChange('company_id')}
+                                            primaryColor={"red"}
+                                        />
+                                    </div>
+                                    {/* Company */}
+
+                                    {/* role  */}
+                                    <div className="relative">
+                                        <InputLabel
+                                            className="absolute"
+                                            htmlFor="type"
+                                            value={'Role'}
+                                        />
+                                        <div className="ml-[2.3rem] text-red-600">*</div>
+                                        <div className="mb-2">
+                                            <Select
+                                                classNames={{
+                                                    menuButton: () =>
+                                                        `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                    menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                    listItem: ({ isSelected }: any) =>
+                                                        `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                            ? `text-white bg-red-500`
+                                                            : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                        }`,
+                                                }}
+                                                options={roleFor}
+                                                isSearchable={true}
+                                                isMultiple={true}
+                                                placeholder={"Select Role"}
+                                                isClearable={true}
+                                                // value={dataInput.role.map(id => roleFor.find((role: { value: any }) => role.value === id)) || null}
+                                                value={
+                                                    dataInput.role.length > 0
+                                                        ? dataInput.role.map((id: any) =>
+                                                            roleFor.find((role: { value: any }) => role.value === id))
+                                                        : null // Set to null if no roles selected
+                                                }
+                                                onChange={handleRoleChange}
+                                                primaryColor={"red"}
+
+                                            />
+                                        </div>
+                                    </div>
+                                    {/* end role  */}
+                                </>
+                            )
+                        }
                         {/* user_login */}
                         <div className="mb-2">
                             <div className="relative">
@@ -828,21 +937,21 @@ export default function UserManagement({ auth, type }: any) {
                                 <div className="ml-[6.8rem] text-red-600">*</div>
                             </div>
                             <div className="relative">
-                            <TextInput
-                                id="password"
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                value={dataInput.password}
-                                className="mt-2"
-                                onChange={(e) => setDataInput({ ...dataInput, password: e.target.value })}
-                                required
-                                placeholder="Password"
-                                autoComplete="off"
-                            />
-                            <ShowHideButton
-                                showPassword = { showPassword}
-                                toggleShowPassword={toggleShowPassword}
-                            />
+                                <TextInput
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={dataInput.password}
+                                    className="mt-2"
+                                    onChange={(e) => setDataInput({ ...dataInput, password: e.target.value })}
+                                    required
+                                    placeholder="Password"
+                                    autoComplete="off"
+                                />
+                                <ShowHideButton
+                                    showPassword={showPassword}
+                                    toggleShowPassword={toggleShowPassword}
+                                />
                             </div>
                         </div>
                         {/* end password */}
@@ -979,7 +1088,12 @@ export default function UserManagement({ auth, type }: any) {
                                             placeholder={"Select Company"}
                                             isClearable={true}
                                             value={companySelect.find((emp: { value: any }) => emp.value === dataInputEdit.company_id) || ''}
-                                            onChange={handleInputChangeEdit('company_id')}
+                                            onChange={(val: any) => {
+                                                setDataInputEdit({
+                                                    ...dataInputEdit,
+                                                    company_id: val ? val.value : null
+                                                });
+                                            }}
                                             primaryColor={"red"}
                                         />
                                     </div>
@@ -1139,6 +1253,84 @@ export default function UserManagement({ auth, type }: any) {
                                     </div>
                                     {/* end jobpost  */}
 
+                                </>
+                            )}
+                            {(dataInputEdit?.type === 4 || dataInputEdit?.type?.user_type_id === 4) && (
+                                <>
+                                    {/* Company */}
+                                    <div className="mb-2">
+                                        <div className="relative">
+                                            <InputLabel
+                                                className=""
+                                                htmlFor="Company"
+                                                value={'Company'}
+                                            />
+                                        </div>
+                                        <Select
+                                            classNames={{
+                                                menuButton: () =>
+                                                    `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                listItem: ({ isSelected }: any) =>
+                                                    `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                        ? `text-white bg-red-500`
+                                                        : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                    }`,
+                                            }}
+                                            options={companySelect}
+                                            isSearchable={true}
+                                            isMultiple={false}
+                                            placeholder={"Select Company"}
+                                            isClearable={true}
+                                            value={companySelect.find((emp: { value: any }) => emp.value === dataInputEdit.company_id) || ''}
+                                            onChange={handleInputChangeEdit('company_id')}
+                                            primaryColor={"red"}
+                                        />
+                                    </div>
+                                    {/* Company */}
+
+                                    {/* Role */}
+                                    <div className="relative">
+                                        <div className="mb-2">
+                                            <InputLabel
+                                                className=""
+                                                htmlFor=""
+                                                value={'Role'}
+                                            />
+                                            <div className="mb-2">
+                                                <Select
+                                                    classNames={{
+                                                        menuButton: () =>
+                                                            `flex text-sm text-gray-500 mt-2 rounded-md shadow-sm transition-all duration-300 focus:outline-none bg-white hover:border-gray-400`,
+                                                        menu: "text-left z-20 w-full bg-white shadow-lg border rounded py-1 mt-1.5 text-sm text-gray-700 h-50 overflow-y-auto custom-scrollbar",
+                                                        listItem: ({ isSelected }: any) =>
+                                                            `block transition duration-200 px-2 py-2 cursor-pointer select-none truncate rounded ${isSelected
+                                                                ? `text-white bg-red-500`
+                                                                : `text-gray-500 hover:bg-blue-100 hover:text-blue-500`
+                                                            }`,
+                                                    }}
+                                                    options={roleFor}
+                                                    isSearchable={true}
+                                                    isMultiple={true}
+                                                    placeholder={"Select"}
+                                                    isClearable={true}
+                                                    // value={dataInputEdit?.role?.map(id => roleFor.find(role => role.value === id))}
+                                                    value={getDataRoleSelect(dataInputEdit.role) || ''}
+                                                    onChange={(val: any) => {
+                                                        const selectedRoleIds = val ? val.map((option: any) => option.value) : [];
+                                                        setDataInputEdit({
+                                                            ...dataInputEdit,
+                                                            role: val,
+                                                            newRole: selectedRoleIds
+                                                        })
+                                                    }}
+                                                    primaryColor={"red"}
+                                                />
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    {/* end Role */}
                                 </>
                             )}
 
@@ -1399,7 +1591,7 @@ export default function UserManagement({ auth, type }: any) {
                                     field: 'company_id',
                                     flex: 7,
                                     valueGetter: (params: any) => {
-                                        return params.data?.company?.COMPANY_NAME;
+                                        return params.data?.company?.COMPANY_NAME || 'No Company';
                                     },
 
                                 },

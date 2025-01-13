@@ -66,7 +66,8 @@ class MenuController extends Controller
 
     public function getMenuData($request)
     {
-       
+        // dd($request);
+
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 5);
         // dd($page);
@@ -103,10 +104,10 @@ class MenuController extends Controller
             }
             // }
         }
-        // dd($query->toSql());
         if (!$sortModel && !$filterModel) {
             $query->orderBy('menu_created_date', 'desc');
         }
+        Log::info('SQL Query: ' . $query->toSql());
 
         $data = $query->paginate($perPage, ['*'], 'page', $page);
         // dd($data);
@@ -180,7 +181,7 @@ class MenuController extends Controller
 
     // edit r_menu
     public function edit(Request $request)
-    {   
+    {
         // dd($request);
         // get data menu
         $menuParent = Menu::find($request->id);
@@ -197,10 +198,9 @@ class MenuController extends Controller
                     'menu_updated_by' => Auth::user()->id,
                     'menu_updated_date' => now()
                 ]);
-                return new JsonResponse([
-                    'Success editing menu.'
-                ], 200, ['X-Inertia' => true]);
-
+            return new JsonResponse([
+                'Success editing menu.'
+            ], 200, ['X-Inertia' => true]);
         } else {
 
             // dd('edit parent');
@@ -208,7 +208,7 @@ class MenuController extends Controller
             // If the parent menu is different, process the change parent
             $newParent =  $request->menu_parent_id;
             $relationParent = Menu::find($request->menu_parent_id);
-         
+
             $relationParent = Menu::find($newParent);
 
             if ($relationParent) {
@@ -227,7 +227,7 @@ class MenuController extends Controller
                     FROM
                         r_menu 
                     WHERE id = ?
-                ", [ $request->id,$newParent ]);
+                ", [$request->id, $newParent]);
                 // dd('masuk', $cekExisting);
                 // if existing group status is 'satu group
                 if ($cekExisting[0]->group_status === 'satu group') {
@@ -253,15 +253,14 @@ class MenuController extends Controller
                             'menu_updated_by' => Auth::user()->id,
                             'menu_updated_date' => now()
                         ]);
-
                 } else {
 
                     Menu::where('id', $request->id)
-                    ->update([
-                        "menu_parent_id" => $newParent,
-                        'menu_updated_by' => Auth::user()->id,
-                        'menu_updated_date' => now()
-                    ]);
+                        ->update([
+                            "menu_parent_id" => $newParent,
+                            'menu_updated_by' => Auth::user()->id,
+                            'menu_updated_date' => now()
+                        ]);
 
                     // // if parent and child are in different groups, update as usual
 
@@ -298,14 +297,13 @@ class MenuController extends Controller
                     //         ]);
                     // }
                 }
-            }
-            else{
+            } else {
                 Menu::where('id', $request->id)
-                ->update([
-                    "menu_parent_id" => null,
-                    'menu_updated_by' => Auth::user()->id,
-                    'menu_updated_date' => now()
-                ]);
+                    ->update([
+                        "menu_parent_id" => null,
+                        'menu_updated_by' => Auth::user()->id,
+                        'menu_updated_date' => now()
+                    ]);
             }
             //call store prosedure set mapping menu
             DB::select('call sp_set_mapping_menu');
@@ -383,7 +381,7 @@ class MenuController extends Controller
         // Log::info($data);
 
     }
-    
+
     public function updateMenuSequence(Request $request)
     {
         // Log::info($request);
@@ -393,8 +391,8 @@ class MenuController extends Controller
             // Log::info($item);
 
         }
-         // updated userlog
-         UserLog::create([
+        // updated userlog
+        UserLog::create([
             'created_by' => Auth::user()->id,
             'action' => json_encode([
                 "description" => "Menu sequence updated.",

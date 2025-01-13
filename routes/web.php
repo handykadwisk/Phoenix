@@ -132,6 +132,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/JobpostByDiv/{id}', [TJobpostController::class, 'getDevJobpostById'])->name('JobpostByDiv.getDevJobpostById');
     Route::post('/setJobpostStatus/{id}/{status}', [TJobpostController::class, 'setJobpostStatus'])->name('setJobpostStatus.setJobpostStatus');
     Route::post('/editJobpost', [TJobpostController::class, 'edit'])->name('editJobpost.edit');
+    Route::get('/getJobpostByCompany', [TJobpostController::class, 'getJobpostByCompany'])->name('getJobpostByCompany.getJobpostByCompany');
 
 
     //Policy
@@ -338,6 +339,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/settings/userEdit/{id}', [UserManagementController::class, 'update'])->name('settings/userEdit.update');
     Route::patch('/settings/userResetPassword/{id}', [UserManagementController::class, 'resetPassword'])->name('settings/userResetPassword.resetPassword');
     Route::get('/user', [UserManagementController::class, 'getAllUser'])->name('user.getAllUser');
+    Route::get('/getAllCompany', [UserManagementController::class, 'getAllCompanyJson'])->name('getAllComapny.getAllCompanyJson');
 
 
     //setting/usertype
@@ -615,7 +617,6 @@ Route::middleware('auth')->group(function () {
     // HR
     Route::get('hr/settingCompany', [TCompanyController::class, 'index'])->name('hr/settingCompany');
     Route::post('/addCompany', [TCompanyController::class, 'store'])->name('addCompany.store');
-    Route::get('/getAllCompany', [TCompanyController::class, 'getAllCompanyJson'])->name('getAllComapny.getAllCompanyJson');
     Route::get('/getCompany', [TCompanyController::class, 'getCompanyJson'])->name('getCompany.getCompanyJson');
     Route::post('/getCompanyDetail', [TCompanyController::class, 'get_company_detail'])->name('getCompanyDetail.get_company_detail');
     Route::post('/editCompany', [TCompanyController::class, 'editStore'])->name('editCompany.editStore');

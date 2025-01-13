@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TJobpost;
 use App\Http\Controllers\Controller;
+use App\Models\TCompany;
 use App\Models\TCompanyDivision;
 use App\Models\UserLog;
 use Illuminate\Http\JsonResponse;
@@ -96,6 +97,62 @@ class TJobpostController extends Controller
     //     return $data;
     // }
 
+    public function getCompanyData($request)
+    {
+        // dd(json_decode($request->newFilter, true));
+        $page = $request->input('page', 1);
+        $perPage = $request->input('perPage', 10);
+
+        $query = TCompany::query();
+        $sortModel = $request->input('sort');
+        $filterModel = json_decode($request->input('filter'), true);
+        $newSearch = json_decode($request->newFilter, true);
+
+
+        if ($sortModel) {
+            $sortModel = explode(';', $sortModel);
+            foreach ($sortModel as $sortItem) {
+                list($colId, $sortDirection) = explode(',', $sortItem);
+                $query->orderBy($colId, $sortDirection);
+            }
+        }
+
+        if ($request->newFilter !== "" && isset($newSearch[0])) {
+            if (isset($newSearch[0]["flag"]) && $newSearch[0]["flag"] !== "") {
+                $query->where('COMPANY_NAME', 'LIKE', '%' . $newSearch[0]['flag'] . '%');
+            } else {
+                foreach ($newSearch[0] as $keyId => $searchValue) {
+                    if ($keyId === 'COMPANY_NAME') {
+                        $query->where('COMPANY_NAME', 'LIKE', '%' . $searchValue . '%');
+                    }
+                }
+            }
+        }
+
+        // if ($filterModel) {
+        //     foreach ($filterModel as $colId => $filterValue) {
+        //         if ($colId === 'policy_number') {
+        //             $query->where('policy_number', 'LIKE', '%' . $filterValue . '%')
+        //                   ->orWhereRelation('insuranceType', 'insurance_type_name', 'LIKE', '%' . $filterValue . '%');
+        //         } elseif ($colId === 'policy_inception_date') {
+        //             $query->where('policy_inception_date', '<=', date('Y-m-d', strtotime($filterValue)))
+        //                   ->where('policy_due_date', '>=', date('Y-m-d', strtotime($filterValue)));
+        //         }
+        //     }
+        // }
+        // dd($query->toSql());
+        $data = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $data;
+    }
+
+
+    // get data company from database
+    public function getJobpostByCompany(Request $request)
+    {
+        $data = $this->getCompanyData($request);
+        return response()->json($data);
+    }
 
     public function getJobpostById($id)
     {
@@ -299,6 +356,4 @@ class TJobpostController extends Controller
             'X-Inertia' => true
         ]);
     }
-
-  
 }

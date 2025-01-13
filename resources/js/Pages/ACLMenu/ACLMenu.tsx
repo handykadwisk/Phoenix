@@ -1,3 +1,4 @@
+
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, usePage } from "@inertiajs/react";
 import { PageProps } from "@/types";
@@ -281,7 +282,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
     //end action delete
 
     
-
+    // console.clear();
     return (
         <AuthenticatedLayout user={auth.user} header={"Menu"}>
             <Head title="Menu" />
