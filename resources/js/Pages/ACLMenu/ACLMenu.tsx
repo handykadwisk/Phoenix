@@ -665,6 +665,8 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
                                     flex: 1.5,
+                                    sortable: false,
+                                    filter: false,
                                 },
                                 {
                                     headerName: "Menu Name",

@@ -817,6 +817,8 @@ export default function ACLRole({ auth, custom_menu, language, permission, newRo
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
                                     flex: 1.5,
+                                    sortable: false,
+                                    filter: false,
                                 },
                                 {
                                     headerName: "Role Name",

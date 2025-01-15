@@ -488,6 +488,8 @@ export default function ACLPermission({ auth }: PageProps) {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
                                     flex: 1.5,
+                                    sortable: false,
+                                    filter: false,
                                 },
                                 {
                                     headerName: "Permission Name",
