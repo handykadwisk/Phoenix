@@ -477,7 +477,7 @@ export default function ACLPermission({ auth }: PageProps) {
                         <AGGrid
                             addButtonLabel={null}
                             addButtonModalState={undefined}
-                            withParam={null}
+                            withParam={''}
                             searchParam={searchPermission.permission_search}
                             // loading={isLoading.get_policy}
                             url={"getPermission"}

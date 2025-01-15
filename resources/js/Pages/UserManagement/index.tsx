@@ -1562,7 +1562,7 @@ export default function UserManagement({ auth, type }: any) {
                         <AGGrid
                             addButtonLabel={null}
                             addButtonModalState={undefined}
-                            withParam={null}
+                            withParam={''}
                             searchParam={searchUser.user_search}
                             // loading={isLoading.get_policy}
                             url={"getUser"}

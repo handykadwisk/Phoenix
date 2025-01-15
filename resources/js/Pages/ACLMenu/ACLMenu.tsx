@@ -64,7 +64,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             }
         ]
     });
-    
+
     const [comboMenu, setComboMenu] = useState<any>([]);
 
     const [detailMenu, setDetailMenu] = useState<any>({
@@ -281,7 +281,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
     };
     //end action delete
 
-    
+
     // console.clear();
     return (
         <AuthenticatedLayout user={auth.user} header={"Menu"}>
@@ -478,7 +478,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     value={data.menu_name || ''}
                                     className="mt-2"
                                     onChange={(e) =>
-                                        setData("menu_name", e? e.target.value : '')
+                                        setData("menu_name", e ? e.target.value : '')
                                     }
                                     autoComplete="off"
                                     required
@@ -499,7 +499,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     value={data.menu_url || ''}
                                     className="mt-2"
                                     onChange={(e) =>
-                                        setData("menu_url",e? e.target.value : '')
+                                        setData("menu_url", e ? e.target.value : '')
                                     }
                                     autoComplete="off"
                                     placeholder="Menu URL"
@@ -533,7 +533,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                 }
             />
             {/* modal end sequence */}
-                
+
             {/* Modal detail */}
             {/* <DetailMenu
                 idMenu={detailMenu.id}
@@ -654,7 +654,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                         <AGGrid
                             addButtonLabel={null}
                             addButtonModalState={undefined}
-                            withParam={null}
+                            withParam={''}
                             searchParam={searchMenu.menu_search}
                             // loading={isLoading.get_policy}
                             url={"getMenusJson"}

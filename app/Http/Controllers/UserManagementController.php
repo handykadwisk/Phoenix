@@ -27,7 +27,7 @@ extends Controller
     }
 
     public function getUserData(Request $request)
-    {   
+    {
         // dd($request);
         $page = $request->input('page', 1);
         $perPage = $request->input('perPage', 10);
@@ -47,16 +47,16 @@ extends Controller
             }
         }
 
-        if ($filterModel) {
-            foreach ($filterModel as $colId => $filterValue) {
-                if ($colId === 'name') {
-                    $query->where('first_name', 'LIKE', '%' . $filterValue . '%')
-                        ->orWhere('last_name', 'LIKE', '%' . $filterValue . '%');
-                } else {
-                    $query->where($colId, 'LIKE', '%' . $filterValue . '%');
-                }
-            }
-        }
+        // if ($filterModel) {
+        //     foreach ($filterModel as $colId => $filterValue) {
+        //         if ($colId === 'name') {
+        //             $query->where('first_name', 'LIKE', '%' . $filterValue . '%')
+        //                 ->orWhere('last_name', 'LIKE', '%' . $filterValue . '%');
+        //         } else {
+        //             $query->where($colId, 'LIKE', '%' . $filterValue . '%');
+        //         }
+        //     }
+        // }
 
         if ($newFilter !== "") {
             foreach ($newSearch as $search) {
@@ -73,7 +73,7 @@ extends Controller
         }
         // dd($page);
         $data = $query->paginate($perPage, ['*'], 'page', $page);
-        Log::info('SQL Query: ' . $query->toSql());
+        // Log::info('SQL Query: ' . $query->toSql());
         return $data;
     }
 
