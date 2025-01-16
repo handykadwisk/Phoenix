@@ -477,7 +477,7 @@ export default function ACLPermission({ auth }: PageProps) {
                         <AGGrid
                             addButtonLabel={null}
                             addButtonModalState={undefined}
-                            withParam={null}
+                            withParam={''}
                             searchParam={searchPermission.permission_search}
                             // loading={isLoading.get_policy}
                             url={"getPermission"}
@@ -488,6 +488,8 @@ export default function ACLPermission({ auth }: PageProps) {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
                                     flex: 1.5,
+                                    sortable: false,
+                                    filter: false,
                                 },
                                 {
                                     headerName: "Permission Name",

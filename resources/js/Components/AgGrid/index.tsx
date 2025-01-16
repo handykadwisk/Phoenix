@@ -19,8 +19,8 @@ export default function AGGrid({
     withParam,
     searchParam,
     triggeringRefreshData,
-    doubleClickEvent = () => {},
-    addButtonModalState = () => {},
+    doubleClickEvent = () => { },
+    addButtonModalState = () => { },
     rowHeight,
     rowSelection,
     onSelectionChanged,
@@ -89,8 +89,7 @@ export default function AGGrid({
 
                 axios
                     .get(
-                        `/${urlNew}page=${page}&perPage=${
-                            endRow - startRow
+                        `/${urlNew}page=${page}&perPage=${endRow - startRow
                         }&sort=${sortParams}&filter=${JSON.stringify(
                             filterParams
                         )}&newFilter=${JSON.stringify(searchParam)}`

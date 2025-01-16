@@ -43,6 +43,7 @@ import { Label } from "flowbite-react";
 import { data } from "jquery";
 import ModalToActions from "@/Components/Modal/ModalToActions";
 import { ShowHideButton } from "@/Components/ShowHideButton";
+import { filter } from "@progress/kendo-data-query/dist/npm/transducers";
 // import {} from 're'
 export default function UserManagement({ auth, type }: any) {
 
@@ -1562,7 +1563,7 @@ export default function UserManagement({ auth, type }: any) {
                         <AGGrid
                             addButtonLabel={null}
                             addButtonModalState={undefined}
-                            withParam={null}
+                            withParam={''}
                             searchParam={searchUser.user_search}
                             // loading={isLoading.get_policy}
                             url={"getUser"}
@@ -1573,6 +1574,8 @@ export default function UserManagement({ auth, type }: any) {
                                     headerName: "No.",
                                     valueGetter: "node.rowIndex + 1",
                                     flex: 3,
+                                    sortable: false, // Tidak perlu sorting di sini karena akan selalu dihitung ulang
+                                    filter: false, // Tidak perlu filter di sini karena hanya berisi nomor urut
                                 },
                                 {
                                     headerName: "User Login",
