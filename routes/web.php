@@ -6,6 +6,7 @@ use App\Http\Controllers\AttendanceSettingController;
 use App\Http\Controllers\BankTransactionController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\CashAdvanceReportController;
+use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\CoBrokingController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CollectiveLeaveController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\MedicalController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\MRelationFBIPKSController;
 use App\Http\Controllers\ExpensesController;
+use App\Http\Controllers\MilestoneController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoleAccessMenuController;
 use App\Http\Controllers\UserLogController;
@@ -40,6 +42,7 @@ use App\Models\TRelationStructure;
 use App\Http\Controllers\PolicyCoverageController;
 use App\Http\Controllers\PolicyInsuredController;
 use App\Http\Controllers\PolicyPartnerController;
+use App\Http\Controllers\RCobController;
 use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\RelationController;
 use App\Http\Controllers\ReportController;
@@ -60,6 +63,7 @@ use App\Http\Controllers\TReminderController;
 use App\Http\Controllers\TJobpostController;
 use App\Http\Controllers\TTagPluginProcessController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\WorkBookController;
 use App\Models\Role;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -113,10 +117,28 @@ Route::middleware('auth')->group(function () {
     Route::post('/editDocumentPks', [RelationController::class, 'edit_document_pks'])->name('editDocumentPks.edit_document_pks');
     Route::post('/getRelationClient', [RelationController::class, 'get_relation_client'])->name('getRelationClient.get_relation_client');
 
+    //milestone
+    Route::post('/addMilestone', [MilestoneController::class, 'store'])->name('addMilestone');
+    Route::get('/getMilestoneById/{id}', [MilestoneController::class, 'getMilestoneById'])->name('getMilestoneById');
+    Route::post('/deleteMilestone/{id}', [MilestoneController::class, 'deleteMilestone'])->name('deleteMilestone');
+    Route::post('/editMilestone', [MilestoneController::class, 'edit'])->name('editMilestone');
+    Route::post('/updateSequence', [MilestoneController::class, 'updateSequence'])->name('updateSequence');
 
+    // Work Book
+    Route::get('/workbook', [WorkBookController::class, 'index'])->name('workbook');
+    Route::get('/getWorkbook', [WorkBookController::class, 'getWorkbookJson'])->name('getWorkbook.getWorkBookJson');
+    Route::post('/storeWorkbook', [WorkBookController::class, 'store'])->name('storeWorkbook.storeWorkbook');
+    Route::get('/workbookId/{id}', [WorkBookController::class, 'getWorkBookById'])->name('workbook.getWorkBookById');
+    Route::post('/editWorkbook/{id}', [WorkBookController::class, 'edit'])->name('editWorkbook.edit');
+    Route::post('/copyWorkbookMilestone/{id}', [WorkBookController::class, 'copyWorkbookMilestone'])->name('copyWorkbookMilestone.copyMilestone');
 
-
-
+    // Claim
+    Route::get('/claim', [ClaimController::class, 'index'])->name('claim');
+    Route::get('/getClaim', [ClaimController::class, 'getClaimJson'])->name('getClaim.getClaimJson');
+    
+    
+    // Class of Business
+    Route::get('/cob', [RCobController::class, 'cobJson'])->name('cob');
 
 
 
