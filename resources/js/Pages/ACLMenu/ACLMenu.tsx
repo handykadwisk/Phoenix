@@ -125,7 +125,6 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             sequence: !modal.sequence,
         });
     };
-    console.log(modal);
 
     const { data, setData } = useForm<any>({
         menu_parent: "",

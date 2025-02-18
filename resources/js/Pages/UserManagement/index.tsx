@@ -493,7 +493,7 @@ export default function UserManagement({ auth, type }: any) {
     const toggleShowPassword = () => setShowPassword(!showPassword);
 
     // console.clear();
-    console.log('dataInput', dataInputEdit);
+    // console.log('dataInput', dataInputEdit);
 
 
     return (
@@ -1162,7 +1162,7 @@ export default function UserManagement({ auth, type }: any) {
                                                     placeholder={"Select"}
                                                     isClearable={true}
                                                     // value={dataInputEdit?.role?.map(id => roleFor.find(role => role.value === id))}
-                                                    value={getDataRoleSelect(dataInputEdit.role)|| dataInputEdit.role}
+                                                    value={getDataRoleSelect(dataInputEdit.role) || dataInputEdit.role}
                                                     onChange={(val: any) => {
                                                         const selectedRoleIds = val ? val.map((option: any) => option.value) : [];
                                                         setDataInputEdit({
