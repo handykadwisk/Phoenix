@@ -494,6 +494,7 @@ export default function UserManagement({ auth, type }: any) {
 
     // console.clear();
     // console.log('dataInput', dataInputEdit);
+    console.log('dataInputEdit', dataInputEdit);
 
 
     return (
@@ -1474,7 +1475,7 @@ export default function UserManagement({ auth, type }: any) {
                                         <InputLabel
                                             className=""
                                             htmlFor="password"
-                                            value={`Are you sure for reseting password ${dataInputEdit.email} to be 'Phoenix123'?`}
+                                            value={`Are you sure for reseting password ${dataInputEdit.name} to be 'Phoenix123'?`}
                                         />
                                     </div>
 
