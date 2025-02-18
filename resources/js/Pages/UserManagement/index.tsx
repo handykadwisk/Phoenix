@@ -494,7 +494,6 @@ export default function UserManagement({ auth, type }: any) {
 
     // console.clear();
     // console.log('dataInput', dataInputEdit);
-    console.log('dataInputEdit', dataInputEdit);
 
 
     return (
