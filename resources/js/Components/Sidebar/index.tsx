@@ -8,23 +8,23 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Cog6ToothIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 interface SidebarProps {
-  sidebarOpen: boolean;
-  setSidebarOpen: (arg: boolean) => void;
-  sidebarDesktopOpen: boolean;
-  setSidebarDesktopOpen: (arg: boolean) => void;
+    sidebarOpen: boolean;
+    setSidebarOpen: (arg: boolean) => void;
+    sidebarDesktopOpen: boolean;
+    setSidebarDesktopOpen: (arg: boolean) => void;
 }
 const Sidebar = ({
-  sidebarOpen,
-  setSidebarOpen,
-  sidebarDesktopOpen,
-  setSidebarDesktopOpen,
+    sidebarOpen,
+    setSidebarOpen,
+    sidebarDesktopOpen,
+    setSidebarDesktopOpen,
 }: SidebarProps) => {
-  const { auth }: any = usePage().props;
+    const { auth }: any = usePage().props;
 
-  const trigger = useRef<any>(null);
-  const sidebar = useRef<any>(null);
+    const trigger = useRef<any>(null);
+    const sidebar = useRef<any>(null);
 
-  const pathname = window.location.pathname.split("/")[1];
+    const pathname = window.location.pathname.split("/")[1];
 
     const storedSidebarExpanded = localStorage.getItem("sidebar-expanded");
     const [sidebarExpanded, setSidebarExpanded] = useState(
@@ -35,31 +35,31 @@ const Sidebar = ({
 
     // console.log(auth,'<<<<<<<<authhhhh');
 
-  // close on click outside
-  useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
-      if (!sidebar.current || !trigger.current) return;
-      if (
-        !sidebarOpen ||
-        sidebar.current.contains(target) ||
-        trigger.current.contains(target)
-      )
-        return;
-      setSidebarOpen(false);
-    };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
-  });
+    // close on click outside
+    useEffect(() => {
+        const clickHandler = ({ target }: MouseEvent) => {
+            if (!sidebar.current || !trigger.current) return;
+            if (
+                !sidebarOpen ||
+                sidebar.current.contains(target) ||
+                trigger.current.contains(target)
+            )
+                return;
+            setSidebarOpen(false);
+        };
+        document.addEventListener("click", clickHandler);
+        return () => document.removeEventListener("click", clickHandler);
+    });
 
-  // close if the esc key is pressed
-  useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
-      if (!sidebarOpen || keyCode !== 27) return;
-      setSidebarOpen(false);
-    };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
-  });
+    // close if the esc key is pressed
+    useEffect(() => {
+        const keyHandler = ({ keyCode }: KeyboardEvent) => {
+            if (!sidebarOpen || keyCode !== 27) return;
+            setSidebarOpen(false);
+        };
+        document.addEventListener("keydown", keyHandler);
+        return () => document.removeEventListener("keydown", keyHandler);
+    });
 
     useEffect(() => {
         localStorage.setItem("sidebar-expanded", sidebarExpanded.toString());
@@ -74,7 +74,6 @@ const Sidebar = ({
 
     const renderMenu = (menu: any, index: number) => {
         const hasChildren = menu.children && menu.children.length > 0;
-        // console.log(hasChildren,'hassschild');
 
         return (
             <li key={index}>
@@ -117,9 +116,8 @@ const Sidebar = ({
                                 >
                                     {menu.menu_name}
                                     <svg
-                                        className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                            open && "rotate-180"
-                                        }`}
+                                        className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                                            }`}
                                         width="20"
                                         height="20"
                                         viewBox="0 0 20 20"
@@ -136,27 +134,25 @@ const Sidebar = ({
 
                                 {/* Dropdown menu untuk children */}
                                 <div
-                                    className={`translate transform overflow-hidden ${
-                                        !open && "hidden"
-                                    }`}
+                                    className={`translate transform overflow-hidden ${!open && "hidden"
+                                        }`}
                                 >
                                     <ul className="mt-2 flex flex-col pl-6 space-y-1">
                                         {/* Render children secara rekursif */}
                                         {hasChildren &&
-                                            menu.children.map(
-                                                (
-                                                    child: any,
-                                                    childIndex: number
-                                                ) => (
-                                                    <Fragment
-                                                        key={`${index}-${childIndex}`}
-                                                    >
-                                                        {renderMenu(
-                                                            child,
-                                                            childIndex
-                                                        )}
+                                            (auth.user.user_type_id === 1
+                                                ? menu.children.map((child: any, childIndex: number) => (
+                                                    <Fragment key={`${index}-${childIndex}`}>
+                                                        {renderMenu(child, childIndex)}
                                                     </Fragment>
-                                                )
+                                                ))
+                                                : menu.children.filter(
+                                                    (m: any) => m.access.length > 0
+                                                ).map((child: any, childIndex: number) => (
+                                                    <Fragment key={`${index}-${childIndex}`}>
+                                                        {renderMenu(child, childIndex)}
+                                                    </Fragment>
+                                                ))
                                             )}
                                     </ul>
                                 </div>
@@ -320,9 +316,8 @@ const Sidebar = ({
 
             {/* Sidebar desktop */}
             <div
-                className={`hidden lg:fixed lg:inset-y-0 lg:z-50 ${
-                    !sidebarDesktopOpen ? "lg:flex lg:w-72 lg:flex-col" : ""
-                }`}
+                className={`hidden lg:fixed lg:inset-y-0 lg:z-50 ${!sidebarDesktopOpen ? "lg:flex lg:w-72 lg:flex-col" : ""
+                    }`}
             >
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
                     <div className="flex h-16 shrink-0 items-center justify-center">

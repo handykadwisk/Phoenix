@@ -23,5 +23,10 @@ class Role extends Model
         return $this->belongsToMany(Menu::class, 'm_role_access_menu')->where('menu_is_deleted', 0)->orderBy('menu_sequence', 'asc');
     }
 
+    public function permission()
+    {
+        return $this->belongsToMany(TPermission::class, 'm_role_permissions', 'role_id', 'permission_id');
+    }
+
     public $timestamps = false;
 }

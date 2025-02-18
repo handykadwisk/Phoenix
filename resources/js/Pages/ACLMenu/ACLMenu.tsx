@@ -125,6 +125,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             sequence: !modal.sequence,
         });
     };
+    console.log(modal);
 
     const { data, setData } = useForm<any>({
         menu_parent: "",
@@ -171,21 +172,16 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
         }
         //get combo menu
         getComboMenu();
-        Swal.fire({
-            title: `${message && message.length > 0 ? message[0] : 'Success'} Please Arrange the Sequence`,
-            icon: 'info',
-            timer: 2000,
-            timerProgressBar: true,
-            showConfirmButton: false,
-            willClose: () => {
-                setModal({
-                    add: false,
-                    edit: false,
-                    detail: false,
-                    sequence: true,
-                });
-            }
-        });
+        // window.location.reload();
+        // **Tunggu sebentar sebelum membuka modal agar tidak langsung tertutup**
+        setTimeout(() => {
+            setModal({
+                add: false,
+                edit: false,
+                detail: false,
+                sequence: true,
+            });
+        }, 500); // Delay 500ms agar perubahan state sebelumnya selesai
     };
 
 
@@ -258,16 +254,17 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                     // send request to server
                     const response = await axios.post(`/changeMenuStatus`, { idMenu, flag });
                     // check status response
-                    if (response.status === 200) {
-                        Swal.fire(
-                            'Deleted!',
-                            'Your menu has been deleted.',
-                            'success'
-                        );
-                        handleSuccessMenu(response.data, e); // Panggil fungsi sukses untuk memperbarui UI atau state
-                    } else {
-                        throw new Error('Unexpected response status');
-                    }
+                    // if (response.status === 200) {
+                    //     Swal.fire(
+                    //         'Deleted!',
+                    //         'Your menu has been deleted.',
+                    //         'success'
+                    //     );
+                    handleSuccessMenu(response.data, e); // Panggil fungsi sukses untuk memperbarui UI atau state
+                    setModal({ ...modal, edit: false });
+                    // } else {
+                    //     throw new Error('Unexpected response status');
+                    // }
                 } catch (error) {
                     console.error(error);
                     Swal.fire(
@@ -511,6 +508,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
             />
             {/* modal end add */}
 
+
             {/* modal sequence */}
             <ModalToAdd
                 buttonAddOns={''}
@@ -533,6 +531,7 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                 }
             />
             {/* modal end sequence */}
+
 
             {/* Modal detail */}
             {/* <DetailMenu

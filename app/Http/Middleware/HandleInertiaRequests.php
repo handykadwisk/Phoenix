@@ -54,7 +54,7 @@ class HandleInertiaRequests extends Middleware
                     'user'       => $request->user(),
                     'role'       => $request->user()->roles->pluck('id'),
                     'menu'       => $menu,  // Menu yang sudah di-filter
-                    'permission' => $user->roles->pluck('permission')->flatten(),
+                    'permission' => $request->user()->roles->pluck('permission'),
                     'additional' => $request->user()->additional,
 
                 ],

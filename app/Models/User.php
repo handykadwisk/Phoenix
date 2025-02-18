@@ -47,7 +47,7 @@ class User extends Authenticatable
         ];
     }
 
-    protected $with = ['employee','jobpost','type','company','roles','type'];
+    protected $with = ['employee', 'jobpost', 'type', 'company', 'roles', 'type'];
 
     public function company(): BelongsTo
     {
@@ -64,21 +64,28 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'm_role_users', 'user_id', 'role_id');
     }
 
+    public function permission()
+    {
+        return $this->belongsToMany(TPermission::class, 'm_role_permissions', 'role_id', 'permission_id');
+    }
+
     public function menu()
     {
         return $this->belongsToMany(Menu::class, 'role_menu', 'role_id', 'menu_id');
     }
-    
+
     public function type()
     {
         return $this->belongsTo(RUserType::class, 'user_type_id');
     }
-    
-    public function additional() {
+
+    public function additional()
+    {
         return $this->hasOne(UserAdditional::class, 'user_id');
     }
 
-    public function jobpost(){
+    public function jobpost()
+    {
         return $this->belongsTo(TJobpost::class, 'jobpost_id');
     }
 }

@@ -135,8 +135,8 @@ Route::middleware('auth')->group(function () {
     // Claim
     Route::get('/claim', [ClaimController::class, 'index'])->name('claim');
     Route::get('/getClaim', [ClaimController::class, 'getClaimJson'])->name('getClaim.getClaimJson');
-    
-    
+
+
     // Class of Business
     Route::get('/cob', [RCobController::class, 'cobJson'])->name('cob');
 
@@ -360,6 +360,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/UserId/{id}', [UserManagementController::class, 'dataById'])->name('settings/UserId.getUserId');
     Route::patch('/settings/userEdit/{id}', [UserManagementController::class, 'update'])->name('settings/userEdit.update');
     Route::patch('/settings/userResetPassword/{id}', [UserManagementController::class, 'resetPassword'])->name('settings/userResetPassword.resetPassword');
+    Route::patch('/settings/userChangePassword/{id}', [UserManagementController::class, 'changePassword'])->name('settings/userChangePassword.changePassword');
     Route::get('/user', [UserManagementController::class, 'getAllUser'])->name('user.getAllUser');
     Route::get('/getAllCompany', [UserManagementController::class, 'getAllCompanyJson'])->name('getAllComapny.getAllCompanyJson');
 

@@ -493,6 +493,8 @@ export default function UserManagement({ auth, type }: any) {
     const toggleShowPassword = () => setShowPassword(!showPassword);
 
     // console.clear();
+    console.log('dataInput', dataInputEdit);
+
 
     return (
         <AuthenticatedLayout user={auth.user} header="User Management">
@@ -1037,7 +1039,7 @@ export default function UserManagement({ auth, type }: any) {
                                     <div className="ml-[2.3rem] text-red-600">*</div>
                                     <select
                                         className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-md focus:ring-2 focus:ring-red-600 sm:text-sm sm:leading-6"
-                                        value={dataInputEdit?.type?.user_type_id || ''}
+                                        value={dataInputEdit?.type?.user_type_id || dataInputEdit?.type || ''}
                                         onChange={(e) => {
                                             const selectedType = Number(e.target.value);
                                             setDataInputEdit({
@@ -1160,7 +1162,7 @@ export default function UserManagement({ auth, type }: any) {
                                                     placeholder={"Select"}
                                                     isClearable={true}
                                                     // value={dataInputEdit?.role?.map(id => roleFor.find(role => role.value === id))}
-                                                    value={getDataRoleSelect(dataInputEdit.role)}
+                                                    value={getDataRoleSelect(dataInputEdit.role)|| dataInputEdit.role}
                                                     onChange={(val: any) => {
                                                         const selectedRoleIds = val ? val.map((option: any) => option.value) : [];
                                                         setDataInputEdit({

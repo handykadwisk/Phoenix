@@ -18,4 +18,9 @@ class TPermission extends Model
     ];
 
     public $timestamps = false;
+
+    public function role()
+    {
+        return $this->belongsToMany(Role::class, 'm_role_permissions', 'permission_id', 'role_id');
+    }
 }

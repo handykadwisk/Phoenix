@@ -330,7 +330,8 @@ class MenuController extends Controller
     public function changeMenuStatus(Request $request)
     {
         // Find the menu by ID
-        $menu = Menu::find($request->idMenu);
+        $menu = Menu::find($request->idMenu['id']);
+        // dd($menu);
 
         // if menu found
         if ($menu) {

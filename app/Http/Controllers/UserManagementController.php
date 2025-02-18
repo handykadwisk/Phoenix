@@ -174,11 +174,12 @@ extends Controller
     // Update User
     public function update(Request $request, $id)
     {
+        // dd($request);
         $User = User::find($id);
         $typeInput = collect($request->input('type'))->first();
         // dd($typeInput);
         $User->update([
-            'individual_relation_id' => $request->individual_relation_id == 0 ? null : $request->individual_relation_id,
+            'individual_relation_id' => $request->individual_relations_id == 0 ? null : $request->individual_relations_id,
             "user_status" => $request->user_status,
             'company_division_id' => $request->company_division_id == 0 ? null : $request->company_division_id,
             "name" => $request->name,
@@ -193,12 +194,12 @@ extends Controller
         ]);
 
         // Hapus entri di m_role_users jika tipe bukan 2
-        if ($typeInput !== 4 && $typeInput !== 4) {
-            DB::table('m_role_users')->where('user_id', $id)->delete();
-        }
+        // if ($typeInput === 4 && $typeInput === 4) {
+        //     DB::table('m_role_users')->where('user_id', $id)->delete();
+        // }
 
         // Insert Roles
-        if (($typeInput === 4 && $typeInput === 4) && $request->has('role')) {
+        if ($request->has('role')) {
             $roles = $request->input('newRole');
             DB::table('m_role_users')->where('user_id', $id)->delete(); // Menghapus entri lama
             foreach ($roles as $roleId) {
@@ -227,6 +228,22 @@ extends Controller
         return new JsonResponse([
             // 'Policy updated.'
             'Password has been reset.'
+        ], 200, [
+            'X-Inertia' => true
+        ]);
+    }
+
+    public function ChangePassword(Request $request, $id)
+    {
+        $User = User::find($id);
+        $User->update([
+            "password" => bcrypt($request->password),
+            "USER_UPDATED_BY" => Auth::user()->id,
+            "USER_UPDATED_DATE" => now()
+        ]);
+        return new JsonResponse([
+            // 'Policy updated.'
+            'Password has been changes.'
         ], 200, [
             'X-Inertia' => true
         ]);

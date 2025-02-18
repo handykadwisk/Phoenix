@@ -12,6 +12,7 @@ import InputLabel from '../InputLabel';
 import TextInput from '../TextInput';
 import { log } from 'console';
 import { ShowHideButton } from '../ShowHideButton';
+import ToastMessage from '../ToastMessage';
 
 const DropdownUser = () => {
 
@@ -41,25 +42,17 @@ const DropdownUser = () => {
     }
   }, [password, confirmPassword]);
 
-  const handleSuccess = (message: string) => {
-    if (modal.reset) {
-      Swal.fire({
-        title: "Success",
-        text: "Reset Password",
-        icon: "success",
-      }).then((result: any) => {
-        if (result.value) {
-          // getUser();
-          setPassword({
-            password: ''
-          })
-          setConfirmPassword({
-            password: ''
-          })
-        }
-      });
+  const [isSuccess, setIsSuccess] = useState<string>('');
+  const handleSuccess = (response: any) => {
+    setIsSuccess('');
+
+    if (response[0]) {
+      setIsSuccess(response[0]);
+      setTimeout(() => {
+        setIsSuccess('');
+      }, 5000);
     }
-  }
+  };
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const trigger = useRef<any>(null);
@@ -96,6 +89,13 @@ const DropdownUser = () => {
 
   return (
     <>
+      {isSuccess && (
+        <ToastMessage
+          message={isSuccess}
+          isShow={true}
+          type={"success"}
+        />
+      )}
       <Menu as="div" className="relative">
         <Menu.Button className="-m-1.5 flex items-center p-1.5">
           <span className="sr-only">Open user menu</span>
@@ -177,7 +177,7 @@ const DropdownUser = () => {
         }
         method="patch"
         title={'Change Password'}
-        url={`/settings/userResetPassword/${id}`}
+        url={`/settings/userChangePassword/${id}`}
         data={password}
         onSuccess={handleSuccess}
         classPanel={
@@ -197,21 +197,21 @@ const DropdownUser = () => {
                     <div className="ml-[6.8rem] text-red-600">*</div>
                   </div>
                   <div className="relative">
-                  <TextInput
-                    id="password"
-                    // type="password"
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    value={password.password}
-                    className="mt-2"
-                    onChange={(e) => setPassword({ ...password, password: e.target.value })}
-                    required
-                    placeholder="Password"
-                  />
-                  <ShowHideButton
-                          showPassword={showPassword}
-                          toggleShowPassword={toggleShowPassword}
-                        />
+                    <TextInput
+                      id="password"
+                      // type="password"
+                      type={showPassword ? 'text' : 'password'}
+                      name="password"
+                      value={password.password}
+                      className="mt-2"
+                      onChange={(e) => setPassword({ ...password, password: e.target.value })}
+                      required
+                      placeholder="Password"
+                    />
+                    <ShowHideButton
+                      showPassword={showPassword}
+                      toggleShowPassword={toggleShowPassword}
+                    />
                   </div>
                   <div className="relative mt-4">
                     <div className="mb-2">
