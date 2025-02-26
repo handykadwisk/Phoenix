@@ -607,20 +607,33 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                             <div
                                 className="bg-red-600 text-white p-2 w-fit rounded-md text-center hover:bg-red-500 cursor-pointer"
                                 onClick={() => {
-                                    if (
-                                        searchMenu.menu_search[0]
-                                            .id === "" &&
-                                        searchMenu.menu_search[0]
-                                            .menu_name === ""
-                                    ) {
-                                        inputDataSearch("flag", "", 0);
+                                    // alert("Search");
+                                    // if (
+                                    //     searchMenu.menu_search[0]
+                                    //         .id === "" &&
+                                    //     searchMenu.menu_search[0]
+                                    //         .menu_name === ""
+                                    // ) {
+                                    //     inputDataSearch("flag", "", 0);
+                                    // } else {
+                                    //     inputDataSearch("flag", "", 0);
+                                    // }
+                                    // setRefreshGrid("success");
+                                    // setTimeout(() => {
+                                    //     setRefreshGrid("");
+                                    // }, 1000);
+                                    const title = searchMenu.menu_search[0].menu_name;
+                                    const id = searchMenu.menu_search[0].id;
+                                    if (title || id) {
+                                        inputDataSearch("flag", title || id, 0);
+                                        setIsSuccess("success");
+                                        setTimeout(() => {
+                                            setIsSuccess("");
+                                        });
                                     } else {
                                         inputDataSearch("flag", "", 0);
+                                        setIsSuccess("Get All Permission");
                                     }
-                                    setRefreshGrid("success");
-                                    setTimeout(() => {
-                                        setRefreshGrid("");
-                                    }, 1000);
                                 }}
                             >
                                 Search
@@ -633,7 +646,8 @@ export default function ACLMenu({ auth, custom_menu }: PageProps) {
                                     inputDataSearch("flag", "", 0);
 
                                     // Refresh the grid to show the default data (without search filters)
-                                    setRefreshGrid("success");
+                                    setIsSuccess("Get All Permission");
+
                                     setTimeout(() => {
                                         setRefreshGrid("");
                                     }, 1000);
