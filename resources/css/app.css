@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /* width */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    /* Track */
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: none;
+        border-radius: 0.5rem;
+    }
+
+    /* Handle */
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 0.5rem;
+    }
+
+    /* Handle on hover */
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #aeaeae;
+    }
+
+    main {
+        min-height: calc(100vh - 6.5rem);
+    }
+
+    .ag-grid-layouts {
+        height: calc(100vh - 4rem - 40px - 16px - 5.1rem);
+    }
+
+    .ag-grid-layout {
+        height: calc(60vh - 4rem - 40px - 16px - 5.1rem);
+    }
+
+    .ag-grid-employee {
+        height: calc(85vh - 4rem - 40px - 16px - 5.1rem);
+    }
+
+    .modal-action {
+        height: calc(100vh - 4rem - 40px - 16px - 8.1rem);
+    }
+
+    .login-layout {
+        height: calc(100vh - 4.1rem - 0rem - 0rem - 0rem);
+    }
+
+    /* .chat-height {
+        height: calc(100vh - 0rem - 0px - 0px - 19rem);
+    } */
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 25px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 21px;
+        width: 21px;
+        left: 1px;
+        bottom: 2px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+    }
+
+    input:checked + .slider {
+        background-color: #2196f3;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 92px;
+        -webkit-border-radius: 92px;
+        -moz-border-radius: 92px;
+        -ms-border-radius: 92px;
+        -o-border-radius: 92px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        -ms-border-radius: 50%;
+        -o-border-radius: 50%;
+    }
+    
+    .inputfield{
+        position: relative;
+        width: 100px;
+    }
+      
+    input[type=time]::-webkit-calendar-picker-indicator {
+        bottom: 0;
+        color: transparent;
+        cursor: pointer;
+        height: auto;
+        left: 0;
+        opacity: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%
+    }
+}
