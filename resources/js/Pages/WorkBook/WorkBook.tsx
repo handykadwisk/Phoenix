@@ -24,6 +24,7 @@ import Alert from "@/Components/Alert";
 import { NumberFilter } from "ag-grid-community";
 import SequenceEditComponent from "@/Components/sequenceEditComponent";
 import ActionModal from "@/Components/Modal/ActionModal";
+import Loader from "@/Components/Loader";
 // import TreeView from "@/Components/ThreeView";
 
 //Initial Data
@@ -238,6 +239,7 @@ export default function WorkBook({ auth, cob, duration, milestones, workbook }: 
             if (result.isConfirmed) {
                 setModal({ ...modal, copyMilestone: false, editSequence: true });
             }
+
         });
     };
 
@@ -598,10 +600,7 @@ export default function WorkBook({ auth, cob, duration, milestones, workbook }: 
             />
 
             {
-                loading ? (
-                    <div className="absolute top-0 left-0 z-50 w-full h-full bg-gray-200 bg-opacity-50 flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-red-500"></div>
-                    </div>) : (
+                loading ? (<Loader />) : (
                     // Modal Edit Workbook
                     <ActionModal
                         cancelButtonName={'Close'}
@@ -1261,8 +1260,6 @@ export default function WorkBook({ auth, cob, duration, milestones, workbook }: 
                 )
 
             }
-
-
 
 
 

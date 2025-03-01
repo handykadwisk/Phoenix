@@ -16,7 +16,7 @@ class Policy extends Model
     protected $table = 't_policy';
 
     public $timestamps = false;
-    public $with = ['policyPremium', 'policyInstallment', 'insuranceType', 'relation'];
+    public $with = ['policyPremium', 'policyInstallment', 'insuranceType', 'relation', 'policyCoverage'];
 
     // protected $fillable = [
     //     'POLICY_ID',
@@ -37,20 +37,29 @@ class Policy extends Model
     // ];
     protected $guarded = ['POLICY_ID'];
 
-    public function policyPremium() {
+
+    public function policyPremium()
+    {
         return $this->hasMany(MPolicyPremium::class, 'POLICY_ID', 'POLICY_ID');
     }
 
-    public function policyInstallment() {
+    public function policyInstallment()
+    {
         return $this->hasMany(PolicyInstallment::class, 'POLICY_ID', 'POLICY_ID');
     }
 
-    public function insuranceType() {
+    public function insuranceType()
+    {
         return $this->hasOne(RInsuranceType::class, 'INSURANCE_TYPE_ID', 'INSURANCE_TYPE_ID');
     }
 
-    public function relation() {
+    public function relation()
+    {
         return $this->hasOne(Relation::class, 'RELATION_ORGANIZATION_ID', 'RELATION_ID');
     }
-    
+
+    public function policyCoverage()
+    {
+        return $this->hasMany(MPolicyCoverage::class, 'POLICY_ID', 'POLICY_ID');
+    }
 }

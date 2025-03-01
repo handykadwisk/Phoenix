@@ -12,11 +12,12 @@ class MPolicyInsuredDetail extends Model
     protected $table = 'm_policy_insured_detail';
 
     public $timestamps = false;
-    // public $with = ['coverage'];
+    public $with = ['interestInsured'];
 
     protected $guarded = ['POLICY_INSURED_DETAIL_ID'];
 
-    // public function coverage() {
-    //     return $this->hasOne(MPolicyCoverage::class, 'COVERAGE_ID', 'COVERAGE_ID');
-    // }
+    public function interestInsured()
+    {
+        return $this->hasOne(RInterestInsured::class, 'INTEREST_INSURED_ID', 'INTEREST_INSURED_ID');
+    }
 }
