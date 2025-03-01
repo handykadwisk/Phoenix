@@ -135,7 +135,12 @@ Route::middleware('auth')->group(function () {
     // Claim
     Route::get('/claim', [ClaimController::class, 'index'])->name('claim');
     Route::get('/getClaim', [ClaimController::class, 'getClaimJson'])->name('getClaim.getClaimJson');
-
+    Route::post('/addClaim', [ClaimController::class, 'store'])->name('addClaim.store');
+    Route::post('/storeInsuredValue', [ClaimController::class, 'storeInsuredValue'])->name('revisiInsured.storeInsuredValue');
+    Route::get('/getClaimById/{id}', [ClaimController::class, 'getClaimById'])->name('getClaimById.getClaimById');
+    Route::post('/editClaim/{id}', [ClaimController::class, 'edit'])->name('editClaim.edit');
+    Route::post('/deleteClaim/{id}', [ClaimController::class, 'delete'])->name('deleteClaim.delete');
+    Route::post('/storeInsuredValue', [ClaimController::class, 'storeInsuredValue'])->name('storeInsuredValue.storeInsuredValue');
 
     // Class of Business
     Route::get('/cob', [RCobController::class, 'cobJson'])->name('cob');
