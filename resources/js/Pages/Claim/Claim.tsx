@@ -46,7 +46,8 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
         edit: false,
         delete: false,
         stepper: false,
-        updateValue: false
+        updateValue: false,
+        historyValue: false
     });
     const [loading, setLoading] = useState<boolean>(false);
     const [search, setSearch] = useState<any>({
@@ -904,6 +905,66 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
             />
 
 
+           <ActionModal
+                submitButtonName={''}
+                headers={''}
+                method=""
+                title="Value Revision"
+                show={modal.historyValue}
+                onClose={() => setModal({ ...modal, historyValue: false })}
+                data={''}
+                url={''}
+                onSuccess={''}
+                classPanel={`relative transform overflow-hidden rounded-lg bg-red-900 text-left shadow-xl transition-all sm:my-12 lg:w-3/4 w-full mx-5`}
+
+                body={
+                    <>
+                        <div className="p-4"></div>
+                            <h2 className="text-lg font-semibold mb-4">History of Value Submitted Coverage</h2>
+                            <div className="overflow-y-auto max-h-96">
+                                {dataId.coverage?.map((coverage: any, index: number) => (
+                                    <div key={index} className="mb-4">
+                                        <h3 className="text-md font-medium">{coverage.coverage.POLICY_COVERAGE_NAME}</h3>
+                                        <div className="border border-black mb-2"></div>
+                                        {coverage.insured
+                                            ?.sort((a: any, b: any) => a.claim_coverage.POLICY_COVERAGE_DETAIL_ID - b.claim_coverage.POLICY_COVERAGE_DETAIL_ID)
+                                            ?.reduce((acc: any, curr: any) => {
+                                                // console.log(acc, curr);
+                                                
+                                                const existing = acc.find((item: any) => item.claim_coverage.POLICY_COVERAGE_DETAIL_ID === curr.claim_coverage.POLICY_COVERAGE_DETAIL_ID);
+                                                if (existing) {
+                                                    existing.values.push(curr);
+                                                } else {
+                                                    acc.push({
+                                                        claim_coverage: curr.claim_coverage,
+                                                        values: [curr]
+                                                    });
+                                                }
+                                                return acc;
+                                            }, [])
+                                            ?.map((group: any, groupIndex: number) => (
+                                                <div key={groupIndex} className="mb-4">
+                                                    <h4 className="text-sm font-semibold">{group.claim_coverage.interest_insured.INTEREST_INSURED_NAME}</h4>
+                                                    {group.values.map((insured: any, insuredIndex: number) => (
+                                                        <div key={insuredIndex} className="p-2 border-b border-gray-300">
+                                                            <div className="flex justify-between">
+                                                                <span>{insured.VALUE_SUBMIT_COVERAGE}</span>
+                                                            </div>
+                                                            <div className="text-sm text-gray-500">
+                                                                Note: {insured.NOTE_VALUE_SUBMIT_COVERAGE}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ))}
+                                    </div>
+                                ))}
+                            </div>
+                    </>
+                }
+            />
+
+
             <ActionModal
                 submitButtonName={'Register'}
                 headers={'Claim Registration'}
@@ -1033,6 +1094,7 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                         placeholder="Select Potential Insurance Policy"
                                                         options={policyOptionsFilter}
                                                         onChange={(e: any) => {
+
                                                             // Tangani penghapusan (clear) dengan memeriksa nilai e
                                                             const updatedPolicies = [...data.potentialInsurancePolicy];
 
@@ -1619,7 +1681,9 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                                                         <div className="flex flex-col">{sumValue}</div>
                                                                                         <div
                                                                                             className="text-gray-500 text-sm flex italic hover:text-red-400 cursor-pointer"
-                                                                                        // onClick={(e) => removeRow(e)}
+                                                                                        onClick={() => {
+                                                                                            setModal({...modal, historyValue: true})
+                                                                                        }}
                                                                                         >
                                                                                             <ExclamationCircleIcon className="w-6 h-8" />
                                                                                         </div>
@@ -1660,7 +1724,6 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                                                                     <div className="">{latestValue?.VALUE_SUBMIT_COVERAGE}</div>
                                                                                                     <div className="text-gray-500 text-sm flex italic hover:text-red-400 cursor-pointer"
                                                                                                         onClick={(e) => {
-                                                                                                            // update value
                                                                                                             valueRevChange(e, latestValue)
                                                                                                         }}>
                                                                                                         <CogIcon className="w-5 h-5" />
@@ -1705,7 +1768,10 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                                                             {currency}
                                                                                         </div>
                                                                                         <div className="">
-                                                                                            {sumValue}
+                                                                                            {/* {sumValue} */}
+                                                                                            No data
+
+
                                                                                         </div>
                                                                                         <div className="text-gray-500 text-sm flex italic hover:text-red-400 cursor-pointer"
                                                                                             onClick={(e) => removeRow(e)}>
@@ -1724,7 +1790,7 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                                                 <>
                                                                                     <div className="px-4 mt-2 text-center ">
                                                                                         <div className="h-16">
-                                                                                            Values Claim submitted
+                                                                                        Value Proposed By Adjuster
                                                                                         </div>
                                                                                         <div className="">{el?.insured?.reduce((acc: any, curr: any) => {
                                                                                             const existing = acc.find((item: any) => item.claim_coverage.POLICY_COVERAGE_DETAIL_ID === curr.claim_coverage.POLICY_COVERAGE_DETAIL_ID);
@@ -1741,16 +1807,14 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                                                             const latestValue = group.values[group.values.length - 1];
                                                                                             return (
                                                                                                 <div key={index} className={`rounded-md flex justify-between px-4 mt-3 p-2 h-10 ${index % 2 === 0 ? 'bg-slate-200' : ''}`}>
-                                                                                                    <div className="">{currency}</div>
+                                                                                                    {/* <div className="">{currency}</div>
                                                                                                     <div className="">{latestValue?.VALUE_SUBMIT_COVERAGE}</div>
                                                                                                     <div className="text-gray-500 text-sm flex italic hover:text-red-400 cursor-pointer"
                                                                                                         onClick={(e) => {
-                                                                                                            // update value
                                                                                                             valueRevChange(e, latestValue)
                                                                                                         }}>
                                                                                                         <CogIcon className="w-5 h-5" />
-                                                                                                        {/* Rev */}
-                                                                                                    </div>
+                                                                                                    </div> */}
                                                                                                 </div>
                                                                                             );
                                                                                         })}
@@ -1788,9 +1852,11 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                                                     <>
                                                                                         <div className="">
                                                                                             {currency}
+                                                                                        
                                                                                         </div>
                                                                                         <div className="">
-                                                                                            {sumValue}
+                                                                                            {/* {sumValue} */}
+                                                                                            No data
                                                                                         </div>
                                                                                         <div className="text-gray-500 text-sm flex italic hover:text-red-400 cursor-pointer"
                                                                                             onClick={(e) => removeRow(e)}>
@@ -1809,7 +1875,7 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                                                 <>
                                                                                     <div className="px-4 mt-2 text-center ">
                                                                                         <div className="h-16">
-                                                                                            Values Claim submitted
+                                                                                        Agreed Values   
                                                                                         </div>
                                                                                         <div className="">{el?.insured?.reduce((acc: any, curr: any) => {
                                                                                             const existing = acc.find((item: any) => item.claim_coverage.POLICY_COVERAGE_DETAIL_ID === curr.claim_coverage.POLICY_COVERAGE_DETAIL_ID);
@@ -1826,16 +1892,14 @@ export default function Claim({ auth, workbook, relation, agent, policy, causeOf
                                                                                             const latestValue = group.values[group.values.length - 1];
                                                                                             return (
                                                                                                 <div key={index} className={`rounded-md flex justify-between px-4 mt-3 p-2 h-10 ${index % 2 === 0 ? 'bg-slate-200' : ''}`}>
-                                                                                                    <div className="">{currency}</div>
-                                                                                                    <div className="">{latestValue?.VALUE_SUBMIT_COVERAGE}</div>
-                                                                                                    <div className="text-gray-500 text-sm flex italic hover:text-red-400 cursor-pointer"
+                                                                                                    {/* <div className="">{currency}</div> */}
+                                                                                                    {/* <div className="">{latestValue?.VALUE_SUBMIT_COVERAGE}</div> */}
+                                                                                                    {/* <div className="text-gray-500 text-sm flex italic hover:text-red-400 cursor-pointer"
                                                                                                         onClick={(e) => {
-                                                                                                            // update value
                                                                                                             valueRevChange(e, latestValue)
                                                                                                         }}>
                                                                                                         <CogIcon className="w-5 h-5" />
-                                                                                                        {/* Rev */}
-                                                                                                    </div>
+                                                                                                    </div> */}
                                                                                                 </div>
                                                                                             );
                                                                                         })}
