@@ -12,7 +12,7 @@ class Claim extends Model
     protected $primaryKey = 'CLAIM_ID';
     public $timestamps = false;
 
-    protected $with = ['workbook', 'relation', 'policy', 'coverage'];
+    protected $with = ['workbook', 'relation', 'policy', 'coverage', 'user'];
 
     // public function causeOfLoss()
     // {
@@ -38,4 +38,11 @@ class Claim extends Model
     {
         return $this->hasMany(ClaimCoverage::class, 'CLAIM_ID', 'CLAIM_ID');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'CLAIM_CREATED_BY', 'id')
+            ->select('id', 'name');
+    }
+    
 }
